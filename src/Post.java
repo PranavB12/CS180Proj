@@ -1,124 +1,143 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Post implements IPost {
-    private ArrayList<String> comments;
-    private int votes;
-    private String comment;
-    private String postId;
-    private String userId;
-    private String title;
+    private int id;
     private String content;
-    private boolean isHidden;
+    private Picture picture;
+    private boolean hidden;
     private boolean commentsEnabled;
-    
-    public Post(String postId, String userId, String title, String content) {
-        this.postId = postId;
-        this.userId = userId;
-        this.title = title;
+    private int upVotes;
+    private int downVotes;
+    private Map<Integer, String> comments; // Stores comments with unique IDs
+
+    // Static fields for total upvotes and downvotes (as per IPost)
+    public static int totalUpVotes;
+    public static int totalDownVotes;
+
+    // Constructor
+    public Post(String content, Picture picture) {
         this.content = content;
-        this.votes = 0;
-        this.comments = new ArrayList<>();
-        this.isHidden = false;
+        this.picture = picture;
+        this.hidden = false;
         this.commentsEnabled = true;
+        this.upVotes = 0;
+        this.downVotes = 0;
+        this.comments = new HashMap<>();
     }
 
-    // METHODS
+    // IPost Interface Methods
+
+    @Override
     public void upvote() {
-        votes++;
+        this.upVotes++;
+        totalUpVotes++;
+        System.out.println("Post upvoted. Total upvotes: " + this.upVotes);
     }
+
+    @Override
     public void downvote() {
-        votes--;
+        this.downVotes++;
+        totalDownVotes++;
+        System.out.println("Post downvoted. Total downvotes: " + this.downVotes);
     }
 
-    public void enableComments() {
-        commentsEnabled = true;
-    }
-    public void disableComments() {
-        commentsEnabled = false;
+    @Override
+    public void addComment(String comment) {
+        if (!commentsEnabled) {
+            System.out.println("Comments are disabled for this post.");
+            return;
+        }
+        int commentId = comments.size() + 1;
+        comments.put(commentId, comment);
+        System.out.println("Comment added with ID: " + commentId);
     }
 
-    public void addComment(String comment, int commentID) {
-        if (commentsEnabled)  {
-            comments.add(comment);
+    @Override
+    public void deleteComment(int commentId) {
+        if (comments.remove(commentId) != null) {
+            System.out.println("Comment with ID " + commentId + " deleted.");
+        } else {
+            System.out.println("Comment with ID " + commentId + " not found.");
         }
     }
-    
-    public void deleteComment(String comment, int commentID) {
-        if (commentsEnabled)  {
-            comments.remove(commentId); 
-        }
-    }
-    
+
+    @Override
     public void hidePost() {
-        postHidden = true;
-    }
-    
-    public void deletePost() {
-        //
+        this.hidden = true;
+        System.out.println("Post is now hidden.");
     }
 
-    // GETTERS AND SETTERS
-    public int getPostID() {
-        return postId;
+    @Override
+    public void deletePost(User user) {
+        // Ensure the post is removed from the user's list of posts
+        if (user.getPosts().remove(this)) {
+            System.out.println("Post with ID " + this.id + " removed from user's posts.");
+        } else {
+            System.out.println("Post with ID " + this.id + " was not found in user's posts.");
+        }
+
+        // Clear comments and reset upvotes and downvotes
+        comments.clear();
+        totalUpVotes -= this.upVotes;
+        totalDownVotes -= this.downVotes;
+        this.upVotes = 0;
+        this.downVotes = 0;
+        System.out.println("All comments cleared, and upvotes/downvotes reset for post ID: " + this.id);
+
+        // Set hidden status for post, marking it as inactive (optional)
+        this.hidden = true;
+        System.out.println("Post with ID " + this.id + " is now hidden and deleted.");
     }
 
-    public String getUserId() {
-        return userID;
+    @Override
+    public void enableComments() {
+        this.commentsEnabled = true;
+        System.out.println("Comments have been enabled for this post.");
     }
 
-    public String getTitle() {
-        return title;
+    @Override
+    public void disableComments() {
+        this.commentsEnabled = false;
+        System.out.println("Comments have been disabled for this post.");
+    }
+
+    // Getters for compatibility with the User class
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getContent() {
         return content;
     }
 
-    public int getVotes() {
-        return votes;
-    }
-    
-    public List<String> getComments() {
-        return new ArrayList<>(comments); 
+    public Picture getPicture() {
+        return picture;
     }
 
-    public boolean getHidden() {
-        return isHidden;
+    public boolean isHidden() {
+        return hidden;
     }
 
-    public boolean getCommentsEnabled() {
+    public boolean isCommentsEnabled() {
         return commentsEnabled;
     }
+}
 
-    public void setPostId(String postId) {
-        this.postId = postId;
+// Picture class (for completeness)
+public class Picture {
+    private String url;
+
+    public Picture(String url) {
+        this.url = url;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setVotes(int votes) {
-        this.votes = votes;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
-
-    public void setHidden(boolean hidden) {
-        isHidden = hidden;
-    }
-
-    public void setCommentsEnabled(boolean commentsEnabled) {
-        this.commentsEnabled = commentsEnabled;
+    public String getUrl() {
+        return url;
     }
 }
