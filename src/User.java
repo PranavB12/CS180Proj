@@ -62,14 +62,6 @@ public class User extends Post {
         this.name = name;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getDescription() {
         return description;
     }
