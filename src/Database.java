@@ -389,7 +389,7 @@ public class Database implements IDatabase {
                         String[] commentParts = commentLine.split(": ");
                         int commentId = Integer.parseInt(commentParts[0].split(" ")[2]);
                         String commentContent = commentParts[1];
-                        post.addComment(commentId, commentContent);
+                        post.addComment(commentContent);
                     }
 
                     synchronized (postsLock) {
@@ -405,4 +405,5 @@ public class Database implements IDatabase {
         }
     }
 }
+
 
