@@ -1,127 +1,408 @@
-package src;
-
 import java.util.*;
+import java.io.*;
 
 public class Database implements IDatabase {
 
-    // initialize maps that contain the uses and posts
-    private final Map<String, User> users;
-    private final Map<Integer, Post> posts;
+    private final List<User> users = new ArrayList<>();
+    private final Map<Integer, Post> posts = new HashMap<>();
+    private static int postIdCounter = 0;
+    private static final Object postIdLock = new Object();
+    private static final Object usersLock = new Object();
+    private static final Object postsLock = new Object();
 
-    // temporary file path for downloading the necessary data from the server
-    private final String dataFilePath = "data/database.json";
-    // server url
-    private final String dataDumpUrl = "";
-    // counter to assign IDs to posts
-    private int postIdCounter;
-
-    // Constructor
     public Database() {
-        // will have a method call to fetch the data from the server and then parse it into object
-
+        // Load data if necessary
     }
 
-    // database will use sync methods to keep network updated
-
+    // Add a new user to the database
     @Override
     public boolean addUser(User user) {
-        // integrity check
-        // http post to make sure server stays updated
-        // add user to local map
-        return false;
+        if (user == null || userExists(user.getUsername())) {
+            System.out.println("User already exists or invalid user data.");
+            return false;
+        }
+        synchronized (usersLock) {
+            users.add(user);
+        }
+        System.out.println("User added: " + user.getUsername());
+        return true;
     }
 
+    // Remove an existing user from the database
     @Override
     public boolean removeUser(User user) {
-        // integrity check
-        // http post to make sure server stays updated
-        // remove user from local map
-        return false;
+        if (user == null || !userExists(user.getUsername())) {
+            System.out.println("User does not exist.");
+            return false;
+        }
+        synchronized (usersLock) {
+            users.remove(user);
+        }
+        System.out.println("User removed: " + user.getUsername());
+        return true;
     }
 
+    // Account creation method
+    public boolean createAccount(String username, String password, String name) {
+        if (username == null || password == null || name == null) {
+            System.out.println("Invalid content or author does not exist.");
+            return false;
+        }
+        User user = new User(username, password, name);
+        synchronized (usersLock) {
+            users.add(user);
+        }
+        return true;
+    }
+
+    // Validate user credentials
     @Override
     public boolean validateCredentials(String username, String password) {
-        // check validity of credentials
+        User user = findUserByUsername(username);
+        if (user != null && user.getPassword().equals(password)) {
+            System.out.println("Credentials validated for user: " + username);
+            return true;
+        }
+        System.out.println("Invalid credentials.");
         return false;
     }
 
+    // Check if a user exists by username
     @Override
     public boolean userExists(String username) {
-        // check if username already exists
-        return false;
+        return findUserByUsername(username) != null;
     }
 
-    @Override
-    public boolean addFriend(User user, String friendUsername) {
-        // integrity check
-        // add request senders username to friendUsername's pending friend requests
-        return false;
+    // Create a new post by a user
+    public int createPost(String content, User author) {
+        if (content == null || author == null || !userExists(author.getUsername())) {
+            System.out.println("Invalid content or author does not exist.");
+            return -1;
+        }
+        int postId;
+        synchronized (postIdLock) {
+            postId = ++postIdCounter;
+        }
+        Post post = new Post(content, author);
+        post.setId(postId);
+        synchronized (postsLock) {
+            posts.put(post.getId(), post);
+        }
+        System.out.println("Post created with ID: " + post.getId() + " by user: " + author.getUsername());
+        return post.getId();
     }
 
-    @Override
-    public boolean removeFriend(User user, String friendUsername) {
-        // integrity check
-        // Remove friendUsername from Users friends list
-
-        return false;
+    // Delete a post by its ID
+    public boolean deletePost(int postId) {
+        synchronized (postsLock) {
+            if (!posts.containsKey(postId)) {
+                System.out.println("Post with ID " + postId + " does not exist.");
+                return false;
+            }
+            posts.remove(postId);
+        }
+        System.out.println("Post with ID " + postId + " deleted.");
+        return true;
     }
 
-    @Override
-    public boolean blockUser(User user, String blockedUsername) {
-        // integrity check
-        // add blockedUsername to Users blocked user list
-        return false;
+    // View user information and their posts
+    public void viewUser(String username) {
+        User user = findUserByUsername(username);
+        if (user == null) {
+            System.out.println("User does not exist.");
+            return;
+        }
+        System.out.println("User: " + user.getUsername());
+        System.out.println("Name: " + user.getName());
+        System.out.println("Friends: " + user.getFriends().size());
+        System.out.println("Blocked Users: " + user.getBlockedUsers().size());
+        System.out.println("Posts:");
+        synchronized (postsLock) {
+            for (Post post : posts.values()) {
+                if (post.getAuthor().equals(user)) {
+                    System.out.println(" - Post ID: " + post.getId() + ", Content: " + post.getContent());
+                }
+            }
+        }
     }
 
-    @Override
-    public boolean unblockUser(User user, String blockedUsername) {
-        // integrity check
-        // remove blockedUsername from Users blocked user list
-        return false;
+    // Add a friend to a user's friend list
+    public boolean addFriend(User user, User friend) {
+        if (user == null || friend == null || !userExists(user.getUsername()) || !userExists(friend.getUsername())) {
+            System.out.println("One or both users do not exist.");
+            return false;
+        }
+        synchronized (usersLock) {
+            if (user.getFriends().contains(friend)) {
+                System.out.println("Friend already added.");
+                return false;
+            }
+            user.getFriends().add(friend);
+            friend.getFriends().add(user);
+        }
+        System.out.println("Friend added: " + friend.getUsername() + " to user: " + user.getUsername());
+        return true;
     }
 
-    @Override
-    public List<String> getFriendsList(User user) {
-        // return list of string reference for friend usernames
+    // Remove a friend from a user's friend list
+    public boolean removeFriend(User user, User friend) {
+        if (user == null || friend == null || !userExists(user.getUsername()) || !userExists(friend.getUsername())) {
+            System.out.println("One or both users do not exist.");
+            return false;
+        }
+        synchronized (usersLock) {
+            if (!user.getFriends().remove(friend)) {
+                System.out.println("Friend not found in list.");
+                return false;
+            }
+            friend.getFriends().remove(user);
+        }
+        System.out.println("Friend removed: " + friend.getUsername() + " from user: " + user.getUsername());
+        return true;
+    }
+
+    // Block a user and remove them from friends if necessary
+    public boolean blockUser(User user, User toBlock) {
+        if (user == null || toBlock == null || !userExists(user.getUsername()) || !userExists(toBlock.getUsername())) {
+            System.out.println("One or both users do not exist.");
+            return false;
+        }
+        synchronized (usersLock) {
+            if (user.getBlockedUsers().contains(toBlock)) {
+                System.out.println("User is already blocked.");
+                return false;
+            }
+            user.getBlockedUsers().add(toBlock);
+            user.getFriends().remove(toBlock);
+            toBlock.getFriends().remove(user);
+        }
+        System.out.println("User blocked: " + toBlock.getUsername() + " by user: " + user.getUsername());
+        return true;
+    }
+
+    // Helper method to find a user by username
+    private User findUserByUsername(String username) {
+        synchronized (usersLock) {
+            for (User user : users) {
+                if (user.getUsername().equals(username)) {
+                    return user;
+                }
+            }
+        }
         return null;
     }
 
-    @Override
-    public List<String> getBlockedList(User user) {
-        // return list of string reference for blocked usernames
-        return null;
+    // Upvote a post
+    public void upvotePost(int postId) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.upvote();
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
     }
 
-    @Override
-    public int addPost(Post post) {
-        // add post to database and return an ID which is stored in the user object.
-        return 0;
+    // Downvote a post
+    public void downvotePost(int postId) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.downvote();
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
     }
 
-    @Override
-    public boolean deletePost(int postID) {
-        // integrity check to make sure postID is posted by User
-        return false;
+    // Add a comment to a post
+    public void addCommentToPost(int postId, String comment) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.addComment(comment);
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
     }
 
-    @Override
-    public boolean enableComments(int postID) {
-        // integrity check to make sure postID is posted by User
-        // Set comments to true in post
-        return false;
+    // Delete a comment from a post
+    public void deleteCommentFromPost(int postId, int commentId) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.deleteComment(commentId);
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
     }
 
-    @Override
-    public boolean disableComments(int postID) {
-        // integrity check to make sure postID is posted by User
-        // Set comments to false in post
-        return false;
+    // Hide a post
+    public void hidePost(int postId) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.hidePost();
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
     }
 
-    @Override
-    public List<Integer> getUserPosts(String username) {
-        // return a list of postIDs for parameter Username
-        return null;
+    // Enable comments for a post
+    public void enableCommentsForPost(int postId) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.enableComments();
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
     }
 
+    // Disable comments for a post
+    public void disableCommentsForPost(int postId) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
+        if (post != null) {
+            post.disableComments();
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
+    }
+    public void saveDatabaseToFile(String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.write("Users:\n");
+            for (User user : users) {
+                writer.write("Username: " + user.getUsername() + ", Name: " + user.getName() + "\n");
+                writer.write("Friends: ");
+                for (User friend : user.getFriends()) {
+                    writer.write(friend.getUsername() + " ");
+                }
+                writer.write("\nBlocked Users: ");
+                for (User blocked : user.getBlockedUsers()) {
+                    writer.write(blocked.getUsername() + " ");
+                }
+                writer.write("\nPosts:\n");
+                for (Post post : posts.values()) {
+                    if (post.getAuthor().equals(user)) {
+                        writer.write(" - Post ID: " + post.getId() + ", Content: " + post.getContent() + "\n");
+                        writer.write("   Upvotes: " + post.getUpVotes() + ", Downvotes: " + post.getDownVotes() + "\n");
+                        writer.write("   Comments:\n");
+                        for (Map.Entry<Integer, String> comment : post.getComments().entrySet()) {
+                            writer.write("    - ID " + comment.getKey() + ": " + comment.getValue() + "\n");
+                        }
+                    }
+                }
+                writer.write("\n");
+            }
+            System.out.println("Database saved to " + filename);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the database: " + e.getMessage());
+        }
+    }
+    public void readDatabaseFromFile(String filename) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            User currentUser = null;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                if (line.startsWith("Username:")) {
+                    // Parse user details
+                    String[] parts = line.split(", ");
+                    String username = parts[0].split(": ")[1];
+                    String name = parts[1].split(": ")[1];
+                    currentUser = new User(username, "", name); // Password left empty for security reasons
+                    synchronized (usersLock) {
+                        users.add(currentUser);
+                    }
+                } else if (line.startsWith("Friends:")) {
+                    // Parse friends for the current user
+                    String[] friends = line.substring("Friends: ".length()).split(" ");
+                    for (String friendUsername : friends) {
+                        User friend = findUserByUsername(friendUsername);
+                        if (friend != null) {
+                            currentUser.getFriends().add(friend);
+                        }
+                    }
+                } else if (line.startsWith("Blocked Users:")) {
+                    // Parse blocked users for the current user
+                    String[] blockedUsers = line.substring("Blocked Users: ".length()).split(" ");
+                    for (String blockedUsername : blockedUsers) {
+                        User blockedUser = findUserByUsername(blockedUsername);
+                        if (blockedUser != null) {
+                            currentUser.getBlockedUsers().add(blockedUser);
+                        }
+                    }
+                } else if (line.startsWith(" - Post ID:")) {
+                    // Parse post details
+                    String[] parts = line.split(", ");
+                    int postId = Integer.parseInt(parts[0].split(": ")[1]);
+                    String content = parts[1].split(": ")[1];
+                    Post post = new Post(content, currentUser);
+                    post.setId(postId);
+
+                    // Parse upvotes and downvotes
+                    String upvotesLine = reader.readLine().trim();
+                    String downvotesLine = reader.readLine().trim();
+                    post.setUpVotes(Integer.parseInt(upvotesLine.split(": ")[1]));
+                    post.setDownVotes(Integer.parseInt(downvotesLine.split(": ")[1]));
+
+                    // Parse comments
+                    String commentLine;
+                    while ((commentLine = reader.readLine()) != null && commentLine.startsWith("    - ID ")) {
+                        String[] commentParts = commentLine.split(": ");
+                        int commentId = Integer.parseInt(commentParts[0].split(" ")[2]);
+                        String commentContent = commentParts[1];
+                        post.addComment(commentId, commentContent);
+                    }
+
+                    synchronized (postsLock) {
+                        posts.put(post.getId(), post);
+                    }
+                }
+            }
+            System.out.println("Database loaded from " + filename);
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + filename);
+        } catch (IOException e) {
+            System.out.println("An error occurred while reading the database: " + e.getMessage());
+        }
+    }
 }
+
