@@ -3,6 +3,17 @@ package src;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Post Class, where each individual Post is managed
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
+
 public class Post implements IPost {
     public User author;
     private int id;

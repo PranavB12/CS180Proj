@@ -8,6 +8,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * User class, where User's data is managed
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
+
 public class User extends Post {
 
     private String username;

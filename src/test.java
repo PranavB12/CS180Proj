@@ -2,6 +2,17 @@ package src;
 
 import java.util.List;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * test (placeholder main method used for DataBase test cases)
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
+
 public class test {
 
     public static void main(String[] args) {

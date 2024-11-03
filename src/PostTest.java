@@ -8,6 +8,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Post Class JUnits
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
+
 class PostTest {
     private User testUser;
     private Post testPost;
