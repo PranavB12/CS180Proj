@@ -1,4 +1,4 @@
-public class FriendException extends RuntimeException {
+public class FriendException extends RuntimeException implements IFriendException {
     public FriendException(String message) {
         super(message);
     }
