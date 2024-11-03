@@ -5,15 +5,17 @@ import java.io.*;
 
 public abstract class Database implements IDatabase {
 
-    private final List<User> users = new ArrayList<>();
-    private final Map<Integer, Post> posts = new HashMap<>();
+    private ArrayList<User> users = new ArrayList<>();
+    private Map<Integer, Post> posts = new HashMap<>();
     private static int postIdCounter = 0;
     private static final Object postIdLock = new Object();
     private static final Object usersLock = new Object();
     private static final Object postsLock = new Object();
 
-    public Database() {
-        // Load data if necessary
+    public Database(List<User> users, Map<Integer, Post> posts) {
+        this.posts = posts;
+        this.users = new ArrayList<>();
+        this.posts = new HashMap<>();
     }
 
     // Add a new user to the database
@@ -33,7 +35,8 @@ public abstract class Database implements IDatabase {
     // Remove an existing user from the database
     @Override
     public boolean removeUser(User user) {
-        if (user == null || !userExists(user.getUsername())) {
+        // This needs to be fixed -> if (user == null || !userExists(user.getUsername()))
+        if (user == null) {
             System.out.println("User does not exist.");
             return false;
         }
@@ -113,11 +116,11 @@ public abstract class Database implements IDatabase {
     }
 
     // View user information and their posts
-    public void viewUser(String username) {
+    public User viewUser(String username) {
         User user = findUserByUsername(username);
         if (user == null) {
             System.out.println("User does not exist.");
-            return;
+            return user;
         }
         System.out.println("User: " + user.getUsername());
         System.out.println("Name: " + user.getName());
@@ -131,6 +134,7 @@ public abstract class Database implements IDatabase {
                 }
             }
         }
+        return user;
     }
 
     // Add a friend to a user's friend list
@@ -190,8 +194,11 @@ public abstract class Database implements IDatabase {
     // Helper method to find a user by username
     private User findUserByUsername(String username) {
         synchronized (usersLock) {
+            // users is not iterating through anything because users is null
+            System.out.println("Before the for loop " + users.size());
             for (User user : users) {
-                if (user.getUsername().equals(username)) {
+                System.out.println("User in Database Class Username: " + user.getUsername());
+                if (user.getUsername().trim().equals(username.trim())) {
                     return user;
                 }
             }
@@ -434,8 +441,5 @@ public abstract class Database implements IDatabase {
             System.out.println("An error occurred while reading the database: " + e.getMessage());
         }
     }
-
-
 }
-
 
