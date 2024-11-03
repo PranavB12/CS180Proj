@@ -1,3 +1,7 @@
+package src;
+
+import src.Picture;
+
 // IUser Interface
 public interface IUser {
     void createAccount(String username, String password, Picture profilePicture);

@@ -1,3 +1,8 @@
+package src;
+
+import src.Post;
+import src.User;
+
 import java.util.*;
 public class NewsFeed {
     private List<Post> posts;
@@ -7,7 +12,7 @@ public class NewsFeed {
         List<User> friends = user.getFriends();
         for (int i = 0; i < friends.size(); i++) {
             User friend = friends.get(i);
-            List<User> friendPosts = friend.getPosts();
+            List<Post> friendPosts = friend.getPosts();
             for (int j = 0; j < friendPosts.size(); j++) {
                 posts.add(friendPosts.get(j));
             }

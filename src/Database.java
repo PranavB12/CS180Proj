@@ -1,7 +1,9 @@
+package src;
+
 import java.util.*;
 import java.io.*;
 
-public class Database implements IDatabase {
+public abstract class Database implements IDatabase {
 
     private final List<User> users = new ArrayList<>();
     private final Map<Integer, Post> posts = new HashMap<>();
@@ -83,7 +85,12 @@ public class Database implements IDatabase {
         synchronized (postIdLock) {
             postId = ++postIdCounter;
         }
-        Post post = new Post(content, author);
+        Post post = new Post(content, author) {
+            @Override
+            public void deletePost() {
+
+            }
+        };
         post.setId(postId);
         synchronized (postsLock) {
             posts.put(post.getId(), post);
@@ -345,55 +352,78 @@ public class Database implements IDatabase {
                 if (line.startsWith("Username:")) {
                     // Parse user details
                     String[] parts = line.split(", ");
-                    String username = parts[0].split(": ")[1];
-                    String name = parts[1].split(": ")[1];
-                    currentUser = new User(username, "", name); // Password left empty for security reasons
-                    synchronized (usersLock) {
-                        users.add(currentUser);
+                    if (parts.length >= 2) {
+                        String[] usernameParts = parts[0].split(": ");
+                        String[] nameParts = parts[1].split(": ");
+                        String username = (usernameParts.length > 1) ? usernameParts[1] : "";
+                        String name = (nameParts.length > 1) ? nameParts[1] : "";
+                        currentUser = new User(username, "", name); // Password left empty for security reasons
+                        synchronized (usersLock) {
+                            users.add(currentUser);
+                        }
                     }
-                } else if (line.startsWith("Friends:")) {
+                } else if (line.startsWith("Friends:") && currentUser != null) {
                     // Parse friends for the current user
-                    String[] friends = line.substring("Friends: ".length()).split(" ");
-                    for (String friendUsername : friends) {
-                        User friend = findUserByUsername(friendUsername);
-                        if (friend != null) {
-                            currentUser.getFriends().add(friend);
+                    String friendsList = line.substring("Friends: ".length()).trim();
+                    if (!friendsList.isEmpty()) {
+                        String[] friends = friendsList.split(" ");
+                        for (String friendUsername : friends) {
+                            User friend = findUserByUsername(friendUsername);
+                            if (friend != null) {
+                                currentUser.getFriends().add(friend);
+                            }
                         }
                     }
-                } else if (line.startsWith("Blocked Users:")) {
+                } else if (line.startsWith("Blocked Users:") && currentUser != null) {
                     // Parse blocked users for the current user
-                    String[] blockedUsers = line.substring("Blocked Users: ".length()).split(" ");
-                    for (String blockedUsername : blockedUsers) {
-                        User blockedUser = findUserByUsername(blockedUsername);
-                        if (blockedUser != null) {
-                            currentUser.getBlockedUsers().add(blockedUser);
+                    String blockedList = line.substring("Blocked Users: ".length() - 1).trim();
+                    if (!blockedList.isEmpty()) {
+                        String[] blockedUsers = blockedList.split(" ");
+                        for (String blockedUsername : blockedUsers) {
+                            User blockedUser = findUserByUsername(blockedUsername);
+                            if (blockedUser != null) {
+                                currentUser.getBlockedUsers().add(blockedUser);
+                            }
                         }
                     }
-                } else if (line.startsWith(" - Post ID:")) {
+                } else if (line.startsWith(" - Post ID:") && currentUser != null) {
                     // Parse post details
                     String[] parts = line.split(", ");
-                    int postId = Integer.parseInt(parts[0].split(": ")[1]);
-                    String content = parts[1].split(": ")[1];
-                    Post post = new Post(content, currentUser);
-                    post.setId(postId);
+                    if (parts.length >= 2) {
+                        String[] postIdParts = parts[0].split(": ");
+                        String[] contentParts = parts[1].split(": ");
+                        int postId = (postIdParts.length > 1) ? Integer.parseInt(postIdParts[1]) : -1;
+                        String content = (contentParts.length > 1) ? contentParts[1] : "";
+                        Post post = new Post(content, currentUser) {
+                            @Override
+                            public void deletePost() {
 
-                    // Parse upvotes and downvotes
-                    String upvotesLine = reader.readLine().trim();
-                    String downvotesLine = reader.readLine().trim();
-                    post.setUpVotes(Integer.parseInt(upvotesLine.split(": ")[1]));
-                    post.setDownVotes(Integer.parseInt(downvotesLine.split(": ")[1]));
+                            }
+                        };
+                        post.setId(postId);
 
-                    // Parse comments
-                    String commentLine;
-                    while ((commentLine = reader.readLine()) != null && commentLine.startsWith("    - ID ")) {
-                        String[] commentParts = commentLine.split(": ");
-                        int commentId = Integer.parseInt(commentParts[0].split(" ")[2]);
-                        String commentContent = commentParts[1];
-                        post.addComment(commentContent);
-                    }
+                        // Parse upvotes and downvotes
+                        String upvotesLine = reader.readLine().trim();
+                        String downvotesLine = reader.readLine().trim();
+                        if (upvotesLine.startsWith("Upvotes:") && downvotesLine.startsWith("Downvotes:")) {
+                            post.setUpVotes(Integer.parseInt(upvotesLine.split(": ")[1]));
+                            post.setDownVotes(Integer.parseInt(downvotesLine.split(": ")[1]));
+                        }
 
-                    synchronized (postsLock) {
-                        posts.put(post.getId(), post);
+                        // Parse comments
+                        String commentLine;
+                        while ((commentLine = reader.readLine()) != null && commentLine.startsWith("    - ID ")) {
+                            String[] commentParts = commentLine.split(": ");
+                            if (commentParts.length >= 2) {
+                                int commentId = Integer.parseInt(commentParts[0].split(" ")[2]);
+                                String commentContent = commentParts[1];
+                                post.addComment(commentContent);
+                            }
+                        }
+
+                        synchronized (postsLock) {
+                            posts.put(post.getId(), post);
+                        }
                     }
                 }
             }
@@ -404,6 +434,8 @@ public class Database implements IDatabase {
             System.out.println("An error occurred while reading the database: " + e.getMessage());
         }
     }
+
+
 }
 
 

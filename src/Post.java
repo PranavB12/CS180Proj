@@ -1,9 +1,9 @@
+package src;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Post implements IPost {
+public abstract class Post implements IPost {
     public User author;
     private static int id;
     private String content;
@@ -28,6 +28,9 @@ public class Post implements IPost {
         this.upVotes = 0;
         this.downVotes = 0;
         this.comments = new HashMap<>();
+    }
+
+    public Post() {
     }
 
     // IPost Interface Methods
@@ -154,16 +157,4 @@ public class Post implements IPost {
 
 }
 
-// Picture class (for completeness)
-public class Picture {
-    private String url;
-
-    public Picture(String url) {
-        this.url = url;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-}
 
