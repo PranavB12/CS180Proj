@@ -39,7 +39,7 @@ public class NewsFeed {
 
         // Display each post
         for (Post post : posts) {
-            System.out.println(post);
+            System.out.println(post.toString());
         }
     }
 
