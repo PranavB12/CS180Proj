@@ -1,6 +1,7 @@
 package src;
 
 // Picture class (for completeness)
+
 public class Picture {
     private String url;
 

@@ -4,6 +4,7 @@ import src.Post;
 import src.User;
 
 import java.util.*;
+
 public class NewsFeed {
     private List<Post> posts;
     // Deleting a Post

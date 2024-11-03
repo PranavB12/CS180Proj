@@ -10,6 +10,7 @@ import java.util.List;
  */
 
 public class User extends Post {
+
     private String username;
     private String password;
     private String name;
@@ -89,7 +90,7 @@ public class User extends Post {
         return this.posts;
     }
 
-    @Override
+
     public void deletePost() {
 
     }

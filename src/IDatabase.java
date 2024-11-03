@@ -1,29 +1,44 @@
 package src;
 
-import java.util.List;
-
-// IDatabase Interface
 public interface IDatabase {
 
     boolean addUser(User user);
+
     boolean removeUser(User user);
+
+    boolean createAccount(String username, String password, String name);
+
     boolean validateCredentials(String username, String password);
+
     boolean userExists(String username);
 
-    boolean addFriend(User user, String friendUsername);
-    boolean removeFriend(User user, String friendUsername);
-    boolean blockUser(User user, String blockedUsername);
-    boolean unblockUser(User user, String blockedUsername);
-    List<String> getFriendsList(User user);
-    List<String> getBlockedList(User user);
+    int createPost(String content, User author);
 
+    boolean deletePost(int postId);
 
-    int addPost(Post post);
-    boolean deletePost(int postID);
-    boolean enableComments(int postID);
-    boolean disableComments(int postID);
-    List<Integer> getUserPosts(User user);
+    User viewUser(String username);
 
+    boolean addFriend(User user, User friend);
 
+    boolean removeFriend(User user, User friend);
 
+    boolean blockUser(User user, User toBlock);
+
+    void upvotePost(int postId);
+
+    void downvotePost(int postId);
+
+    void addCommentToPost(int postId, String comment);
+
+    void deleteCommentFromPost(int postId, int commentId);
+
+    void hidePost(int postId);
+
+    void enableCommentsForPost(int postId);
+
+    void disableCommentsForPost(int postId);
+
+    void saveDatabaseToFile(String filename);
+
+    void readDatabaseFromFile(String filename);
 }
