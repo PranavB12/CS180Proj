@@ -24,8 +24,15 @@ class DatabaseTest {
         userList.add(alice);
         userList.add(bob);
         userList.add(charlie);
+        HashMap<Integer, Post> posts = new HashMap<>();
+        Post newPost1 = new PostImpl("This is Alice's new post", userList.get(0));
+        Post newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        Post newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        posts.put(newPost1.getId(), newPost1);
+        posts.put(newPost2.getId(), newPost2);
+        posts.put(newPost3.getId(), newPost3);
 
-        DatabaseImpl databaseImpl = new DatabaseImpl(userList, null);
+        DatabaseImpl database = new DatabaseImpl(userList, posts);
 
     }
 
@@ -55,10 +62,7 @@ class DatabaseTest {
 
         DatabaseImpl database = new DatabaseImpl(userList, null);
 
-        System.out.println("Size: " + userList.size());
-        System.out.println("User 1 " + userList.getFirst().getUsername());
         int i=0 ;
-        System.out.println("User 1 " + userList.get(i).getUsername());
         User userToRemove = userList.get(i);
         assertTrue(database.removeUser(userToRemove), "User should be removed successfully.");
         assertFalse(database.userExists(userToRemove.getUsername()), "Removed user should not exist.");
@@ -66,6 +70,13 @@ class DatabaseTest {
 
     @Test
     void createAccount() {
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
         DatabaseImpl database = new DatabaseImpl(userList, null);
         User newUser = new User("newUser123", "password123", "New User");
         assertTrue(database.addUser(newUser), "Account creation should be successful.");
@@ -75,14 +86,28 @@ class DatabaseTest {
     // fails because of findUserByUsername
     @Test
     void validateCredentials() {
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
         DatabaseImpl database = new DatabaseImpl(userList, null);
         assertTrue(database.validateCredentials("alice123", "password1"), "Credentials should be valid for Alice.");
         assertFalse(database.validateCredentials("bob456", "wrongpassword"), "Credentials should be invalid with incorrect password.");
     }
 
-    // fails
+    // fails because of UserExists method and findUserByUsername
     @Test
     void userExists() {
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
         DatabaseImpl database = new DatabaseImpl(userList, null);
         assertTrue(database.userExists("alice123"), "Alice should exist in the database.");
         assertFalse(database.userExists("unknownUser"), "Unknown user should not exist.");
@@ -114,29 +139,77 @@ class DatabaseTest {
         assertTrue(database.deletePost(postId), "Post should be deleted successfully.");
     }
 
+    // fails because of findUserByUsername
     @Test
     void viewUser() {
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+        DatabaseImpl database = new DatabaseImpl(userList, null);
+
         User viewedUser = database.viewUser("alice123");
         assertNotNull(viewedUser, "User should be viewable in the database.");
         assertEquals("Alice", viewedUser.getName(), "Viewed user should match expected details.");
     }
 
+    // fails because of UserExists
     @Test
     void addFriend() {
-        assertTrue(database.addFriend(userList.get(0), "bob456"), "Should be able to add Bob as a friend.");
-    }
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+        DatabaseImpl database = new DatabaseImpl(userList, null);
 
+        assertTrue(database.addFriend(userList.get(0), userList.get(1)), "Should be able to add Bob as a friend.");
+    }
+    // fails because of UserExists
     @Test
     void removeFriend() {
-        assertTrue(database.addFriend(userList.get(0), "bob456"), "Should be able to add Bob as a friend.");
-        assertTrue(database.removeFriend(userList.get(0), "bob456"), "Should be able to remove Bob from friends.");
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+        DatabaseImpl database = new DatabaseImpl(userList, null);
+
+        assertTrue(database.addFriend(userList.get(0), userList.get(1)), "Should be able to add Bob as a friend.");
+        assertTrue(database.removeFriend(userList.get(0), userList.get(1)), "Should be able to remove Bob from friends.");
     }
 
+    // fails because of UserExists
     @Test
     void blockUser() {
-        assertTrue(database.blockUser(userList.get(0), "charlie789"), "Should be able to block Charlie.");
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+        HashMap<Integer, Post> posts = new HashMap<>();
+        Post newPost1 = new PostImpl("This is Alice's new post", userList.get(0));
+        Post newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        Post newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        posts.put(newPost1.getId(), newPost1);
+        posts.put(newPost2.getId(), newPost2);
+        posts.put(newPost3.getId(), newPost3);
+
+        DatabaseImpl database = new DatabaseImpl(userList, posts);
+
+        assertTrue(database.blockUser(userList.get(0), userList.get(2)), "Should be able to block Charlie.");
     }
 
+    // fails
     @Test
     void upvotePost() {
         User alice = new User("alice123", "password1", "Alice");
@@ -151,48 +224,136 @@ class DatabaseTest {
         Post newPost1 = new PostImpl("This is Alice's new post", userList.get(0));
         Post newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
         Post newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
-        posts.put(newPost1.getId(), newPost1);
-        posts.put(newPost2.getId(), newPost2);
-        posts.put(newPost3.getId(), newPost3);
+        newPost1.setId(1);
+        newPost2.setId(2);
+        newPost3.setId(3);
+        posts.put(1, newPost1);
+        posts.put(2, newPost2);
+        posts.put(3, newPost3);
 
         DatabaseImpl databaseImpl = new DatabaseImpl(userList, posts);
         int postIdToUpvote = newPost1.getId();
         Post post = posts.get(postIdToUpvote);
+
         int beforeUpVoting = post.getUpVotes();
-        System.out.println("Before voting: " + beforeUpVoting);
+
         databaseImpl.upvotePost(postIdToUpvote);
 
         // Check that the upvote count increased by 1
         assertEquals(beforeUpVoting + 1, post.getUpVotes(), "Upvote count should increase by 1.");
     }
-    /**
+
+    // fails
     @Test
     void downvotePost() {
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+
+        HashMap<Integer, Post> posts = new HashMap<>();
+        PostImpl newPost1 = new PostImpl("This is Alice's new post", userList.get(0));
+        PostImpl newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        PostImpl newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        newPost1.setId(1);
+        newPost2.setId(2);
+        newPost3.setId(3);
+        posts.put(newPost1.getId(), newPost1);
+        posts.put(newPost2.getId(), newPost2);
+        posts.put(newPost3.getId(), newPost3);
+        System.out.println(posts.size());
+
+        DatabaseImpl databaseImpl = new DatabaseImpl(userList, posts);
         PostImpl post = new PostImpl("Downvote this post", userList.get(1));
-        int postId = database.addPost(post);
-        assertTrue(database.downvotePost(postId), "Post should be downvoted successfully.");
+        int i = 0;
+        List<Integer> postId = databaseImpl.getUserPosts(userList.get(i));
+        databaseImpl.downvotePost(postId.get(i));
     }
 
     @Test
     void addCommentToPost() {
-        PostImpl post = new PostImpl("Comment on this post", userList.get(1));
-        int postId = database.addPost(post);
-        assertTrue(database.addCommentToPost(postId, "This is a comment", userList.get(0)), "Comment should be added to post.");
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+
+        HashMap<Integer, Post> posts = new HashMap<>();
+        PostImpl newPost1 = new PostImpl("This is Alice's post", userList.get(0));
+        PostImpl newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        PostImpl newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        newPost1.setId(1);
+        newPost2.setId(2);
+        newPost3.setId(3);
+        posts.put(1, newPost1);
+        posts.put(2, newPost2);
+        posts.put(3, newPost3);
+
+        DatabaseImpl databaseImpl = new DatabaseImpl(userList, posts);
+        databaseImpl.addCommentToPost(1, "This is a comment.");
+
+
+        Map<Integer, String> comments = posts.get(1).getComments();
+        assertEquals("Expected one comment in the map", 1);
     }
+
 
     @Test
     void deleteCommentFromPost() {
-        PostImpl post = new PostImpl("Post with comments", userList.get(1));
-        int postId = database.addPost(post);
-        int commentId = database.addCommentToPost(postId, "This is a comment", userList.get(0));
-        assertTrue(database.deleteCommentFromPost(postId, commentId), "Comment should be deleted from post.");
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+
+        HashMap<Integer, Post> posts = new HashMap<>();
+        PostImpl newPost1 = new PostImpl("This is Alice's post", userList.get(0));
+        PostImpl newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        PostImpl newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        newPost1.setId(1);
+        newPost2.setId(2);
+        newPost3.setId(3);
+        posts.put(1, newPost1);
+        posts.put(2, newPost2);
+        posts.put(3, newPost3);
+
+        DatabaseImpl databaseImpl = new DatabaseImpl(userList, posts);
+        databaseImpl.addCommentToPost(1, "This is a comment.");
+        //Need to add Comment ID to the Post - Is it defined as a Hashmap making it challenging.
+        //assertTrue(database.deleteCommentFromPost(postId, commentId), "Comment should be deleted from post.");
     }
 
     @Test
     void hidePost() {
-        PostImpl post = new PostImpl("Hide this post", userList.get(1));
-        int postId = database.addPost(post);
-        assertTrue(database.hidePost(postId), "Post should be hidden successfully.");
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+
+        HashMap<Integer, Post> posts = new HashMap<>();
+        PostImpl newPost1 = new PostImpl("This is Alice's post", userList.get(0));
+        PostImpl newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        PostImpl newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        newPost1.setId(1);
+        newPost2.setId(2);
+        newPost3.setId(3);
+        posts.put(1, newPost1);
+        posts.put(2, newPost2);
+        posts.put(3, newPost3);
+
+        DatabaseImpl databaseImpl = new DatabaseImpl(userList, posts);
+        //Integer x = 1 ;
+        //assertTrue(database.hidePost(newPost1.getId()), "Post should be hidden successfully.");
     }
 
     @Test
@@ -211,11 +372,36 @@ class DatabaseTest {
 
     @Test
     void saveDatabaseToFile() {
-        assertTrue(database.saveDatabaseToFile("database.txt"), "Database should be saved to file successfully.");
+        User alice = new User("alice123", "password1", "Alice");
+        User bob = new User("bob456", "password2", "Bob");
+        User charlie = new User("charlie789", "password3", "Charlie");
+        userList = new ArrayList<>();
+        userList.add(alice);
+        userList.add(bob);
+        userList.add(charlie);
+
+        HashMap<Integer, Post> posts = new HashMap<>();
+        PostImpl newPost1 = new PostImpl("This is Alice's post", userList.get(0));
+        PostImpl newPost2 = new PostImpl("This is a Bob's post", userList.get(1));
+        PostImpl newPost3 = new PostImpl("This is a Charlie's post", userList.get(2));
+        newPost1.setId(1);
+        newPost2.setId(2);
+        newPost3.setId(3);
+        posts.put(1, newPost1);
+        posts.put(2, newPost2);
+        posts.put(3, newPost3);
+
+        DatabaseImpl databaseImpl = new DatabaseImpl(userList, posts);
+        databaseImpl.saveDatabaseToFile("database.txt");
+       //assertTrue(databaseImpl.saveDatabaseToFile("database.txt" ) , "Database should be saved to file successfully.");
     }
 
     @Test
     void readDatabaseFromFile() {
-        assertTrue(database.readDatabaseFromFile("database.txt"), "Database should be read from file successfully.");
-    }*/
+
+        DatabaseImpl databaseImpl = new DatabaseImpl(null, null);
+        databaseImpl.readDatabaseFromFile("database.txt") ;
+        //assertTrue(database.readDatabaseFromFile("database.txt"), "Database should be read from file successfully.");
+    }
+
 }
