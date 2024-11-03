@@ -19,6 +19,12 @@ public class Database implements IDatabase {
 //    }
 
     // Add a new user to the database
+    public ArrayList<User> getUsers() {
+        return users;
+    }
+    public Map<Integer, Post> getPosts() {
+        return posts;
+    }
     @Override
     public boolean addUser(User user) {
         if (user == null || userExists(user.getUsername())) {
@@ -88,11 +94,7 @@ public class Database implements IDatabase {
         synchronized (postIdLock) {
             postId = ++postIdCounter;
         }
-        Post post = new Post(content, author) {
-            public void deletePost() {
-
-            }
-        };
+        Post post = new Post(content, author, postId);
         post.setId(postId);
         synchronized (postsLock) {
             posts.put(post.getId(), post);
@@ -193,13 +195,12 @@ public class Database implements IDatabase {
     // Helper method to find a user by username
     private User findUserByUsername(String username) {
         synchronized (usersLock) {
-            System.out.println("Before the for loop " + users.size());
-            if (users.size() != 0) {
-                for (User user : users) {
-                    System.out.println("User in Database Class Username: " + user.getUsername());
-                    if (user.getUsername().trim().equals(username.trim())) {
-                        return user;
-                    }
+            // users is not iterating through anything because users is null
+
+            for (User user : users) {
+                //System.out.println("User in Database Class Username: " + user.getUsername());
+                if (user.getUsername().trim().equals(username.trim())) {
+                    return user;
                 }
             }
         }
@@ -321,7 +322,7 @@ public class Database implements IDatabase {
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write("Users:\n");
             for (User user : users) {
-                writer.write("Username: " + user.getUsername() + ", Name: " + user.getName() + "\n");
+                writer.write("Username: " + user.getUsername() + ", Password: " + user.getPassword() + ", Name: " + user.getName() + "\n");
                 writer.write("Friends: ");
                 for (User friend : user.getFriends()) {
                     writer.write(friend.getUsername() + " ");
@@ -359,12 +360,14 @@ public class Database implements IDatabase {
                 if (line.startsWith("Username:")) {
                     // Parse user details
                     String[] parts = line.split(", ");
-                    if (parts.length >= 2) {
+                    if (parts.length >= 3) {
                         String[] usernameParts = parts[0].split(": ");
-                        String[] nameParts = parts[1].split(": ");
+                        String[] passwordParts = parts[1].split(": ");
+                        String[] nameParts = parts[2].split(": ");
                         String username = (usernameParts.length > 1) ? usernameParts[1] : "";
+                        String password = (passwordParts.length > 1) ? passwordParts[1] : "";
                         String name = (nameParts.length > 1) ? nameParts[1] : "";
-                        currentUser = new User(username, "", name); // Password left empty for security reasons
+                        currentUser = new User(username, password, name); // Password left empty for security reasons
                         synchronized (usersLock) {
                             users.add(currentUser);
                         }
@@ -401,7 +404,7 @@ public class Database implements IDatabase {
                         String[] contentParts = parts[1].split(": ");
                         int postId = (postIdParts.length > 1) ? Integer.parseInt(postIdParts[1]) : -1;
                         String content = (contentParts.length > 1) ? contentParts[1] : "";
-                        Post post = new Post(content, currentUser) {
+                        Post post = new Post(content, currentUser, postId) {
                             public void deletePost() {
 
                             }
@@ -441,4 +444,3 @@ public class Database implements IDatabase {
         }
     }
 }
-
