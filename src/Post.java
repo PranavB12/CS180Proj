@@ -51,6 +51,7 @@ public class Post implements IPost {
         System.out.println("Post downvoted. Total downvotes: " + totalDownVotes);
     }
 
+    
     @Override
     public void addComment(String comment) {
         if (!commentsEnabled) {

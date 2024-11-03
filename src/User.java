@@ -10,6 +10,7 @@ import java.util.List;
  */
 
 public class User extends Post {
+
     private String username;
     private String password;
     private String name;

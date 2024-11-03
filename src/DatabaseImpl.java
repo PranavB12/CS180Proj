@@ -8,6 +8,7 @@
 //    public DatabaseImpl(List<User> users, Map<Integer, Post> posts) {
 //        super(users, posts);
 //    }
+
 //
 //    @Override
 //    public boolean addFriend(User user, String friendUsername) {

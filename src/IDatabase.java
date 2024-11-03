@@ -1,6 +1,5 @@
 package src;
 
-import java.util.List;
 public interface IDatabase {
 
     boolean addUser(User user);

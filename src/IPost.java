@@ -2,6 +2,7 @@ package src;
 
 import java.util.Map;
 
+
 public interface IPost {
 
     void upvote();

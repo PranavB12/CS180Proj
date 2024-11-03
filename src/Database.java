@@ -36,7 +36,7 @@ public class Database implements IDatabase {
     @Override
     public boolean removeUser(User user) {
         // This needs to be fixed -> if (user == null || !userExists(user.getUsername()))
-        if (user == null) {
+        if (user == null || !userExists(user.getUsername())) {
             System.out.println("User does not exist.");
             return false;
         }
@@ -119,7 +119,7 @@ public class Database implements IDatabase {
         User user = findUserByUsername(username);
         if (user == null) {
             System.out.println("User does not exist.");
-            return user;
+            return null;
         }
         System.out.println("User: " + user.getUsername());
         System.out.println("Name: " + user.getName());

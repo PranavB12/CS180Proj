@@ -139,6 +139,7 @@
 //        assertTrue(database.deletePost(postId), "Post should be deleted successfully.");
 //    }
 //
+
 //    // fails because of findUserByUsername
 //    @Test
 //    void viewUser() {
