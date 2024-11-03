@@ -13,4 +13,6 @@ package src;
 
 public interface INewsFeed {
     void displayPosts(User user);
+    void deletePost(Post post);
+    void clearFeed();
 }
