@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Post implements IPost {
     public User author;
-    private static int id;
+    private int id;
     private String content;
     private Picture picture;
     private boolean hidden;
@@ -16,11 +16,11 @@ public class Post implements IPost {
     private static Object obj = new Object();// Stores comments with unique IDs
 
     // Static fields for total upvotes and downvotes (as per IPost)
-    public static int totalUpVotes;
-    public static int totalDownVotes;
+
 
     // Constructor
-    public Post(String content, User user) {
+    public Post(String content, User user, int postId) {
+        this.id = postId;
         this.author = user;
         this.content = content;
         this.hidden = false;
@@ -28,6 +28,7 @@ public class Post implements IPost {
         this.upVotes = 0;
         this.downVotes = 0;
         this.comments = new HashMap<>();
+
     }
 
     public Post() {
@@ -38,20 +39,20 @@ public class Post implements IPost {
     @Override
     public void upvote() {
         synchronized (obj) {
-            totalUpVotes++;
+            upVotes++;
         }
-        System.out.println("Post upvoted. Total upvotes: " + totalUpVotes);
+        System.out.println("Post upvoted. Total upvotes: " + upVotes);
     }
 
     @Override
     public void downvote() {
         synchronized (obj) {
-            totalDownVotes++;
+            downVotes++;
         }
-        System.out.println("Post downvoted. Total downvotes: " + totalDownVotes);
+        System.out.println("Post downvoted. Total downvotes: " + downVotes);
     }
 
-    
+
     @Override
     public void addComment(String comment) {
         if (!commentsEnabled) {
@@ -89,8 +90,7 @@ public class Post implements IPost {
 
         // Clear comments and reset upvotes and downvotes
         comments.clear();
-        totalUpVotes -= this.upVotes;
-        totalDownVotes -= this.downVotes;
+
         this.upVotes = 0;
         this.downVotes = 0;
         System.out.println("All comments cleared, and upvotes/downvotes reset for post ID: " + this.id);
@@ -143,10 +143,10 @@ public class Post implements IPost {
         return this.comments;
     }
     public int getUpVotes() {
-        return totalUpVotes;
+        return upVotes;
     }
     public int getDownVotes() {
-        return totalDownVotes;
+        return downVotes;
     }
     public synchronized void setUpVotes(int upVotes) {
         this.upVotes = upVotes;
@@ -154,8 +154,9 @@ public class Post implements IPost {
     public synchronized void setDownVotes(int downVotes) {
         this.downVotes = downVotes;
     }
+    public String toString() {
+        return "Post ID: " + id + ", Author of Post: " + author + ", Post content: " + content;
+    }
 
 
 }
-
-
