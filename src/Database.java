@@ -2,7 +2,16 @@ package src;
 
 import java.util.*;
 import java.io.*;
-
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Database class, where all data is managed
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
 public class Database implements IDatabase {
 
     private ArrayList<User> users = new ArrayList<>();
