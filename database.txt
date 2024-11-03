@@ -1,0 +1,28 @@
+Users:
+Username: alice123, Name: Alice
+Friends: bob456 charlie789 
+Blocked Users: 
+Posts:
+ - Post ID: 3, Content: Hello, this is Alice's first post!
+   Upvotes: 1, Downvotes: 1
+   Comments:
+    - ID 1: Nice post, Alice!
+
+Username: bob456, Name: Bob
+Friends: alice123 
+Blocked Users: 
+Posts:
+ - Post ID: 3, Content: Bob here, enjoying this new app!
+   Upvotes: 1, Downvotes: 1
+   Comments:
+    - ID 1: Welcome, Bob!
+ - Post ID: 3, Content: Bob here, enjoying this new app!
+   Upvotes: 1, Downvotes: 1
+   Comments:
+    - ID 1: Welcome, Bob!
+
+Username: charlie789, Name: Charlie
+Friends: alice123 
+Blocked Users: 
+Posts:
+

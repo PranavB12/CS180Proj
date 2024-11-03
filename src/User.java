@@ -1,3 +1,8 @@
+package src;
+
+import src.Picture;
+import src.Post;
+
 import java.util.ArrayList;
 import java.util.List;
 /*
@@ -18,6 +23,7 @@ public class User extends Post {
 
     // Constructors
     public User(String username, String password, Picture profilePicture, String description, String name) {
+        this();
         this.username = username;
         this.password = password;
         this.profilePicture = profilePicture;
@@ -79,7 +85,12 @@ public class User extends Post {
     public List<User> getBlockedUsers() {
         return this.blockedUsers;
     }
-    public List<User> getPosts() {
+    public List<Post> getPosts() {
         return this.posts;
+    }
+
+    @Override
+    public void deletePost() {
+
     }
 }
