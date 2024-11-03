@@ -3,17 +3,6 @@ package src;
 import java.util.*;
 import java.io.*;
 
-/**
- * Group Project - CS18000 Gold
- *
- * Database, where most info is stored and managed collectively
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
- *
- * @version November 3, 2024
- *
- */
-
 public class Database implements IDatabase {
 
     private ArrayList<User> users = new ArrayList<>();
@@ -70,6 +59,13 @@ public class Database implements IDatabase {
             System.out.println("Invalid content or author does not exist.");
             return false;
         }
+        for (int i = 0; i < users.size(); i++) {
+            User newUser = users.get(i);
+            if (newUser.getUsername().equals(username)) {
+                System.out.println("User already exists.");
+                return false;
+            }
+        }
         User user = new User(username, password, name);
         synchronized (usersLock) {
             users.add(user);
@@ -106,12 +102,20 @@ public class Database implements IDatabase {
             postId = ++postIdCounter;
         }
         Post post = new Post(content, author, postId);
-        post.setId(postId);
+        List<Post> userPosts = author.getPosts();
+        userPosts.add(post);
+        author.setPosts(userPosts);
+        for(int i = 0; i < users.size(); i++) {
+            if (author.equals(users.get(i))) {
+                users.set(i, author);
+            }
+
+        }
         synchronized (postsLock) {
-            posts.put(post.getId(), post);
+            posts.put(postId, post);
         }
         System.out.println("Post created with ID: " + post.getId() + " by user: " + author.getUsername());
-        return post.getId();
+        return postId;
     }
 
     // Delete a post by its ID
@@ -256,6 +260,7 @@ public class Database implements IDatabase {
         synchronized (postsLock) {
             post = posts.get(postId);
         }
+
         if (post != null) {
             post.addComment(comment);
             synchronized (postsLock) {
@@ -307,7 +312,7 @@ public class Database implements IDatabase {
         if (post != null) {
             post.enableComments();
             synchronized (postsLock) {
-                posts.put(post.getId(), post);
+                posts.put(postId, post);
             }
         } else {
             System.out.println("Post with ID " + postId + " not found.");
@@ -323,8 +328,9 @@ public class Database implements IDatabase {
         if (post != null) {
             post.disableComments();
             synchronized (postsLock) {
-                posts.put(post.getId(), post);
+                posts.put(postId, post);
             }
+
         } else {
             System.out.println("Post with ID " + postId + " not found.");
         }
@@ -334,7 +340,9 @@ public class Database implements IDatabase {
             writer.write("Users:\n");
             for (User user : users) {
                 writer.write("Username: " + user.getUsername() + ", Password: " + user.getPassword() + ", Name: " + user.getName() + "\n");
-                writer.write("Friends: ");
+                writer.write("Description: " + user.getDescription());
+                writer.write("\nFriends: ");
+
                 for (User friend : user.getFriends()) {
                     writer.write(friend.getUsername() + " ");
                 }
@@ -345,12 +353,20 @@ public class Database implements IDatabase {
                 writer.write("\nPosts:\n");
                 for (Post post : posts.values()) {
                     if (post.getAuthor().equals(user)) {
-                        writer.write(" - Post ID: " + post.getId() + ", Content: " + post.getContent() + "\n");
-                        writer.write("   Upvotes: " + post.getUpVotes() + ", Downvotes: " + post.getDownVotes() + "\n");
-                        writer.write("   Comments:\n");
+                        writer.write(" - Post ID: " + post.getId() + ", Content: " + post.getContent() + ", Hidden: " + post.isHidden() + "\n");
+                        writer.write("   Upvotes: " + post.getUpVotes() + "\n   Downvotes: " + post.getDownVotes() + "\n");
+                        String a;
+                        if (post.isCommentsEnabled()) {
+                            a = "Enabled";
+                        } else {
+                            a = "Disabled";
+                        }
+                        writer.write("   Comments: " + a + "\n");
+
                         for (Map.Entry<Integer, String> comment : post.getComments().entrySet()) {
                             writer.write("    - ID " + comment.getKey() + ": " + comment.getValue() + "\n");
                         }
+
                     }
                 }
                 writer.write("\n");
@@ -367,91 +383,91 @@ public class Database implements IDatabase {
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-
-                if (line.startsWith("Username:")) {
-                    // Parse user details
-                    String[] parts = line.split(", ");
-                    if (parts.length >= 3) {
-                        String[] usernameParts = parts[0].split(": ");
-                        String[] passwordParts = parts[1].split(": ");
-                        String[] nameParts = parts[2].split(": ");
-                        String username = (usernameParts.length > 1) ? usernameParts[1] : "";
-                        String password = (passwordParts.length > 1) ? passwordParts[1] : "";
-                        String name = (nameParts.length > 1) ? nameParts[1] : "";
-                        currentUser = new User(username, password, name); // Password left empty for security reasons
-                        synchronized (usersLock) {
-                            users.add(currentUser);
-                        }
+                if (line.startsWith("Username: ")) {
+                    // If there's a current user, add them to the list before starting a new one
+                    if (currentUser != null) {
+                        users.add(currentUser);
                     }
-                } else if (line.startsWith("Friends:") && currentUser != null) {
-                    // Parse friends for the current user
-                    String friendsList = line.substring("Friends: ".length()).trim();
-                    if (!friendsList.isEmpty()) {
-                        String[] friends = friendsList.split(" ");
-                        for (String friendUsername : friends) {
-                            User friend = findUserByUsername(friendUsername);
-                            if (friend != null) {
-                                currentUser.getFriends().add(friend);
+
+                    String[] userDetails = line.split(", ");
+                    String username = userDetails[0].split(": ")[1];
+                    String password = userDetails[1].split(": ")[1];
+                    String name = userDetails[2].split(": ")[1];
+
+                    currentUser = new User(username, password, name);
+                } else if (line.startsWith("Description: ")) {
+                    if (currentUser != null) {
+                        currentUser.setDescription(line.split(": ", 2)[1]);
+                    }
+                } else if (line.startsWith("Friends: ")) {
+                    if (currentUser != null) {
+                        String[] friends = line.split(": ")[1].trim().split(" ");
+                        for (String friend : friends) {
+                            User friendUser = findUserByUsername(friend);
+                            if (friendUser != null) {
+                                currentUser.getFriends().add(friendUser);
                             }
                         }
                     }
-                } else if (line.startsWith("Blocked Users:") && currentUser != null) {
-                    // Parse blocked users for the current user
-                    String blockedList = line.substring("Blocked Users: ".length() - 1).trim();
-                    if (!blockedList.isEmpty()) {
-                        String[] blockedUsers = blockedList.split(" ");
-                        for (String blockedUsername : blockedUsers) {
-                            User blockedUser = findUserByUsername(blockedUsername);
-                            if (blockedUser != null) {
-                                currentUser.getBlockedUsers().add(blockedUser);
+                } else if (line.startsWith("Blocked Users: ")) {
+                    if (currentUser != null) {
+                        String[] blockedUsers = line.split(": ")[1].trim().split(" ");
+                        for (String blockedUser : blockedUsers) {
+                            User blocked = findUserByUsername(blockedUser);
+                            if (blocked != null) {
+                                currentUser.getBlockedUsers().add(blocked);
                             }
                         }
                     }
-                } else if (line.startsWith(" - Post ID:") && currentUser != null) {
-                    // Parse post details
-                    String[] parts = line.split(", ");
-                    if (parts.length >= 2) {
-                        String[] postIdParts = parts[0].split(": ");
-                        String[] contentParts = parts[1].split(": ");
-                        int postId = (postIdParts.length > 1) ? Integer.parseInt(postIdParts[1]) : -1;
-                        String content = (contentParts.length > 1) ? contentParts[1] : "";
-                        Post post = new Post(content, currentUser, postId) {
-                            public void deletePost() {
+                } else if (line.startsWith("Posts:")) {
+                    // Continue to next line for posts
+                    while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
+                        line = line.trim();
+                        if (line.startsWith("- Post ID: ")) {
+                            String[] postDetails = line.split(", ");
+                            int postId = Integer.parseInt(postDetails[0].split(": ")[1]);
+                            String content = postDetails[1].split(": ")[1];
+                            boolean hidden = Boolean.parseBoolean(postDetails[2].split(": ")[1]);
 
+                            Post post = new Post(content, currentUser, postId);
+                            post.setHidden(hidden);
+                            // Next line for upvotes, downvotes, and comments
+                            line = reader.readLine().trim();
+                            if (line.startsWith("Upvotes: ")) {
+                                int upvotes = Integer.parseInt(line.split(": ")[1]);
+                                post.setUpVotes(upvotes);
                             }
-                        };
-                        post.setId(postId);
-
-                        // Parse upvotes and downvotes
-                        String upvotesLine = reader.readLine().trim();
-                        String downvotesLine = reader.readLine().trim();
-                        if (upvotesLine.startsWith("Upvotes:") && downvotesLine.startsWith("Downvotes:")) {
-                            post.setUpVotes(Integer.parseInt(upvotesLine.split(": ")[1]));
-                            post.setDownVotes(Integer.parseInt(downvotesLine.split(": ")[1]));
-                        }
-
-                        // Parse comments
-                        String commentLine;
-                        while ((commentLine = reader.readLine()) != null && commentLine.startsWith("    - ID ")) {
-                            String[] commentParts = commentLine.split(": ");
-                            if (commentParts.length >= 2) {
-                                int commentId = Integer.parseInt(commentParts[0].split(" ")[2]);
-                                String commentContent = commentParts[1];
-                                post.addComment(commentContent);
+                            line = reader.readLine().trim();
+                            if (line.startsWith("Downvotes: ")) {
+                                int downvotes = Integer.parseInt(line.split(": ")[1]);
+                                post.setDownVotes(downvotes);
                             }
-                        }
-
-                        synchronized (postsLock) {
-                            posts.put(post.getId(), post);
+                            line = reader.readLine().trim();
+                            if (line.startsWith("Comments: ")) {
+                                boolean commentsEnabled = line.split(": ")[1].equalsIgnoreCase("Enabled");
+                                post.setCommentsEnabled(commentsEnabled);
+                            }
+                            // Now read comments
+                            while ((line = reader.readLine()) != null && line.startsWith(" - ID ")) {
+                                int commentId = Integer.parseInt(line.split(":")[0].split(" ")[2]);
+                                String commentContent = line.split(": ", 2)[1].trim();
+                                post.addComment(commentContent); // Assuming addComment handles comment IDs
+                            }
+                            // Add post to current user
+                            currentUser.getPosts().add(post);
                         }
                     }
                 }
             }
+            // Add the last user read to the list
+            if (currentUser != null) {
+                users.add(currentUser);
+            }
             System.out.println("Database loaded from " + filename);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + filename);
         } catch (IOException e) {
             System.out.println("An error occurred while reading the database: " + e.getMessage());
         }
     }
+
+
 }
