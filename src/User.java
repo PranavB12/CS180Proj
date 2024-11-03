@@ -1,13 +1,12 @@
 package src;
-// hello
+
 import src.Picture;
 import src.Post;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-/*
-
- */
+import java.util.Set;
 
 public class User extends Post {
 
@@ -16,10 +15,9 @@ public class User extends Post {
     private String name;
     private String description;
 
-
     private Picture profilePicture;
-    private List<User> friends;
-    private List<User> blockedUsers;
+    private Set<User> friends;          // Changed to Set to avoid duplicates
+    private Set<User> blockedUsers;      // Changed to Set to avoid duplicates
     private List<Post> posts;
 
     // Constructors
@@ -27,12 +25,9 @@ public class User extends Post {
         this();
         this.username = username;
         this.password = password;
-        this.profilePicture = profilePicture;
+        this.profilePicture = profilePicture;   // Initialize profile picture correctly
         this.description = description;
         this.name = name;
-        this.friends = new ArrayList<>();
-        this.blockedUsers = new ArrayList<>();
-        this.posts = new ArrayList<>();
     }
 
     public User(String username, String password, String name) {
@@ -40,11 +35,12 @@ public class User extends Post {
     }
 
     public User() {
-        this.friends = new ArrayList<>();
-        this.blockedUsers = new ArrayList<>();
+        this.friends = new HashSet<>();         // Use HashSet to prevent duplicate friends
+        this.blockedUsers = new HashSet<>();    // Use HashSet to prevent duplicate blocked users
         this.posts = new ArrayList<>();
     }
 
+    // Getters and Setters
     public String getUsername() {
         return username;
     }
@@ -77,21 +73,50 @@ public class User extends Post {
         this.description = description;
     }
 
+    public Picture getProfilePicture() {
+        return profilePicture;
+    }
 
+    public void setProfilePicture(Picture profilePicture) {
+        this.profilePicture = profilePicture;
+    }
 
-
-    public List<User> getFriends() {
+    // Friend management
+    public Set<User> getFriends() {
         return this.friends;
     }
-    public List<User> getBlockedUsers() {
+
+    public boolean addFriend(User friend) {
+        return this.friends.add(friend); // Returns false if friend is already in the set
+    }
+
+    public boolean removeFriend(User friend) {
+        return this.friends.remove(friend);
+    }
+
+    // Blocked user management
+    public Set<User> getBlockedUsers() {
         return this.blockedUsers;
     }
+
+    public boolean blockUser(User user) {
+        return this.blockedUsers.add(user); // Returns false if user is already blocked
+    }
+
+    public boolean unblockUser(User user) {
+        return this.blockedUsers.remove(user);
+    }
+
+    // Post management
     public List<Post> getPosts() {
         return this.posts;
     }
 
+    public void addPost(Post post) {
+        this.posts.add(post);
+    }
 
-    public void deletePost() {
-
+    public void deletePost(Post post) {
+        this.posts.remove(post);
     }
 }

@@ -17,9 +17,11 @@ public class Post implements IPost {
 
     // Static fields for total upvotes and downvotes (as per IPost)
 
-
-    // Constructor
+    // constructor
     public Post(String content, User user, int postId) {
+        if (postId < 0) {
+            throw new IllegalArgumentException("Post ID cannot be negative");
+        }
         this.id = postId;
         this.author = user;
         this.content = content;
@@ -28,11 +30,21 @@ public class Post implements IPost {
         this.upVotes = 0;
         this.downVotes = 0;
         this.comments = new HashMap<>();
-
     }
 
+    // Default constructor with default field initialization
     public Post() {
+        this.id = 0;
+        this.content = null;
+        this.author = null;
+        this.picture = null;
+        this.hidden = false; // Default to visible
+        this.commentsEnabled = true; // Default to comments enabled
+        this.upVotes = 0;
+        this.downVotes = 0;
+        this.comments = new HashMap<>();  // Initialize comments map
     }
+
 
     // IPost Interface Methods
 
@@ -59,10 +71,15 @@ public class Post implements IPost {
             System.out.println("Comments are disabled for this post.");
             return;
         }
+        if (comment == null || comment.trim().isEmpty()) { // Prevent empty or null comments
+            System.out.println("Cannot add empty comment.");
+            return;
+        }
         int commentId = comments.size() + 1;
         comments.put(commentId, comment);
         System.out.println("Comment added with ID: " + commentId);
     }
+
 
     @Override
     public void deleteComment(int commentId) {
@@ -154,8 +171,10 @@ public class Post implements IPost {
     public synchronized void setDownVotes(int downVotes) {
         this.downVotes = downVotes;
     }
+
+    @Override
     public String toString() {
-        return "Post ID: " + id + ", Author of Post: " + author + ", Post content: " + content;
+        return "Post ID: " + id + ", Author of Post: " + (author != null ? author.getUsername() : "null") + ", Post content: " + content;
     }
 
 
