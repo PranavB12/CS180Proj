@@ -3,7 +3,7 @@ package src;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Post implements IPost {
+public class Post implements IPost {
     public User author;
     private static int id;
     private String content;

@@ -3,7 +3,7 @@ package src;
 import java.util.*;
 import java.io.*;
 
-public abstract class Database implements IDatabase {
+public class Database implements IDatabase {
 
     private ArrayList<User> users = new ArrayList<>();
     private Map<Integer, Post> posts = new HashMap<>();
@@ -12,11 +12,11 @@ public abstract class Database implements IDatabase {
     private static final Object usersLock = new Object();
     private static final Object postsLock = new Object();
 
-    public Database(List<User> users, Map<Integer, Post> posts) {
-        this.posts = posts;
-        this.users = new ArrayList<>();
-        this.posts = new HashMap<>();
-    }
+//    public Database(List<User> users, Map<Integer, Post> posts) {
+//        this.posts = posts;
+//        this.users = new ArrayList<>();
+//        this.posts = new HashMap<>();
+//    }
 
     // Add a new user to the database
     @Override
@@ -89,7 +89,6 @@ public abstract class Database implements IDatabase {
             postId = ++postIdCounter;
         }
         Post post = new Post(content, author) {
-            @Override
             public void deletePost() {
 
             }
@@ -402,7 +401,6 @@ public abstract class Database implements IDatabase {
                         int postId = (postIdParts.length > 1) ? Integer.parseInt(postIdParts[1]) : -1;
                         String content = (contentParts.length > 1) ? contentParts[1] : "";
                         Post post = new Post(content, currentUser) {
-                            @Override
                             public void deletePost() {
 
                             }

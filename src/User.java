@@ -89,7 +89,7 @@ public class User extends Post {
         return this.posts;
     }
 
-    @Override
+
     public void deletePost() {
 
     }
