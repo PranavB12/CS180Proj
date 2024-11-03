@@ -1,7 +1,8 @@
 package src;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 /**
  * Group Project - CS18000 Gold
  *
@@ -12,7 +13,6 @@ import java.util.List;
  * @version November 3, 2024
  *
  */
-
 public class test {
 
     public static void main(String[] args) {
@@ -22,11 +22,12 @@ public class test {
         User alice = new User("alice123", "password1", "Alice");
         User bob = new User("bob456", "password2", "Bob");
         User charlie = new User("charlie789", "password3", "Charlie");
-
+        bob.setDescription("Hello! My name is Bob.");
         // Add users to the database
         database.addUser(alice);
         database.addUser(bob);
         database.addUser(charlie);
+
 
         // Validate user credentials
         database.validateCredentials("alice123", "password1");
@@ -36,13 +37,18 @@ public class test {
         database.addFriend(alice, charlie);
 
         // Create posts by users
-        int postId1 = database.createPost("Hello, this is Alice's first post!", alice);
-        int postId2 = database.createPost("Bob here, enjoying this new app!", bob);
+        int postId1 = database.createPost("Hello this is Alice's first post!", alice);
+        int postId2 = database.createPost("Bob here enjoying this new app!", bob);
         int postId3 = database.createPost("Charlie posting a quick update!", charlie);
-
         // Add comments to a post
+        database.enableCommentsForPost(postId1);
+        database.disableCommentsForPost(postId2);
+        database.enableCommentsForPost(postId3);
         database.addCommentToPost(postId1, "Nice post, Alice!");
         database.addCommentToPost(postId2, "Welcome, Bob!");
+        database.addCommentToPost(postId3, "Welcome, Charlie!");
+        database.addCommentToPost(postId3, "This is my 2nd Post!");
+
 
         // Upvote and downvote posts
         database.upvotePost(postId1);
@@ -51,6 +57,7 @@ public class test {
         // View user information and their posts
         database.viewUser("alice123");
         database.viewUser("bob456");
+
 
         // Save the database to a file
         database.saveDatabaseToFile("database.txt");
@@ -62,5 +69,6 @@ public class test {
         System.out.println("\nData loaded from file:");
         database.viewUser("alice123");
         database.viewUser("bob456");
+
     }
 }
