@@ -193,12 +193,13 @@ public class Database implements IDatabase {
     // Helper method to find a user by username
     private User findUserByUsername(String username) {
         synchronized (usersLock) {
-            // users is not iterating through anything because users is null
             System.out.println("Before the for loop " + users.size());
-            for (User user : users) {
-                System.out.println("User in Database Class Username: " + user.getUsername());
-                if (user.getUsername().trim().equals(username.trim())) {
-                    return user;
+            if (users.size() != 0) {
+                for (User user : users) {
+                    System.out.println("User in Database Class Username: " + user.getUsername());
+                    if (user.getUsername().trim().equals(username.trim())) {
+                        return user;
+                    }
                 }
             }
         }
