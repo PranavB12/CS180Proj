@@ -13,6 +13,7 @@ package src;
 
 public interface IDatabase {
 
+
     boolean addUser(User user);
     boolean removeUser(User user);
     boolean createAccount(String username, String password, String name);
