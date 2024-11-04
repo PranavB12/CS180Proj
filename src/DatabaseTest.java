@@ -1,379 +1,194 @@
 package src;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class DatabaseTest {
-    private ArrayList<User> userList = new ArrayList<>();
+/**
+ * Group Project - CS18000 Gold
+ *
+ * User JUnits
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
+
+public class DatabaseTest {
+    private User user1;
+    private User user2;
+    private Post post1;
+    private Post post2;
+    private Picture picture1;
+    private Picture picture2;
+    private NewsFeed newsFeed;
 
     @BeforeEach
-    void setUp() {
-        // Initialize user instances
-        User alice = new User("alice123", "password1", "Alice");
-        User bob = new User("bob456", "password2", "Bob");
-        User charlie = new User("charlie789", "password3", "Charlie");
-        Database database = new Database();
-        database.addUser(alice);
-        database.addUser(bob);
-        database.addUser(charlie);
+    public void setUp() {
+        // Initialize users and pictures
+        picture1 = new Picture("http://example.com/pic1.jpg");
+        picture2 = new Picture("http://example.com/pic2.jpg");
+        user1 = new User("user1", "pass1", picture1, "This is user1", "User One");
+        user2 = new User("user2", "pass2", picture2, "This is user2", "User Two");
 
+        // Initialize posts
+        post1 = new Post("Hello World!", user1, 1);
+        post2 = new Post("Java is awesome!", user2, 2);
 
+        // Initialize NewsFeed
+        newsFeed = new NewsFeed();
 
-        HashMap<Integer, Post> posts = new HashMap<>();
-        Post newPost1 = new Post();
-        posts.put(newPost1.getId(), newPost1);
-
-    }
-
-    @AfterEach
-    void tearDown() {
-        userList.clear();
+        // Set up friendships
+        user1.getFriends().add(user2);
+        user2.getFriends().add(user1);
     }
 
     @Test
-    void addUser() {
-        Database database = new Database();
-        User daniel = new User("daniel123", "password1", "Daniel");
-        boolean userAdded = database.addUser(daniel);
-        assertTrue(userAdded, "User should be added successfully.");
+    public void testUserCreation() {
+        assertNotNull(user1);
+        assertEquals("user1", user1.getUsername());
+        assertEquals("User One", user1.getName());
     }
 
     @Test
-    void removeUser() {
-        Database database = new Database();
-        User bob = new User("bob456", "password2", "Bob");
-        database.addUser(bob);
-        database.removeUser(bob);
-
-        int i=0 ;
-        User userToRemove = userList.get(i);
-        assertTrue(database.removeUser(userToRemove), "User should be removed successfully.");
+    public void testPostCreation() {
+        assertNotNull(post1);
+        assertEquals("Hello World!", post1.getContent());
+        assertEquals(user1, post1.getAuthor());
     }
-    /**
-//    @Test
-//    void createAccount() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        Database database = new Database();
-//        User newUser = new User("newUser123", "password123", "New User");
-//        assertTrue(database.addUser(newUser), "Account creation should be successful.");
-//        assertTrue(database.userExists("newUser123"), "New user should exist after account creation.");
-//    }
-//
-//    // fails because of findUserByUsername
-//    @Test
-//    void validateCredentials() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        Database database = new Database();
-//        assertTrue(database.validateCredentials("alice123", "password1"), "Credentials should be valid for Alice.");
-//        assertFalse(database.validateCredentials("bob456", "wrongpassword"), "Credentials should be invalid with incorrect password.");
-//    }
-//
-//    // fails because of UserExists method and findUserByUsername
-//    @Test
-//    void userExists() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        Database database = new Database();
-//        assertTrue(database.userExists("alice123"), "Alice should exist in the database.");
-//        assertFalse(database.userExists("unknownUser"), "Unknown user should not exist.");
-//    }
-//
-//    @Test
-//    void createPost() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's post", alice, 1);
-//        Database database = new Database();
-//        database.createPost("This is Alice's post", alice);
-//        assertNotEquals(-1, 1, "Post should be created successfully.");
-//    }
-//
-//    // fails
-//    @Test
-//    void deletePost() {
-//        Post post = new Post();
-//        Database database = new Database();
-//        int postId = database.addPost(post);
-//        assertTrue(database.deletePost(postId), "Post should be deleted successfully.");
-//    }
-//
-//    // fails because of findUserByUsername
-//    @Test
-//    void viewUser() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        Database database = new Database();
-//
-//        User viewedUser = database.viewUser("alice123");
-//        assertNotNull(viewedUser, "User should be viewable in the database.");
-//        assertEquals("Alice", viewedUser.getName(), "Viewed user should match expected details.");
-//    }
-//
-//    // fails because of UserExists
-//    @Test
-//    void addFriend() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        Database database = new Database();
-//        assertTrue(database.addFriend(userList.get(0), userList.get(1)), "Should be able to add Bob as a friend.");
-//    }
-//    // fails because of UserExists
-//    @Test
-//    void removeFriend() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        Database database = new Database();
-//        assertTrue(database.addFriend(userList.get(0), userList.get(1)), "Should be able to add Bob as a friend.");
-//        assertTrue(database.removeFriend(userList.get(0), userList.get(1)), "Should be able to remove Bob from friends.");
-//    }
-//
-//    // fails because of UserExists
-//    @Test
-//    void blockUser() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's new post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        posts.put(newPost1.getId(), newPost1);
-//        posts.put(newPost2.getId(), newPost2);
-//        posts.put(newPost3.getId(), newPost3);
-//        Database database = new Database();
-//        assertTrue(database.blockUser(userList.get(0), userList.get(2)), "Should be able to block Charlie.");
-//    }
-//
-//    // fails
-//    @Test
-//    void upvotePost() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's new post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        newPost1.setId(1);
-//        newPost2.setId(2);
-//        newPost3.setId(3);
-//        posts.put(1, newPost1);
-//        posts.put(2, newPost2);
-//        posts.put(3, newPost3);
-//        Database database = new Database();
-//        int postIdToUpvote = newPost1.getId();
-//        Post post = posts.get(postIdToUpvote);
-//
-//        int beforeUpVoting = post.getUpVotes();
-//
-//        database.upvotePost(postIdToUpvote);
-//
-//        // Check that the upvote count increased by 1
-//        assertEquals(beforeUpVoting + 1, post.getUpVotes(), "Upvote count should increase by 1.");
-//    }
-//
-//    // fails
-//    @Test
-//    void downvotePost() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's new post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        newPost1.setId(1);
-//        newPost2.setId(2);
-//        newPost3.setId(3);
-//        posts.put(newPost1.getId(), newPost1);
-//        posts.put(newPost2.getId(), newPost2);
-//        posts.put(newPost3.getId(), newPost3);
-//        System.out.println(posts.size());
-//        Database database = new Database();
-//        PostImpl post = new PostImpl("Downvote this post", userList.get(1));
-//        int i = 0;
-//        List<Integer> postId = database.getUserPosts(userList.get(i));
-//        database.downvotePost(postId.get(i));
-//    }
-//
-//    @Test
-//    void addCommentToPost() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        newPost1.setId(1);
-//        newPost2.setId(2);
-//        newPost3.setId(3);
-//        posts.put(1, newPost1);
-//        posts.put(2, newPost2);
-//        posts.put(3, newPost3);
-//        Database database = new Database();
-//        database.addCommentToPost(1, "This is a comment.");
-//
-//
-//        Map<Integer, String> comments = posts.get(1).getComments();
-//        assertEquals("Expected one comment in the map", 1);
-//    }
-//
-//
-//    @Test
-//    void deleteCommentFromPost() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        newPost1.setId(1);
-//        newPost2.setId(2);
-//        newPost3.setId(3);
-//        posts.put(1, newPost1);
-//        posts.put(2, newPost2);
-//        posts.put(3, newPost3);
-//        Database database = new Database();
-//        database.addCommentToPost(1, "This is a comment.");
-//        //Need to add Comment ID to the Post - Is it defined as a Hashmap making it challenging.
-//        //assertTrue(database.deleteCommentFromPost(postId, commentId), "Comment should be deleted from post.");
-//    }
-//
-//    @Test
-//    void hidePost() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        newPost1.setId(1);
-//        newPost2.setId(2);
-//        newPost3.setId(3);
-//        posts.put(1, newPost1);
-//        posts.put(2, newPost2);
-//        posts.put(3, newPost3);
-//        Database database = new Database();
-//        //Integer x = 1 ;
-//        //assertTrue(database.hidePost(newPost1.getId()), "Post should be hidden successfully.");
-//    }
-//
-//    @Test
-//    void enableCommentsForPost() {
-//        Database database = new Database();
-//        Post post = new Post("Enable comments for this post", userList.get(2));
-//        int postId = database.addPost(post);
-//        assertTrue(database.enableComments(postId), "Comments should be enabled for post.");
-//    }
-//
-//    @Test
-//    void disableCommentsForPost() {
-//        Post post = new Post("Disable comments for this post", userList.get(2));
-//        int postId = database.addPost(post);
-//        assertTrue(database.disableComments(postId), "Comments should be disabled for post.");
-//    }
-//
-//    @Test
-//    void saveDatabaseToFile() {
-//        User alice = new User("alice123", "password1", "Alice");
-//        User bob = new User("bob456", "password2", "Bob");
-//        User charlie = new User("charlie789", "password3", "Charlie");
-//        userList = new ArrayList<>();
-//        userList.add(alice);
-//        userList.add(bob);
-//        userList.add(charlie);
-//
-//        HashMap<Integer, Post> posts = new HashMap<>();
-//        Post newPost1 = new Post("This is Alice's post", userList.get(0));
-//        Post newPost2 = new Post("This is a Bob's post", userList.get(1));
-//        Post newPost3 = new Post("This is a Charlie's post", userList.get(2));
-//        newPost1.setId(1);
-//        newPost2.setId(2);
-//        newPost3.setId(3);
-//        posts.put(1, newPost1);
-//        posts.put(2, newPost2);
-//        posts.put(3, newPost3);
-//
-//        Database database = new Database();
-//        database.saveDatabaseToFile("database.txt");
-//        //assertTrue(database.saveDatabaseToFile("database.txt" ) , "Database should be saved to file successfully.");
-//    }
-//
-//    @Test
-//    void readDatabaseFromFile() {
-//        Database database = new Database();
-//        database.readDatabaseFromFile("database.txt") ;
-//        assertTrue(database.readDatabaseFromFile("database.txt"), "Database should be read from file successfully.");
-//    }*/
+
+    @Test
+    public void testAddPostToUser() {
+        user1.getPosts().add(post1);
+        assertTrue(user1.getPosts().contains(post1));
+    }
+
+    @Test
+    public void testCommentOnPost() {
+        post1.addComment("This is a comment.");
+        assertEquals(1, post1.getComments().size());
+        assertTrue(post1.getComments().containsValue("This is a comment."));
+    }
+
+    @Test
+    public void testDeleteComment() {
+        post1.addComment("Comment to be deleted");
+        assertEquals(1, post1.getComments().size());
+
+        post1.deleteComment(1);
+        assertEquals(0, post1.getComments().size());
+    }
+
+    @Test
+    public void testHidePost() {
+        post1.hidePost();
+        assertTrue(post1.isHidden());
+    }
+
+    @Test
+    public void testDeletePost() {
+        user1.getPosts().add(post1);
+        post1.deletePost(user1);
+        assertFalse(user1.getPosts().contains(post1));
+        assertTrue(post1.isHidden());
+    }
+
+    @Test
+    public void testNewsFeedDisplayPosts() {
+        user1.getPosts().add(post1);
+        user2.getPosts().add(post2);
+        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
+
+        // Ideally, you would check for output, but this is a basic check
+        assertFalse(newsFeed.getPosts().isEmpty());
+    }
+
+    @Test
+    public void testNewsFeedDeletePost() {
+        user1.getPosts().add(post1);
+        newsFeed.deletePost(post1);
+        assertFalse(newsFeed.getPosts().contains(post1));
+    }
+
+    @Test
+    public void testEnableDisableComments() {
+        post1.disableComments();
+        assertFalse(post1.isCommentsEnabled());
+
+        post1.enableComments();
+        assertTrue(post1.isCommentsEnabled());
+    }
+
+    @Test
+    public void testMultipleComments() {
+        post1.enableComments();
+        post1.addComment("First Comment");
+        post1.addComment("Second Comment");
+
+        assertEquals(2, post1.getComments().size());
+    }
+
+    @Test
+    public void testDownvotePost() {
+        post1.downvote();
+        assertEquals(1, post1.getDownVotes());
+    }
+
+    @Test
+    public void testUpvotePost() {
+        post2.upvote();
+        assertEquals(1, post2.getUpVotes());
+    }
+
+    @Test
+    public void testBlockedUsers() {
+        user1.getBlockedUsers().add(user2);
+        assertTrue(user1.getBlockedUsers().contains(user2));
+    }
+
+    @Test
+    public void testUserEquals() {
+        User user3 = new User("user1", "pass3", "Another User");
+        assertTrue(user1.equals(user3));
+    }
+
+    // New test cases for comments, pictures, and news feed
+
+    @Test
+    public void testPostWithNoComments() {
+        assertEquals(0, post1.getComments().size());
+    }
+
+    @Test
+    public void testPictureUrl() {
+        assertEquals("http://example.com/pic1.jpg", picture1.getUrl());
+        assertEquals("http://example.com/pic2.jpg", picture2.getUrl());
+    }
+
+    @Test
+    public void testNewsFeedWithMultiplePosts() {
+        user1.getPosts().add(post1);
+        user2.getPosts().add(post2);
+        newsFeed.displayPosts(user1); // User1 should see User2's post
+
+        // Validate that the newsFeed has the posts
+        assertTrue(newsFeed.getPosts().contains(post1) || newsFeed.getPosts().contains(post2));
+    }
+
+    @Test
+    public void testDisplayPostsWithNoFriends() {
+        User lonelyUser = new User("lonelyUser", "lonelyPass", "Lonely User");
+        newsFeed.displayPosts(lonelyUser); // No friends, no posts
+
+        // Validate that the news feed is empty
+        assertTrue(newsFeed.getPosts().isEmpty());
+    }
+
+    @Test
+    public void testAddCommentWhenDisabled() {
+        post1.disableComments();
+        post1.addComment("Comment on disabled post"); // Attempt to add comment
+        assertEquals(0, post1.getComments().size()); // Should not be able to add
+    }
 }

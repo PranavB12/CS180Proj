@@ -14,15 +14,23 @@ import src.Picture;
  */
 
 // IUser Interface
+import java.util.List;
+
 public interface IUser {
-    void createAccount(String username, String password, Picture profilePicture);
-    void deleteAccount();
-    boolean login(String username, String password);
-    void searchUser(String username, String name);
-    void addFriend(String username, String name);
-    void removeFriend(String username, String name);
-    void blockUser(String username, String name);
-    void viewUser();
-    void createPost(String content, String description, Picture postPicture);
-    void deletePost(int postId);
+    String getUsername();
+    void setUsername(String username);
+    String getPassword();
+    void setPassword(String password);
+    String getName();
+    void setName(String name);
+    String getDescription();
+    void setDescription(String description);
+    List<User> getFriends();
+    List<User> getBlockedUsers();
+    List<Post> getPosts();
+    void setPosts(List<Post> posts);
+    void deletePost();
+    String toString();
+    boolean equals(Object o);
 }
+
