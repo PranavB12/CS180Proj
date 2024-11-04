@@ -1,7 +1,8 @@
 package src;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Group Project - CS18000 Gold
@@ -15,18 +16,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 
 class PictureTest {
+    private Picture picture; // Ensure this is Picture, not IPicture unless Picture implements IPicture
 
-    public static void main(String[] args) {
-        PictureTest test = new PictureTest();
-        test.testPictureUrl();
+    @BeforeEach
+    void setUp() {
+        picture = new Picture("http://example.com/image.jpg"); // Initialize correctly here
     }
 
     @Test
-    void testPictureUrl() {
-        String testUrl = "http://example.com/image.jpg";
+    void testGetUrl() {
+        // Ensure that picture is initialized and that getUrl() returns the correct URL
+        assertNotNull(picture, "Picture should be initialized");
+        assertEquals("http://example.com/image.jpg", picture.getUrl());
+    }
 
-        Picture picture = new Picture(testUrl);
-
-        assertEquals(testUrl, picture.getUrl(), "The URL should match the one provided during construction");
+    @Test
+    void testGetUrlWithNull() {
+        // Reassign picture with a null URL and test the behavior
+        picture = new Picture(null);
+        assertNull(picture.getUrl(), "URL should be null");
     }
 }

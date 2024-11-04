@@ -13,7 +13,7 @@ package src;
 
 // Picture class (for completeness)
 
-public class Picture {
+public class Picture implements IPicture{
     private String url;
 
     public Picture(String url) {
