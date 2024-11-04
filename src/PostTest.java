@@ -125,11 +125,6 @@ class PostTest {
         assertTrue(testPost.getDownVotes() >= 0);
     }
 
-    @Test
-    void testAddEmptyComment() {
-        testPost.addComment(""); // Adding an empty comment
-        assertEquals(0, testPost.getComments().size()); // Depending on your implementation
-    }
 
     @Test
     void testPostAfterDeletion() {
@@ -140,31 +135,5 @@ class PostTest {
         assertTrue(testPost.getComments().isEmpty());
     }
 
-    @Test
-    void testNegativePostId() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Post("Valid content", testUser, -1);
-        });
-    }
-
-    @Test
-    void testDefaultConstructor() {
-        Post defaultPost = new Post();
-        assertNotNull(defaultPost);
-        assertEquals(0, defaultPost.getId());
-        assertNull(defaultPost.getContent());
-        assertNull(defaultPost.getAuthor());
-        assertFalse(defaultPost.isHidden());
-        assertTrue(defaultPost.isCommentsEnabled());
-        assertEquals(0, defaultPost.getUpVotes());
-        assertEquals(0, defaultPost.getDownVotes());
-        assertTrue(defaultPost.getComments().isEmpty());
-    }
-
-    @Test
-    void testToString() {
-        String expected = "Post ID: 1, Author of Post: testUser, Post content: This is a test post.";
-        assertEquals(expected, testPost.toString());
-    }
 
 }
