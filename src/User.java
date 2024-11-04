@@ -14,7 +14,7 @@ import java.util.List;
  *
  */
 
-public class User extends Post {
+public class User extends Post implements IUser {
 
     private String username;
     private String password;
