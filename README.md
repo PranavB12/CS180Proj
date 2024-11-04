@@ -1,5 +1,10 @@
 # CS180 Project
 
+### Prerequisites
+- Java Development Kit (JDK) version 11 or higher.
+- JUnit 5 for running tests.
+
+
 ### Compilation and Execution Instructions
 
 1. Navigate to the src folder
@@ -10,11 +15,10 @@
 3. Run the classes by running
 ```java -cp src ClassName```
 
-Alternatively
-
-Open the project in IntelliJ IDEA.\
-Right-click on the main class or any test class you want to run, and select Run 'ClassName'.\
-To run all tests, you can also navigate to the Run menu, select Run All Tests, or use the JUnit configuration to execute all test cases.
+##### Alternatively
+1. Open the project in IntelliJ IDEA.
+2. Right-click on the main class or any test class you want to run, and select Run 'ClassName'.
+3. To run all tests, you can also navigate to the Run menu, select Run All Tests, or use the JUnit configuration to execute all test cases.
 
 ### Submission Details
 #### Pranav Bansal -`bansa124@purdue.edu`
