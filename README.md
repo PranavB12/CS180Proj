@@ -17,7 +17,7 @@ Right-click on the main class or any test class you want to run, and select Run 
 To run all tests, you can also navigate to the Run menu, select Run All Tests, or use the JUnit configuration to execute all test cases.
 
 ### Submission Details
- - Pranav Bansal: Purdue email - bansa124@purdue.edu 
+#### Pranav Bansal -`bansa124@purdue.edu`
 - Submitted to Vocareum workspace.
 
 
@@ -47,3 +47,4 @@ To run all tests, you can also navigate to the Run menu, select Run All Tests, o
 - Functionality: This class represents a post created by a user, it contains details about the post like content, author, up votes, down votes, comments, visibility, and whether comments are disabled or enabled. It provides methods for upvoting, downvoting, adding and removing comments, and managing the post visibility.
 - Testing: The tests for this ensure that voting, commenting, and visibility control all work as expected. Verified in `PostTest.java`
 - Relationships: This class uses the User class as the author of the post and optionally includes a Picture for post images. It is managed by the Database and NewsFeed classes to enable post sharing and feed display.
+
