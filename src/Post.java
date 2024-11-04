@@ -69,6 +69,7 @@ public class Post implements IPost {
             System.out.println("Comments are disabled for this post.");
             return;
         }
+
         int commentId = comments.size() + 1;
         comments.put(commentId, comment);
         System.out.println("Comment added with ID: " + commentId);

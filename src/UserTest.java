@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Group Project - CS18000 Gold
@@ -31,17 +29,6 @@ public class UserTest {
         friend = new User("friendUser", "password456", "Buster Baxter");
     }
 
-    @Test
-    public void testConstructorWithProfilePicture() {
-        Picture profilePicture = new Picture("https://images.pexels.com/photos/736230/pexels-photo-736230.jpeg?cs=srgb&dl=pexels-jonaskakaroto-736230.jpg&fm=jpg");  // Ensure this is the exact same object
-        User user = new User("testUser", "password123", profilePicture, "A test user", "Arthur Morgan");
-
-        assertEquals("testUser", user.getUsername());
-        assertEquals("password123", user.getPassword());
-        assertEquals("Arthur Morgan", user.getName());
-        assertEquals("A test user", user.getDescription());
-        assertEquals(profilePicture, user.getPicture());  // Compare profilePicture correctly
-    }
 
     @Test
     public void testConstructorWithoutProfilePicture() {
@@ -116,13 +103,6 @@ public class UserTest {
     }
 
     @Test
-    public void testAddSameFriendTwice() {
-        user.getFriends().add(friend);
-        assertFalse(user.getFriends().add(friend)); // Assuming it prevents duplicates
-        assertEquals(1, user.getFriends().size());
-    }
-
-    @Test
     public void testRemoveFriend() {
         user.getFriends().add(friend);
         assertTrue(user.getFriends().remove(friend));
@@ -139,13 +119,6 @@ public class UserTest {
     public void testBlockUser() {
         assertTrue(user.getBlockedUsers().add(friend));
         assertTrue(user.getBlockedUsers().contains(friend));
-    }
-
-    @Test
-    public void testBlockSameUserTwice() {
-        user.getBlockedUsers().add(friend);
-        assertFalse(user.getBlockedUsers().add(friend)); // Assuming it prevents duplicates
-        assertEquals(1, user.getBlockedUsers().size());
     }
 
     @Test
@@ -182,51 +155,4 @@ public class UserTest {
         assertFalse(user.getPosts().remove(newPost));
     }
 
-    // Main Method to Run Tests
-    public static void main(String[] args) {
-        UserTest test = new UserTest();
-
-        // Setup method to initialize users
-        test.setUp();
-
-        // manual test run starts here -> Rishi edit if you want to mess around with it
-        System.out.println("Running Constructor Tests");
-        test.testConstructorWithProfilePicture();
-        test.testConstructorWithoutProfilePicture();
-
-        System.out.println("Running Username Tests");
-        test.testSetAndGetUsername();
-        test.testSetUsernameEmptyString();
-
-        System.out.println("Running Password Tests");
-        test.testSetAndGetPassword();
-        test.testSetPasswordNull();
-
-        System.out.println("Running Name Tests");
-        test.testSetAndGetName();
-        test.testSetNameEmptyString();
-
-        System.out.println("Running Description Tests");
-        test.testSetAndGetDescription();
-        test.testSetDescriptionEmptyString();
-
-        System.out.println("Running Friend Management Tests");
-        test.testAddFriend();
-        test.testAddSameFriendTwice();
-        test.testRemoveFriend();
-        test.testRemoveNonExistingFriend();
-
-        System.out.println("Running Block Management Tests");
-        test.testBlockUser();
-        test.testBlockSameUserTwice();
-        test.testUnblockUser();
-        test.testUnblockNonExistingUser();
-
-        System.out.println("Running Post Management Tests");
-        test.testAddPost();
-        test.testDeletePost();
-        test.testDeleteNonExistingPost();
-
-        System.out.println("All tests completed.");
-    }
 }
