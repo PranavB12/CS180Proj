@@ -5,6 +5,17 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Test cases for the NewsFeed class
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 3, 2024
+ *
+ */
+
 public class NewsFeedTest {
 
     private NewsFeed newsFeed;
