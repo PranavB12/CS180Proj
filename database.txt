@@ -1,28 +1,34 @@
 Users:
-Username: alice123, Name: Alice
+Username: alice123, Password: password1, Name: Alice
+Description: 
 Friends: bob456 charlie789 
 Blocked Users: 
 Posts:
- - Post ID: 3, Content: Hello, this is Alice's first post!
-   Upvotes: 1, Downvotes: 1
-   Comments:
+ - Post ID: 1, Content: Hello this is Alice's first post!, Hidden: false
+   Upvotes: 1
+   Downvotes: 0
+   Comments: Enabled
     - ID 1: Nice post, Alice!
 
-Username: bob456, Name: Bob
+Username: bob456, Password: password2, Name: Bob
+Description: Hello! My name is Bob.
 Friends: alice123 
 Blocked Users: 
 Posts:
- - Post ID: 3, Content: Bob here, enjoying this new app!
-   Upvotes: 1, Downvotes: 1
-   Comments:
-    - ID 1: Welcome, Bob!
- - Post ID: 3, Content: Bob here, enjoying this new app!
-   Upvotes: 1, Downvotes: 1
-   Comments:
-    - ID 1: Welcome, Bob!
+ - Post ID: 2, Content: Bob here enjoying this new app!, Hidden: false
+   Upvotes: 0
+   Downvotes: 1
+   Comments: Disabled
 
-Username: charlie789, Name: Charlie
+Username: charlie789, Password: password3, Name: Charlie
+Description: 
 Friends: alice123 
 Blocked Users: 
 Posts:
+ - Post ID: 3, Content: Charlie posting a quick update!, Hidden: false
+   Upvotes: 0
+   Downvotes: 0
+   Comments: Enabled
+    - ID 1: Welcome, Charlie!
+    - ID 2: This is my 2nd Post!
 

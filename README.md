@@ -52,3 +52,5 @@
 - Testing: The tests for this ensure that voting, commenting, and visibility control all work as expected. Verified in `PostTest.java`
 - Relationships: This class uses the User class as the author of the post and optionally includes a Picture for post images. It is managed by the Database and NewsFeed classes to enable post sharing and feed display.
 
+### Test
+This class is a test class that adds some sample users and posts to the database to test the data persistence it will not be present in the final project.
