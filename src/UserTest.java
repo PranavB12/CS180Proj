@@ -40,7 +40,7 @@ public class UserTest {
         assertEquals("password123", user.getPassword());
         assertEquals("Arthur Morgan", user.getName());
         assertEquals("A test user", user.getDescription());
-        assertEquals(profilePicture, user.getProfilePicture());  // Compare profilePicture correctly
+        assertEquals(profilePicture, user.getPicture());  // Compare profilePicture correctly
     }
 
     @Test

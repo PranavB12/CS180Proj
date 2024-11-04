@@ -14,6 +14,7 @@ import java.io.*;
  */
 public class Database implements IDatabase {
 
+
     private ArrayList<User> users = new ArrayList<>();
     private Map<Integer, Post> posts = new HashMap<>();
     private static int postIdCounter = 0;
@@ -21,6 +22,7 @@ public class Database implements IDatabase {
     private static final Object usersLock = new Object();
     private static final Object postsLock = new Object();
 
+    // temp
 //    public Database(List<User> users, Map<Integer, Post> posts) {
 //        this.posts = posts;
 //        this.users = new ArrayList<>();
