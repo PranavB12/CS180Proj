@@ -5,17 +5,6 @@ import src.User;
 
 import java.util.*;
 
-/**
- * Group Project - CS18000 Gold
- *
- * NewsFeed, manages posts Displayed for User
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
- *
- * @version November 3, 2024
- *
- */
-
 public class NewsFeed {
     private List<Post> posts;
 
@@ -26,7 +15,7 @@ public class NewsFeed {
 
     // Display posts from user's friends, with posts in random order
     public void displayPosts(User user) {
-        Set<User> friends = user.getFriends();  // Changed to Set<User>
+        List<User> friends = user.getFriends();  // Changed to Set<User>
 
         // Collect posts from each friend
         for (User friend : friends) {
@@ -39,7 +28,7 @@ public class NewsFeed {
 
         // Display each post
         for (Post post : posts) {
-            System.out.println(post.toString());
+            System.out.println(post);
         }
     }
 
@@ -52,4 +41,14 @@ public class NewsFeed {
     public void clearFeed() {
         posts.clear();
     }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+
 }
