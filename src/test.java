@@ -13,7 +13,7 @@ package src;
 public class test {
 
     public static void main(String[] args) {
-        Database database = new Database() {};
+        Database database = new Database();
 
         // Create some sample users
         User alice = new User("alice123", "password1", "Alice");
