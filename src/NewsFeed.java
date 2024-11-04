@@ -5,6 +5,19 @@ import src.User;
 
 import java.util.*;
 
+/**
+* PJ05 - NewsFeedClass
+*
+* This class manages a collection of Post objects, allowing posts from a user's friends to be displayed in random order, 
+* with options to delete specific posts or clear the entire feed.
+*
+* @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+*
+* @version November 3, 2024
+*
+*/
+
+
 public class NewsFeed {
     private List<Post> posts;
 
