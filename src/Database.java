@@ -16,7 +16,7 @@ public class Database implements IDatabase {
 
 
     private ArrayList<User> users = new ArrayList<>();
-    private Map<Integer, Post> posts = new HashMap<>();
+    private Map<String, Post> posts = new HashMap<>();
     private static int postIdCounter = 0;
     private static final Object postIdLock = new Object();
     private static final Object usersLock = new Object();
@@ -33,7 +33,7 @@ public class Database implements IDatabase {
     public ArrayList<User> getUsers() {
         return users;
     }
-    public Map<Integer, Post> getPosts() {
+    public Map<String, Post> getPosts() {
         return posts;
     }
     @Override
@@ -103,34 +103,38 @@ public class Database implements IDatabase {
     }
 
     // Create a new post by a user
-    public int createPost(String content, User author) {
+
+    public String createPost(String content, User author) {
         if (content == null || author == null || !userExists(author.getUsername())) {
             System.out.println("Invalid content or author does not exist.");
-            return -1;
+            return null;
         }
-        int postId;
-        synchronized (postIdLock) {
-            postId = ++postIdCounter;
-        }
+
+        // Generate a unique post ID using UUID
+        String postId = UUID.randomUUID().toString();
         Post post = new Post(content, author, postId);
-        List<Post> userPosts = author.getPosts();
-        userPosts.add(post);
-        author.setPosts(userPosts);
-        for(int i = 0; i < users.size(); i++) {
+
+        // Use a method to add the post to the author's list
+//        author.addPost(post);
+
+        // Update the user in the users list
+        for (int i = 0; i < users.size(); i++) {
             if (author.equals(users.get(i))) {
                 users.set(i, author);
             }
-
         }
+
+        // Add the post to the posts map
         synchronized (postsLock) {
             posts.put(postId, post);
         }
+
         System.out.println("Post created with ID: " + post.getId() + " by user: " + author.getUsername());
         return postId;
     }
 
     // Delete a post by its ID
-    public boolean deletePost(int postId) {
+    public boolean deletePost(String postId) {
         synchronized (postsLock) {
             if (!posts.containsKey(postId)) {
                 System.out.println("Post with ID " + postId + " does not exist.");
@@ -141,6 +145,7 @@ public class Database implements IDatabase {
         System.out.println("Post with ID " + postId + " deleted.");
         return true;
     }
+
 
     // View user information and their posts
     public User viewUser(String username) {
@@ -234,7 +239,7 @@ public class Database implements IDatabase {
     }
 
     // Upvote a post
-    public void upvotePost(int postId) {
+    public void upvotePost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -250,7 +255,7 @@ public class Database implements IDatabase {
     }
 
     // Downvote a post
-    public void downvotePost(int postId) {
+    public void downvotePost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -266,7 +271,7 @@ public class Database implements IDatabase {
     }
 
     // Add a comment to a post
-    public void addCommentToPost(int postId, String comment) {
+    public void addCommentToPost(String postId, String comment) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -283,13 +288,13 @@ public class Database implements IDatabase {
     }
 
     // Delete a comment from a post
-    public void deleteCommentFromPost(int postId, int commentId) {
+    public void deleteCommentFromPost(String postId, String commentId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            post.deleteComment(commentId);
+            post.deleteComment(String.valueOf(commentId));
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
@@ -299,7 +304,7 @@ public class Database implements IDatabase {
     }
 
     // Hide a post
-    public void hidePost(int postId) {
+    public void hidePost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -315,7 +320,7 @@ public class Database implements IDatabase {
     }
 
     // Enable comments for a post
-    public void enableCommentsForPost(int postId) {
+    public void enableCommentsForPost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -331,7 +336,7 @@ public class Database implements IDatabase {
     }
 
     // Disable comments for a post
-    public void disableCommentsForPost(int postId) {
+    public void disableCommentsForPost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -374,7 +379,7 @@ public class Database implements IDatabase {
                         }
                         writer.write("   Comments: " + a + "\n");
 
-                        for (Map.Entry<Integer, String> comment : post.getComments().entrySet()) {
+                        for (Map.Entry<String, String> comment : post.getComments().entrySet()) {
                             writer.write("    - ID " + comment.getKey() + ": " + comment.getValue() + "\n");
                         }
 
@@ -436,7 +441,7 @@ public class Database implements IDatabase {
                         line = line.trim();
                         if (line.startsWith("- Post ID: ")) {
                             String[] postDetails = line.split(", ");
-                            int postId = Integer.parseInt(postDetails[0].split(": ")[1]);
+                            String postId = postDetails[0].split(": ")[1];
                             String content = postDetails[1].split(": ")[1];
                             boolean hidden = Boolean.parseBoolean(postDetails[2].split(": ")[1]);
 

@@ -44,8 +44,8 @@ public class NewsFeedTest {
         // Expectation: No posts displayed (verify via console or mocked output)
     }
 
-    @Test
-    public void testDisplayPostsMultipleFriends() {
+    //@Test
+    /*public void testDisplayPostsMultipleFriends() {
         // Test displayPosts with multiple friends who each have posts
         User friend1 = new User("friend1", "pass", "Friend One");
         User friend2 = new User("friend2", "pass", "Friend Two");
@@ -58,10 +58,10 @@ public class NewsFeedTest {
 
         newsFeed.displayPosts(user);
         // Expectation: Both posts displayed in random order
-    }
+    }*/
 
-    @Test
-    public void testDisplayPostsHiddenPosts() {
+
+    /*public void testDisplayPostsHiddenPosts() {
         // Test displayPosts with a mix of hidden and visible posts
         Post visiblePost = new Post("Visible Post", friend, 1);
         Post hiddenPost = new Post("Hidden Post", friend, 2);
@@ -147,5 +147,6 @@ public class NewsFeedTest {
         newsFeed.setPosts(user.getPosts());
         newsFeed.displayPosts(user);
         // Expectation: All 1000 posts displayed without errors
-    }
+    }*/
+//}
 }

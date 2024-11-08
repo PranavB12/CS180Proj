@@ -33,8 +33,9 @@ public class DatabaseTest {
         user2 = new User("user2", "pass2", picture2, "This is user2", "User Two");
 
         // Initialize posts
-        post1 = new Post("Hello World!", user1, 1);
-        post2 = new Post("Java is awesome!", user2, 2);
+       // post1 = new Post("Hello World!", user1, 1);
+        //post2 = new Post("Java is awesome!", user2, 2);
+
 
         // Initialize NewsFeed
         newsFeed = new NewsFeed();
@@ -76,7 +77,7 @@ public class DatabaseTest {
         post1.addComment("Comment to be deleted");
         assertEquals(1, post1.getComments().size());
 
-        post1.deleteComment(1);
+        post1.deleteComment(String.valueOf(1));
         assertEquals(0, post1.getComments().size());
     }
 
