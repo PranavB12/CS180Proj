@@ -4,18 +4,18 @@ Description:
 Friends: bob456 charlie789 
 Blocked Users: 
 Posts:
- - Post ID: 1, Content: Hello this is Alice's first post!, Hidden: false
+ - Post ID: cc4b6bbb-e5fb-4dcc-834f-2f3fd8540347, Content: Hello this is Alice's first post!, Hidden: false
    Upvotes: 1
    Downvotes: 0
    Comments: Enabled
-    - ID 1: Nice post, Alice!
+    - ID 1d88c4a5-b676-46dd-927b-e3fbdcc32a95: Nice post, Alice!
 
 Username: bob456, Password: password2, Name: Bob
 Description: Hello! My name is Bob.
 Friends: alice123 
 Blocked Users: 
 Posts:
- - Post ID: 2, Content: Bob here enjoying this new app!, Hidden: false
+ - Post ID: 9e094b85-6694-4515-b8b5-b81f04be4d69, Content: Bob here enjoying this new app!, Hidden: false
    Upvotes: 0
    Downvotes: 1
    Comments: Disabled
@@ -25,10 +25,10 @@ Description:
 Friends: alice123 
 Blocked Users: 
 Posts:
- - Post ID: 3, Content: Charlie posting a quick update!, Hidden: false
+ - Post ID: 3dc55c96-9822-447b-9790-d517b6a04eb9, Content: Charlie posting a quick update!, Hidden: false
    Upvotes: 0
    Downvotes: 0
    Comments: Enabled
-    - ID 1: Welcome, Charlie!
-    - ID 2: This is my 2nd Post!
+    - ID 1261a9a0-467d-43dd-9b82-2b4cd0556049: Welcome, Charlie!
+    - ID 1f2a2ec4-d269-4726-a9e2-f7c273da9f2a: This is my 2nd Post!
 

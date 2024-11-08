@@ -34,9 +34,9 @@ public class test {
         database.addFriend(alice, charlie);
 
         // Create posts by users
-        int postId1 = database.createPost("Hello this is Alice's first post!", alice);
-        int postId2 = database.createPost("Bob here enjoying this new app!", bob);
-        int postId3 = database.createPost("Charlie posting a quick update!", charlie);
+        String postId1 = database.createPost("Hello this is Alice's first post!", alice);
+        String postId2 = database.createPost("Bob here enjoying this new app!", bob);
+        String postId3 = database.createPost("Charlie posting a quick update!", charlie);
         // Add comments to a post
         database.enableCommentsForPost(postId1);
         database.disableCommentsForPost(postId2);

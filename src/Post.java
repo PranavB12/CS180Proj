@@ -3,6 +3,8 @@ package src;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 /**
  * Group Project - CS18000 Gold
  *
@@ -15,21 +17,21 @@ import java.util.Map;
  */
 public class Post implements IPost {
     public User author;
-    private int id;
+    private String id;
     private String content;
     private Picture picture;
     private boolean hidden;
     private boolean commentsEnabled;
     private int upVotes;
     private int downVotes;
-    private Map<Integer, String> comments; //
+    private Map<String, String> comments; //
     private static Object obj = new Object();// Stores comments with unique IDs
 
     // Static fields for total upvotes and downvotes (as per IPost)
 
 
     // Constructor
-    public Post(String content, User user, int postId) {
+    public Post(String content, User user, String postId) {
         this.id = postId;
         this.author = user;
         this.content = content;
@@ -64,25 +66,25 @@ public class Post implements IPost {
 
 
     @Override
-    public void addComment(String comment) {
-        if (!commentsEnabled) {
-            System.out.println("Comments are disabled for this post.");
-            return;
+        public void addComment(String comment) {
+            if (!commentsEnabled) {
+                System.out.println("Comments are disabled for this post.");
+                return;
+            }
+
+            String commentId = UUID.randomUUID().toString();
+            comments.put((commentId), comment);
+            System.out.println("Comment added with ID: " + commentId);
         }
 
-        int commentId = comments.size() + 1;
-        comments.put(commentId, comment);
-        System.out.println("Comment added with ID: " + commentId);
-    }
-
-    @Override
-    public void deleteComment(int commentId) {
-        if (comments.remove(commentId) != null) {
-            System.out.println("Comment with ID " + commentId + " deleted.");
-        } else {
-            System.out.println("Comment with ID " + commentId + " not found.");
+        @Override
+        public void deleteComment(String commentId) {
+            if (comments.remove(commentId) != null) {
+                System.out.println("Comment with ID " + commentId + " deleted.");
+            } else {
+                System.out.println("Comment with ID " + commentId + " not found.");
+            }
         }
-    }
 
     @Override
     public void hidePost() {
@@ -127,11 +129,11 @@ public class Post implements IPost {
     }
 
     // Getters for compatibility with the User class
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -150,7 +152,7 @@ public class Post implements IPost {
     public boolean isCommentsEnabled() {
         return commentsEnabled;
     }
-    public Map<Integer, String> getComments() {
+    public Map<String, String> getComments() {
         return this.comments;
     }
     public int getUpVotes() {
