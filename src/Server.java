@@ -1,44 +1,54 @@
 package src;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-
-public class Server {
-    private Database database;
-    private int port;
+public class Server implements IServer, Runnable {
+    private final Database database;
+    private final int port;
+    private final ExecutorService threadPool;
 
     public Server(int port) {
         this.port = port;
         this.database = new Database();
+        this.threadPool = Executors.newCachedThreadPool();
     }
 
-    public void start() {
+    @Override
+    public void startServer() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is listening on port " + port);
-
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
-                new ClientHandler(socket, database).start();
+                threadPool.execute(new ClientHandler(socket, database));
             }
-        } catch (IOException ex) {
-            System.out.println("Server error: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Server error: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    @Override
+    public void run() {
+        startServer();
     }
 }
 
-class ClientHandler extends Thread {
-    private Socket socket;
-    private Database database;
+class ClientHandler implements Runnable {
+    private final Socket socket;
+    private final Database database;
 
     public ClientHandler(Socket socket, Database database) {
         this.socket = socket;
         this.database = database;
     }
 
+    @Override
     public void run() {
         try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter output = new PrintWriter(socket.getOutputStream(), true)) {
@@ -50,9 +60,9 @@ class ClientHandler extends Thread {
                 String response = handleRequest(command, parts);
                 output.println(response);
             }
-        } catch (IOException ex) {
-            System.out.println("ClientHandler error: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("ClientHandler error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
