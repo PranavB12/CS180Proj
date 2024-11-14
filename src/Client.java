@@ -4,8 +4,8 @@ import java.io.*;
 import java.net.Socket;
 
 public class Client {
-    private String hostname;
-    private int port;
+    private final String hostname;
+    private final int port;
 
     public Client(String hostname, int port) {
         this.hostname = hostname;
@@ -27,9 +27,9 @@ public class Client {
                 System.out.println("Server response: " + response);
             }
 
-        } catch (IOException e) {
-            System.out.println("Client error: " + e.getMessage());
-            e.printStackTrace();
+        } catch (IOException ex) {
+            System.out.println("Client error: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
