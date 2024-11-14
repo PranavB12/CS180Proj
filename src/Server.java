@@ -27,9 +27,9 @@ public class Server implements IServer, Runnable {
                 System.out.println("New client connected");
                 threadPool.execute(new ClientHandler(socket, database));
             }
-        } catch (IOException ex) {
-            System.out.println("Server error: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Server error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -60,9 +60,9 @@ class ClientHandler implements Runnable {
                 String response = handleRequest(command, parts);
                 output.println(response);
             }
-        } catch (IOException ex) {
-            System.out.println("ClientHandler error: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("ClientHandler error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
