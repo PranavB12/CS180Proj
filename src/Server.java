@@ -1,36 +1,103 @@
 package src;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Arrays;
 
-// READ ME!!! --> THIS IS JUST A BASIC OUTLINE
 
-// PRANAV'S UPDATE WILL CHANGE MAJORITY OF THE CODE HERE
-
-// Basic foundation is setup
-
-public class Server implements Runnable {
-    private ServerSocket serverSocket;
-    private Database database; // Reference to the database
-    private List<ClientHandler> clients; // List of connected clients
+public class Server {
+    private Database database;
+    private int port;
 
     public Server(int port) {
-        serverSocket = new ServerSocket(port);
-        clients = new ArrayList<>();
-        database = new Database(); // or inject via constructor
+        this.port = port;
+        this.database = new Database();
     }
 
-    @Override
+    public void start() {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            System.out.println("Server is listening on port " + port);
+
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("New client connected");
+                new ClientHandler(socket, database).start();
+            }
+        } catch (IOException ex) {
+            System.out.println("Server error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+}
+
+class ClientHandler extends Thread {
+    private Socket socket;
+    private Database database;
+
+    public ClientHandler(Socket socket, Database database) {
+        this.socket = socket;
+        this.database = database;
+    }
+
     public void run() {
-        while (true) {
-            Socket clientSocket = serverSocket.accept();
-            ClientHandler clientHandler = new ClientHandler(clientSocket, database);
-            clients.add(clientHandler);
-            new Thread(clientHandler).start(); // Handle each client in a separate thread
+        try (BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter output = new PrintWriter(socket.getOutputStream(), true)) {
+
+            String request;
+            while ((request = input.readLine()) != null) {
+                String[] parts = request.split(" ");
+                String command = parts[0];
+                String response = handleRequest(command, parts);
+                output.println(response);
+            }
+        } catch (IOException ex) {
+            System.out.println("ClientHandler error: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
-    // Method to broadcast messages to all clients
-    public synchronized void broadcast(String message) {
-        for (ClientHandler client : clients) {
-            client.sendMessage(message);
+    private String handleRequest(String command, String[] parts) {
+        switch (command.toUpperCase()) {
+            case "ADDUSER":
+                if (parts.length == 4) {
+                    boolean added = database.createAccount(parts[1], parts[2], parts[3]);
+                    return added ? "User added" : "Failed to add user";
+                }
+                return "Invalid ADDUSER command format";
+
+            case "REMOVEUSER":
+                if (parts.length == 2) {
+                    User user = database.viewUser(parts[1]);
+                    boolean removed = user != null && database.removeUser(user);
+                    return removed ? "User removed" : "User not found";
+                }
+                return "Invalid REMOVEUSER command format";
+
+            case "CREATEPOST":
+                if (parts.length >= 3) {
+                    User user = database.viewUser(parts[1]);
+                    String content = String.join(" ", Arrays.copyOfRange(parts, 2, parts.length));
+                    String postId = user != null ? database.createPost(content, user) : null;
+                    return postId != null ? "Post created with ID " + postId : "Failed to create post";
+                }
+                return "Invalid CREATEPOST command format";
+
+            case "DELETEPOST":
+                if (parts.length == 2) {
+                    boolean deleted = database.deletePost(parts[1]);
+                    return deleted ? "Post deleted" : "Post not found";
+                }
+                return "Invalid DELETEPOST command format";
+
+            case "VIEWUSER":
+                if (parts.length == 2) {
+                    User user = database.viewUser(parts[1]);
+                    return user != null ? user.toString() : "User not found";
+                }
+                return "Invalid VIEWUSER command format";
+
+            default:
+                return "Unknown command";
         }
     }
 }
