@@ -1,12 +1,11 @@
 package src;
-// Test
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+// test2
 public class Server implements IServer, Runnable {
     private final Database database;
     private final int port;
@@ -109,5 +108,13 @@ class ClientHandler implements Runnable {
             default:
                 return "Unknown command";
         }
+    }
+}
+
+class ServerMain {
+    public static void main(String[] args) {
+        Server server = new Server(5050);
+        Thread serverThread = new Thread(server);
+        serverThread.start();
     }
 }
