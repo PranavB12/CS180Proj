@@ -224,7 +224,7 @@ public class Database implements IDatabase {
     }
 
     // Helper method to find a user by username
-    private User findUserByUsername(String username) {
+    User findUserByUsername(String username) {
         synchronized (usersLock) {
             // users is not iterating through anything because users is null
 
