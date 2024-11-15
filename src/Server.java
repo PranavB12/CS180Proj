@@ -66,7 +66,7 @@ public class Server implements IDatabase, Runnable {
                 }
                 String command = request.substring(0, firstSpaceIndex).toUpperCase();
                 String arguments = request.substring(firstSpaceIndex + 1);
-
+                //
                 switch (command) {
                     case "ADD_USER": {
                         String[] parts = arguments.split(" ", 3); // Limit split to 3 parts
