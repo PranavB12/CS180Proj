@@ -141,18 +141,23 @@ public class Database implements IDatabase {
         return postId;
     }
 
-    // Delete a post by its ID
-    public boolean deletePost(String postId) {
+    public boolean deletePost(String postId, User requestingUser) {
         synchronized (postsLock) {
             if (!posts.containsKey(postId)) {
                 System.out.println("Post with ID " + postId + " does not exist.");
                 return false;
             }
+            Post post = posts.get(postId);
+            if (!post.getAuthor().equals(requestingUser)) {
+                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot delete it.");
+                return false;
+            }
             posts.remove(postId);
         }
-        System.out.println("Post with ID " + postId + " deleted.");
+        System.out.println("Post with ID " + postId + " deleted by author " + requestingUser.getUsername() + ".");
         return true;
     }
+
 
 
     // View user information and their posts
@@ -227,13 +232,13 @@ public class Database implements IDatabase {
     }
 
     // Upvote a post
-    public void upvotePost(String postId) {
+    public void upvotePost(String postId, String username) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            post.upvote();
+            post.upvote(username);
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
@@ -242,14 +247,13 @@ public class Database implements IDatabase {
         }
     }
 
-    // Downvote a post
-    public void downvotePost(String postId) {
+    public void downvotePost(String postId, String username) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            post.downvote();
+            post.downvote(username);
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
@@ -280,12 +284,36 @@ public class Database implements IDatabase {
     }
 
     // Delete a comment from a post
-    public void deleteCommentFromPost(String postId, String commentId) {
+    public void deleteCommentFromPost(String postId, String commentId, User requestingUser) {
         Post post;
+
+        // Synchronize access to the posts map
         synchronized (postsLock) {
             post = posts.get(postId);
         }
+
+        // Retrieve the comment
+        Comment comment = comments.get(commentId);
+
+        // Check if the comment exists
+        if (comment == null) {
+            System.out.println("Comment with ID " + commentId + " not found.");
+            return;
+        }
+
+        // Check if the requesting user is authorized to delete the comment
+        boolean isPostOwner = post != null && post.getAuthor().equals(requestingUser);
+        boolean isCommentAuthor = comment.getAuthor().equals(requestingUser);
+
+        if (!isPostOwner && !isCommentAuthor) {
+            System.out.println("Unauthorized action. Only the post owner or comment author can delete the comment.");
+            return;
+        }
+
+        // Remove the comment
         comments.remove(commentId);
+
+        // Remove the comment from the post if the post exists
         if (post != null) {
             post.deleteComment(commentId);
             synchronized (postsLock) {
@@ -296,54 +324,70 @@ public class Database implements IDatabase {
         }
     }
 
+
     // Hide a post
-    public void hidePost(String postId) {
+// Hide a post by its ID only if the requesting user is the author
+    public void hidePost(String postId, User requestingUser) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
+            if (!post.getAuthor().equals(requestingUser)) {
+                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot hide it.");
+                return;
+            }
             post.hidePost();
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
+            System.out.println("Post with ID " + postId + " has been hidden by author " + requestingUser.getUsername() + ".");
         } else {
             System.out.println("Post with ID " + postId + " not found.");
         }
     }
 
-    // Enable comments for a post
-    public void enableCommentsForPost(String postId) {
+
+    // Enable comments for a post only if the requesting user is the author
+    public void enableCommentsForPost(String postId, User requestingUser) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
+            if (!post.getAuthor().equals(requestingUser)) {
+                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot enable comments.");
+                return;
+            }
             post.enableComments();
             synchronized (postsLock) {
                 posts.put(postId, post);
             }
+            System.out.println("Comments enabled for post with ID " + postId + " by author " + requestingUser.getUsername() + ".");
         } else {
             System.out.println("Post with ID " + postId + " not found.");
         }
     }
 
-    // Disable comments for a post
-    public void disableCommentsForPost(String postId) {
+    // Disable comments for a post only if the requesting user is the author
+    public void disableCommentsForPost(String postId, User requestingUser) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
+            if (!post.getAuthor().equals(requestingUser)) {
+                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot disable comments.");
+                return;
+            }
             post.disableComments();
             synchronized (postsLock) {
                 posts.put(postId, post);
             }
-
+            System.out.println("Comments disabled for post with ID " + postId + " by author " + requestingUser.getUsername() + ".");
         } else {
             System.out.println("Post with ID " + postId + " not found.");
-        }
-    }
+
     public synchronized void writeDatabaseToFile(String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write Users
