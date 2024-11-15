@@ -113,7 +113,7 @@ public class Database implements IDatabase {
     // Create a new post by a user
 
     public String createPost(String content, User author) {
-        if (content == null || author == null || !userExists(author.getUsername())) {
+        if (content == null || author == null || getUserByUsername(author.getUsername()) == null) {
             System.out.println("Invalid content or author does not exist.");
             return null;
         }
@@ -212,7 +212,7 @@ public class Database implements IDatabase {
     }
 
     // Helper method to find a user by username
-    public User findUserByUsername(String username) {
+    private User findUserByUsername(String username) {
         synchronized (usersLock) {
             // users is not iterating through anything because users is null
 
@@ -344,115 +344,169 @@ public class Database implements IDatabase {
             System.out.println("Post with ID " + postId + " not found.");
         }
     }
-    public void writeDatabaseToFile(String filePath) {
+    public synchronized void writeDatabaseToFile(String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write Users
             writer.write("USERS\n");
-            synchronized (usersLock) {
-                for (User user : users) {
-                    writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getName() + "," +
-                            (user.getDescription() != null ? user.getDescription() : "") + "\n");
-                    writer.write("FRIENDS:" + user.getFriends().stream().map(User::getUsername).toList() + "\n");
-                    writer.write("BLOCKED:" + user.getBlockedUsers().stream().map(User::getUsername).toList() + "\n");
+
+            for (User user : users) {
+                writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getName() + "," + user.getDescription() + "\n");
+
+                // Write Friends (if any)
+                List<User> friends = user.getFriends();
+                if (friends != null && !friends.isEmpty()) {
+                    writer.write("Friends for " + user.getUsername() + ": ");
+                    writer.write(String.join(",", friends.stream().map(User::getUsername).toList()) + "\n");
+                }
+
+                // Write Blocked Users (if any)
+                List<User> blockedUsers = user.getBlockedUsers();
+                if (blockedUsers != null ) {
+                    writer.write("Blocked users for " + user.getUsername() + ": ");
+                    writer.write(String.join(",", blockedUsers.stream().map(User::getUsername).toList()) + "\n");
                 }
             }
 
             // Write Posts
             writer.write("POSTS\n");
-            synchronized (postsLock) {
-                for (Post post : posts.values()) {
-                    writer.write(post.getId() + "," + post.getContent() + "," + post.getAuthor().getUsername() + "," +
-                            post.getUpVotes() + "," + post.getDownVotes() + "," + post.getHidden() + "," +
-                            post.getComments().keySet() + "\n");
-                }
+            for (Post post : posts.values()) {
+                // Write post ID, content, author, upvotes, and downvotes
+                writer.write(post.getId() + "," + post.getContent() + "," + post.getAuthor().getUsername() + ","
+                        + post.getUpVotes() + "," + post.getDownVotes() + "\n");
+                System.out.println("Post created with ID: " + post.getId() + " Upvotes: " + post.getUpVotes() + " Downvotes: " + post.getDownVotes()); // Debugging line
             }
-
             // Write Comments
             writer.write("COMMENTS\n");
-            synchronized (postsLock) {
-                for (Comment comment : comments.values()) {
-                    writer.write(comment.getID() + "," + comment.getContent() + "," + comment.getAuthor().getUsername() + "," +
-                            comment.getPostID() + "\n");
-                }
+            for (Comment comment : comments.values()) {
+                // Include the postId along with other comment data
+                writer.write(comment.getID() + "," + comment.getContent() + "," + comment.getAuthor().getUsername() + ","
+                        + comment.getUpVotes() + "," + comment.getDownVotes() + "," + comment.getPostID() + "\n");
             }
+
         } catch (IOException e) {
-            System.out.println("Error writing to file: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    public void readDatabaseFromFile(String filePath) {
+
+    // Method to read the database from a file (synchronized for thread safety)
+    public synchronized void readDatabaseFromFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            String section = "";
-            Map<String, User> userMap = new HashMap<>(); // Temp map for quick access
+            String currentSection = ""; // Section we are currently reading
 
             while ((line = reader.readLine()) != null) {
-                if (line.equals("USERS")) {
-                    section = "USERS";
-                    continue;
-                } else if (line.equals("POSTS")) {
-                    section = "POSTS";
-                    continue;
-                } else if (line.equals("COMMENTS")) {
-                    section = "COMMENTS";
-                    continue;
-                }
+                line = line.trim(); // Remove leading and trailing spaces
 
-                switch (section) {
-                    case "USERS" -> {
-                        if (line.startsWith("FRIENDS:") || line.startsWith("BLOCKED:")) {
-                            // Handle friends and blocked users
-                            String[] data = line.split(":", 2);
-                            List<String> relatedUsers = Arrays.asList(data[1].replaceAll("[\\[\\]]", "").split(", "));
-                            if (data[0].equals("FRIENDS")) {
-                                User user = users.get(users.size() - 1); // Last user added
-                                for (String friendUsername : relatedUsers) {
-                                    user.addFriend(userMap.get(friendUsername));
+                // Debugging: show which line is being processed
+                System.out.println("Reading line: " + line);
+
+                // Handle section headers
+                if (line.equals("USERS")) {
+                    currentSection = "USERS";
+                    System.out.println("Switching to USERS section");
+                } else if (line.equals("POSTS")) {
+                    currentSection = "POSTS";
+                    System.out.println("Switching to POSTS section");
+                } else if (line.equals("COMMENTS")) {
+                    currentSection = "COMMENTS";
+                    System.out.println("Switching to COMMENTS section");
+                } else {
+                    // Process data based on the current section
+                    if (currentSection.equals("USERS")) {
+                        // User line (4 values, without friends and blocked users)
+                        if (!line.startsWith("Friends for") && !line.startsWith("Blocked users for")) {
+                            String[] userParts = line.split(",");
+                            if (userParts.length == 4) {
+                                // Valid user data found
+                                User user = new User(userParts[0], userParts[1], userParts[2], userParts[3]);
+                                this.addUser(user); // Add user to the database
+                            } else {
+                                System.err.println("Skipping invalid user line: " + line);
+                            }
+                        }
+                    } else if (currentSection.equals("POSTS")) {
+                        // Post line (expecting 5 values: ID, content, author, upvotes, downvotes)
+                        String[] postParts = line.split(",");
+                        if (postParts.length >= 3) {  // Expect at least 3 values: ID, content, author
+                            String postId = postParts[0];
+                            String postContent = postParts[1];
+                            String authorUsername = postParts[2];
+                            int upVotes = Integer.parseInt(postParts[3]); // Upvotes
+                            int downVotes = Integer.parseInt(postParts[4]); // Downvotes
+
+                            // Debugging: Print post ID being read
+                            System.out.println("Reading post with ID: " + postId);
+
+                            // Create the post and add it to the posts map
+                            User author = this.getUserByUsername(authorUsername);
+                            if (author != null) {
+                                Post post = new Post(postContent, author, postId);
+                                post.setUpVotes(upVotes);
+                                post.setDownVotes(downVotes);
+
+                                synchronized (postsLock) {
+                                    posts.put(postId, post);
                                 }
-                            } else if (data[0].equals("BLOCKED")) {
-                                User user = users.get(users.size() - 1); // Last user added
-                                for (String blockedUsername : relatedUsers) {
-                                    user.blockUser(userMap.get(blockedUsername));
-                                }
+
+                                System.out.println("Added post: " + postId); // Debugging
+                            } else {
+                                System.err.println("Author not found for post: " + authorUsername);
+                            }
+                        }
+                    }
+                    else if (currentSection.equals("COMMENTS")) {
+                        // Comment line (expecting 6 values: ID, content, author, upvotes, downvotes, postID)
+                        String[] commentParts = line.split(",");
+                        if (commentParts.length >= 6) {  // Expect 6 values: ID, content, author, upvotes, downvotes, postID
+                            String commentId = commentParts[0];
+                            String commentContent = commentParts[1];
+                            String authorUsername = commentParts[2];
+                            int upVotes = Integer.parseInt(commentParts[3]);
+                            int downVotes = Integer.parseInt(commentParts[4]);
+                            String postId = commentParts[5];
+
+                            // Debugging: Print post ID being looked for
+                            System.out.println("Looking for post with ID: " + postId);
+
+                            // Get the post associated with this comment
+                            Post post = this.getPostById(postId);
+                            if (post != null) {
+                                // Create a new comment with the correct parameters
+                                Comment comment = new Comment(commentContent, this.getUserByUsername(authorUsername), postId);
+                                comment.setUpvotes(upVotes);
+                                comment.setDownvotes(downVotes);
+
+                                // Add the comment to the post
+                                this.addCommentToPost(postId, commentContent, this.getUserByUsername(authorUsername));
+                                System.out.println("Added comment to post " + postId); // Debugging
+                            } else {
+                                System.err.println("Post with ID " + postId + " not found for comment.");
                             }
                         } else {
-                            // Handle regular user data
-                            String[] data = line.split(",", 4);
-                            User user = new User(data[0], data[1], data[2]);
-                            user.setDescription(data[3]);
-                            users.add(user);
-                            userMap.put(data[0], user); // Map for quick access
+                            System.err.println("Skipping invalid comment line: " + line);
                         }
                     }
-                    case "POSTS" -> {
-                        String[] data = line.split(",", 7);
-                        User author = userMap.get(data[2]);
-                        Post post = new Post(data[1], author, data[0]);
-                        post.setUpVotes(Integer.parseInt(data[3]));
-                        post.setDownVotes(Integer.parseInt(data[4]));
-                        post.setHidden(Boolean.parseBoolean(data[5]));
-                        posts.put(data[0], post);
 
-                        // Add comments if any
-                        if (!data[6].equals("[]")) {
-                            List<String> commentIds = Arrays.asList(data[6].replaceAll("[\\[\\]]", "").split(", "));
-                            for (String commentId : commentIds) {
-                                Comment comment = comments.get(commentId);
-                                post.addComment(commentId, comment);
-                            }
-                        }
-                    }
-                    case "COMMENTS" -> {
-                        String[] data = line.split(",", 4);
-                        User author = userMap.get(data[2]);
-                        Comment comment = new Comment(data[1], author,data[3], data[0]);
-                        comments.put(data[0], comment);
-                    }
+
+
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error reading from file: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+
+
+    // Helper method to get User by username
+    private User getUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
     }
     private void updateUserInDatabase(User user) {
         for (int i = 0; i < users.size(); i++) {
@@ -460,6 +514,16 @@ public class Database implements IDatabase {
                 users.set(i, user); // Replace the old user object with the updated one
                 return;
             }
+        }
+    }
+    public Post getPostById(String postId) {
+        // Check if the posts map contains the postId
+        if (posts.containsKey(postId)) {
+            return posts.get(postId); // Return the post with the specified postId
+        } else {
+            // If postId is not found, return null or handle as needed
+            System.err.println("Post with ID " + postId + " not found.");
+            return null;
         }
     }
 
