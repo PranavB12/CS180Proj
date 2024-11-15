@@ -1,6 +1,8 @@
+package src;
+
 import java.util.UUID;
 
-public class Comment {
+public class Comment implements IComment {
     private String comment;
     private String ID;
     private User author;
