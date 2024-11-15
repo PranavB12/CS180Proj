@@ -20,15 +20,25 @@ public class Client {
              BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
 
             System.out.println("Connected to server at " + host + ":" + port);
+            System.out.println("Type commands to interact with the server (e.g., ADD_USER <username> <password> <name>):");
+
             String input;
             while ((input = userInput.readLine()) != null) {
-                out.println(input);
-                String response = in.readLine();
+                out.println(input); // Send user input to the server
+                String response = in.readLine(); // Receive response from the server
                 System.out.println("Server: " + response);
             }
 
         } catch (IOException e) {
             System.err.println("Client error: " + e.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+        String host = "localhost"; // Server host
+        int port = 12345;          // Server port
+
+        Client client = new Client(host, port);
+        client.start();
     }
 }
