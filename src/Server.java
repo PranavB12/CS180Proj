@@ -148,9 +148,9 @@ public class Server implements IDatabase, Runnable {
     }
 
     @Override
-    public void addCommentToPost(String postId, String comment) {
-        database.addCommentToPost(postId, comment);
-    }
+    public void addCommentToPost(String postId, String comment, User commentAuthor) {
+        database.addCommentToPost(postId, comment, commentAuthor);
+    } 
 
     @Override
     public void deleteCommentFromPost(String postId, String commentId) {
@@ -173,9 +173,7 @@ public class Server implements IDatabase, Runnable {
     }
 
     @Override
-    public void saveDatabaseToFile(String filename) {
-        database.saveDatabaseToFile(filename);
-    }
+    public void writeDatabaseToFile(String filename) {database.writeDatabaseToFile(filename); }
 
     @Override
     public void readDatabaseFromFile(String filename) {
