@@ -1,43 +1,34 @@
 package src;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 
 public class Client {
-    private final String hostname;
+
+    private final String host;
     private final int port;
 
-    public Client(String hostname, int port) {
-        this.hostname = hostname;
+    public Client(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
     public void start() {
-        try (Socket socket = new Socket(hostname, port);
-             BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader console = new BufferedReader(new InputStreamReader(System.in))) {
+        try (Socket socket = new Socket(host, port);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
 
-            System.out.println("Connected to the server");
-
-            String text;
-            while ((text = console.readLine()) != null) {
-                output.println(text);
-                String response = input.readLine();
-                System.out.println("Server response: " + response);
+            System.out.println("Connected to server at " + host + ":" + port);
+            String input;
+            while ((input = userInput.readLine()) != null) {
+                out.println(input);
+                String response = in.readLine();
+                System.out.println("Server: " + response);
             }
 
-        } catch (IOException ex) {
-            System.out.println("Client error: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Client error: " + e.getMessage());
         }
     }
 }
-
-class ClientMain {
-    public static void main(String[] args) {
-        Client client = new Client("localhost", 5050);
-        client.start();
-    }
-}
-
