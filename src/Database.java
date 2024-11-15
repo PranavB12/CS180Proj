@@ -141,23 +141,18 @@ public class Database implements IDatabase {
         return postId;
     }
 
-    public boolean deletePost(String postId, User requestingUser) {
+    // Delete a post by its ID
+    public boolean deletePost(String postId) {
         synchronized (postsLock) {
             if (!posts.containsKey(postId)) {
                 System.out.println("Post with ID " + postId + " does not exist.");
                 return false;
             }
-            Post post = posts.get(postId);
-            if (!post.getAuthor().equals(requestingUser)) {
-                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot delete it.");
-                return false;
-            }
             posts.remove(postId);
         }
-        System.out.println("Post with ID " + postId + " deleted by author " + requestingUser.getUsername() + ".");
+        System.out.println("Post with ID " + postId + " deleted.");
         return true;
     }
-
 
 
     // View user information and their posts
@@ -232,13 +227,13 @@ public class Database implements IDatabase {
     }
 
     // Upvote a post
-    public void upvotePost(String postId, String username) {
+    public void upvotePost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            post.upvote(username);
+            post.upvote();
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
@@ -247,13 +242,14 @@ public class Database implements IDatabase {
         }
     }
 
-    public void downvotePost(String postId, String username) {
+    // Downvote a post
+    public void downvotePost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            post.downvote(username);
+            post.downvote();
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
@@ -284,36 +280,12 @@ public class Database implements IDatabase {
     }
 
     // Delete a comment from a post
-    public void deleteCommentFromPost(String postId, String commentId, User requestingUser) {
+    public void deleteCommentFromPost(String postId, String commentId) {
         Post post;
-
-        // Synchronize access to the posts map
         synchronized (postsLock) {
             post = posts.get(postId);
         }
-
-        // Retrieve the comment
-        Comment comment = comments.get(commentId);
-
-        // Check if the comment exists
-        if (comment == null) {
-            System.out.println("Comment with ID " + commentId + " not found.");
-            return;
-        }
-
-        // Check if the requesting user is authorized to delete the comment
-        boolean isPostOwner = post != null && post.getAuthor().equals(requestingUser);
-        boolean isCommentAuthor = comment.getAuthor().equals(requestingUser);
-
-        if (!isPostOwner && !isCommentAuthor) {
-            System.out.println("Unauthorized action. Only the post owner or comment author can delete the comment.");
-            return;
-        }
-
-        // Remove the comment
         comments.remove(commentId);
-
-        // Remove the comment from the post if the post exists
         if (post != null) {
             post.deleteComment(commentId);
             synchronized (postsLock) {
@@ -324,70 +296,54 @@ public class Database implements IDatabase {
         }
     }
 
-
     // Hide a post
-// Hide a post by its ID only if the requesting user is the author
-    public void hidePost(String postId, User requestingUser) {
+    public void hidePost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            if (!post.getAuthor().equals(requestingUser)) {
-                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot hide it.");
-                return;
-            }
             post.hidePost();
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
             }
-            System.out.println("Post with ID " + postId + " has been hidden by author " + requestingUser.getUsername() + ".");
         } else {
             System.out.println("Post with ID " + postId + " not found.");
         }
     }
 
-
-    // Enable comments for a post only if the requesting user is the author
-    public void enableCommentsForPost(String postId, User requestingUser) {
+    // Enable comments for a post
+    public void enableCommentsForPost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            if (!post.getAuthor().equals(requestingUser)) {
-                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot enable comments.");
-                return;
-            }
             post.enableComments();
             synchronized (postsLock) {
                 posts.put(postId, post);
             }
-            System.out.println("Comments enabled for post with ID " + postId + " by author " + requestingUser.getUsername() + ".");
         } else {
             System.out.println("Post with ID " + postId + " not found.");
         }
     }
 
-    // Disable comments for a post only if the requesting user is the author
-    public void disableCommentsForPost(String postId, User requestingUser) {
+    // Disable comments for a post
+    public void disableCommentsForPost(String postId) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
         }
         if (post != null) {
-            if (!post.getAuthor().equals(requestingUser)) {
-                System.out.println("User " + requestingUser.getUsername() + " is not the author of the post and cannot disable comments.");
-                return;
-            }
             post.disableComments();
             synchronized (postsLock) {
                 posts.put(postId, post);
             }
-            System.out.println("Comments disabled for post with ID " + postId + " by author " + requestingUser.getUsername() + ".");
+
         } else {
             System.out.println("Post with ID " + postId + " not found.");
-
+        }
+    }
     public synchronized void writeDatabaseToFile(String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write Users
@@ -434,106 +390,130 @@ public class Database implements IDatabase {
 
 
     // Method to read the database from a file (synchronized for thread safety)
-    public synchronized void readDatabaseFromFile(String filePath) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    public void readDatabaseFromFile(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            String currentSection = ""; // Section we are currently reading
+            String currentSection = "";  // Will track the current section (USERS, POSTS, COMMENTS)
 
-            while ((line = reader.readLine()) != null) {
-                line = line.trim(); // Remove leading and trailing spaces
-
-                // Debugging: show which line is being processed
-                System.out.println("Reading line: " + line);
-
+            while ((line = br.readLine()) != null) {
                 // Handle section headers
                 if (line.equals("USERS")) {
                     currentSection = "USERS";
-                    System.out.println("Switching to USERS section");
                 } else if (line.equals("POSTS")) {
                     currentSection = "POSTS";
-                    System.out.println("Switching to POSTS section");
                 } else if (line.equals("COMMENTS")) {
                     currentSection = "COMMENTS";
-                    System.out.println("Switching to COMMENTS section");
                 } else {
-                    // Process data based on the current section
-                    if (currentSection.equals("USERS")) {
-                        // User line (4 values, without friends and blocked users)
-                        if (!line.startsWith("Friends for") && !line.startsWith("Blocked users for")) {
-                            String[] userParts = line.split(",");
-                            if (userParts.length == 4) {
-                                // Valid user data found
-                                User user = new User(userParts[0], userParts[1], userParts[2], userParts[3]);
-                                this.addUser(user); // Add user to the database
-                            } else {
-                                System.err.println("Skipping invalid user line: " + line);
-                            }
-                        }
-                    } else if (currentSection.equals("POSTS")) {
-                        // Post line (expecting 5 values: ID, content, author, upvotes, downvotes)
-                        String[] postParts = line.split(",");
-                        if (postParts.length >= 3) {  // Expect at least 3 values: ID, content, author
-                            String postId = postParts[0];
-                            String postContent = postParts[1];
-                            String authorUsername = postParts[2];
-                            int upVotes = Integer.parseInt(postParts[3]); // Upvotes
-                            int downVotes = Integer.parseInt(postParts[4]); // Downvotes
-
-                            // Debugging: Print post ID being read
-                            System.out.println("Reading post with ID: " + postId);
-
-                            // Create the post and add it to the posts map
-                            User author = this.getUserByUsername(authorUsername);
-                            if (author != null) {
-                                Post post = new Post(postContent, author, postId);
-                                post.setUpVotes(upVotes);
-                                post.setDownVotes(downVotes);
-
-                                synchronized (postsLock) {
-                                    posts.put(postId, post);
+                    // Handle data in each section
+                    switch (currentSection) {
+                        case "USERS":
+                            // Process user data (4 values)
+                            if (!line.startsWith("Friends for") && !line.startsWith("Blocked users for")) {
+                                String[] userParts = line.split(",");
+                                if (userParts.length == 4) {
+                                    // Create user and add to the database
+                                    User user = new User(userParts[0], userParts[1], userParts[2], userParts[3]);
+                                    this.addUser(user);
+                                    System.out.println("User added: " + user.getUsername());
+                                } else {
+                                    System.err.println("Skipping invalid user line: " + line);
                                 }
-
-                                System.out.println("Added post: " + postId); // Debugging
                             } else {
-                                System.err.println("Author not found for post: " + authorUsername);
+                                // Handle friends and blocked users for the current user
+                                String username = line.split(":")[0].split(" ")[2];  // Extract the username
+                                User currentUser = this.getUserByUsername(username);
+
+                                if (currentUser != null) {
+                                    if (line.startsWith("Friends for")) {
+                                        // Process friends
+                                        String friendsLine = line.substring("Friends for ".length());
+                                        String[] friends = friendsLine.split(",");
+                                        for (String friendUsername : friends) {
+                                            User friend = this.getUserByUsername(friendUsername);
+                                            if (friend != null) {
+                                                currentUser.addFriend(friend);
+                                                System.out.println(currentUser.getUsername() + " added friend: " + friend.getUsername());
+                                            } else {
+                                                System.err.println("Friend with username " + friendUsername + " not found.");
+                                            }
+                                        }
+                                    } else if (line.startsWith("Blocked users for")) {
+                                        // Process blocked users
+                                        String blockedLine = line.substring("Blocked users for ".length());
+                                        String[] blockedUsers = blockedLine.split(",");
+                                        for (String blockedUsername : blockedUsers) {
+                                            User blockedUser = this.getUserByUsername(blockedUsername);
+                                            if (blockedUser != null) {
+                                                currentUser.blockUser(blockedUser);
+                                                System.out.println(currentUser.getUsername() + " blocked user: " + blockedUser.getUsername());
+                                            } else {
+                                                System.err.println("Blocked user with username " + blockedUsername + " not found.");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    System.err.println("User with username " + username + " not found for friends/blocked users.");
+                                }
                             }
-                        }
-                    }
-                    else if (currentSection.equals("COMMENTS")) {
-                        // Comment line (expecting 6 values: ID, content, author, upvotes, downvotes, postID)
-                        String[] commentParts = line.split(",");
-                        if (commentParts.length >= 6) {  // Expect 6 values: ID, content, author, upvotes, downvotes, postID
-                            String commentId = commentParts[0];
-                            String commentContent = commentParts[1];
-                            String authorUsername = commentParts[2];
-                            int upVotes = Integer.parseInt(commentParts[3]);
-                            int downVotes = Integer.parseInt(commentParts[4]);
-                            String postId = commentParts[5];
+                            break;
 
-                            // Debugging: Print post ID being looked for
-                            System.out.println("Looking for post with ID: " + postId);
+                        case "POSTS":
+                            // Parse post data (5 values)
+                            String[] postParts = line.split(",");
+                            if (postParts.length == 5) {
+                                String postId = postParts[0];
+                                String content = postParts[1];
+                                String authorUsername = postParts[2];
+                                int upVotes = Integer.parseInt(postParts[3]);
+                                int downVotes = Integer.parseInt(postParts[4]);
 
-                            // Get the post associated with this comment
-                            Post post = this.getPostById(postId);
-                            if (post != null) {
-                                // Create a new comment with the correct parameters
-                                Comment comment = new Comment(commentContent, this.getUserByUsername(authorUsername), postId);
-                                comment.setUpvotes(upVotes);
-                                comment.setDownvotes(downVotes);
-
-                                // Add the comment to the post
-                                this.addCommentToPost(postId, commentContent, this.getUserByUsername(authorUsername));
-                                System.out.println("Added comment to post " + postId); // Debugging
+                                User author = this.getUserByUsername(authorUsername);
+                                if (author != null) {
+                                    Post post = new Post(content, author, postId);
+                                    post.setUpVotes(upVotes);
+                                    post.setDownVotes(downVotes);
+                                    this.addPost(post);
+                                    System.out.println("Post created with ID: " + postId + " Content: " + content);
+                                } else {
+                                    System.err.println("Post author " + authorUsername + " not found.");
+                                }
                             } else {
-                                System.err.println("Post with ID " + postId + " not found for comment.");
+                                System.err.println("Skipping invalid post line: " + line);
                             }
-                        } else {
-                            System.err.println("Skipping invalid comment line: " + line);
-                        }
+                            break;
+
+                        case "COMMENTS":
+                            // Parse comment data (6 values)
+                            String[] commentParts = line.split(",");
+                            if (commentParts.length == 6) {
+                                String commentId = commentParts[0];
+                                String commentContent = commentParts[1];
+                                String authorUsername = commentParts[2];
+                                int upVotes = Integer.parseInt(commentParts[3]);
+                                int downVotes = Integer.parseInt(commentParts[4]);
+                                String postId = commentParts[5];
+
+                                // Find the post for this comment
+                                Post post = this.getPostById(postId);
+                                if (post != null) {
+                                    User author = this.getUserByUsername(authorUsername);
+                                    if (author != null) {
+                                        Comment comment = new Comment(commentContent, author, commentId);
+                                        comment.setUpvotes(upVotes);
+                                        comment.setDownvotes(downVotes);
+                                        this.addCommentToPost(postId, commentContent, author);
+                                        System.out.println("Added comment to post with ID: " + postId);
+                                    } else {
+                                        System.err.println("Comment author " + authorUsername + " not found.");
+                                    }
+                                } else {
+                                    System.err.println("Post with ID " + postId + " not found for comment.");
+                                }
+                            } else {
+                                System.err.println("Skipping invalid comment line: " + line);
+                            }
+                            break;
                     }
-
-
-
                 }
             }
         } catch (IOException e) {
@@ -543,8 +523,9 @@ public class Database implements IDatabase {
 
 
 
+
     // Helper method to get User by username
-    private User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         for (User user : users) {
             if (user.getUsername().equals(username)) {
                 return user;
@@ -552,7 +533,7 @@ public class Database implements IDatabase {
         }
         return null;
     }
-    private void updateUserInDatabase(User user) {
+    public void updateUserInDatabase(User user) {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getUsername().equals(user.getUsername())) {
                 users.set(i, user); // Replace the old user object with the updated one
@@ -568,6 +549,16 @@ public class Database implements IDatabase {
             // If postId is not found, return null or handle as needed
             System.err.println("Post with ID " + postId + " not found.");
             return null;
+        }
+    }
+    public synchronized void addPost(Post post) {
+        // Check if the post already exists in the database
+        if (posts.containsKey(post.getId())) {
+            System.out.println("Post with ID " + post.getId() + " already exists.");
+        } else {
+            // Add the post to the database
+            posts.put(post.getId(), post);
+            System.out.println("Post created with ID: " + post.getId() + " by user: " + post.getAuthor().getUsername());
         }
     }
 
