@@ -351,139 +351,147 @@ public class Database implements IDatabase {
             System.out.println("Post with ID " + postId + " not found.");
         }
     }
+
+    // Save Database to txt file
     public void saveDatabaseToFile(String filename) {
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.write("Users:\n");
-            for (User user : users) {
-                writer.write("Username: " + user.getUsername() + ", Password: " + user.getPassword() + ", Name: " + user.getName() + "\n");
-                writer.write("Description: " + user.getDescription());
-                writer.write("\nFriends: ");
+        synchronized (usersLock) {
+            synchronized (postsLock) {
+                try (FileWriter writer = new FileWriter(filename)) {
+                    writer.write("Users:\n");
+                    for (User user : users) {
+                        writer.write("Username: " + user.getUsername() + ", Password: " + user.getPassword() + ", Name: " + user.getName() + "\n");
+                        writer.write("Description: " + user.getDescription());
+                        writer.write("\nFriends: ");
 
-                for (User friend : user.getFriends()) {
-                    writer.write(friend.getUsername() + " ");
-                }
-                writer.write("\nBlocked Users: ");
-                for (User blocked : user.getBlockedUsers()) {
-                    writer.write(blocked.getUsername() + " ");
-                }
-                writer.write("\nPosts:\n");
-                for (Post post : posts.values()) {
-                    if (post.getAuthor().equals(user)) {
-                        writer.write(" - Post ID: " + post.getId() + ", Content: " + post.getContent() + ", Hidden: " + post.isHidden() + "\n");
-                        writer.write("   Upvotes: " + post.getUpVotes() + "\n   Downvotes: " + post.getDownVotes() + "\n");
-                        String a;
-                        if (post.isCommentsEnabled()) {
-                            a = "Enabled";
-                        } else {
-                            a = "Disabled";
+                        for (User friend : user.getFriends()) {
+                            writer.write(friend.getUsername() + " ");
                         }
-                        writer.write("   Comments: " + a + "\n");
-
-                        for (Map.Entry<String, String> comment : post.getComments().entrySet()) {
-                            writer.write("    - ID " + comment.getKey() + ": " + comment.getValue() + "\n");
+                        writer.write("\nBlocked Users: ");
+                        for (User blocked : user.getBlockedUsers()) {
+                            writer.write(blocked.getUsername() + " ");
                         }
+                        writer.write("\nPosts:\n");
+                        for (Post post : posts.values()) {
+                            if (post.getAuthor().equals(user)) {
+                                writer.write(" - Post ID: " + post.getId() + ", Content: " + post.getContent() + ", Hidden: " + post.isHidden() + "\n");
+                                writer.write("   Upvotes: " + post.getUpVotes() + "\n   Downvotes: " + post.getDownVotes() + "\n");
+                                String a;
+                                if (post.isCommentsEnabled()) {
+                                    a = "Enabled";
+                                } else {
+                                    a = "Disabled";
+                                }
+                                writer.write("   Comments: " + a + "\n");
 
+                                for (Map.Entry<String, String> comment : post.getComments().entrySet()) {
+                                    writer.write("    - ID " + comment.getKey() + ": " + comment.getValue() + "\n");
+                                }
+
+                            }
+                        }
+                        writer.write("\n");
                     }
+                    System.out.println("Database saved to " + filename);
+                } catch (IOException e) {
+                    System.out.println("An error occurred while saving the database: " + e.getMessage());
                 }
-                writer.write("\n");
             }
-            System.out.println("Database saved to " + filename);
-        } catch (IOException e) {
-            System.out.println("An error occurred while saving the database: " + e.getMessage());
         }
     }
-    public void readDatabaseFromFile(String filename) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            String line;
-            User currentUser = null;
 
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("Username: ")) {
-                    // If there's a current user, add them to the list before starting a new one
+    public void readDatabaseFromFile(String filename) {
+        synchronized (usersLock) {
+            synchronized (postsLock) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+                    String line;
+                    User currentUser = null;
+
+                    while ((line = reader.readLine()) != null) {
+                        line = line.trim();
+                        if (line.startsWith("Username: ")) {
+                            if (currentUser != null) {
+                                users.add(currentUser);
+                            }
+
+                            String[] userDetails = line.split(", ");
+                            String username = userDetails[0].split(": ")[1];
+                            String password = userDetails[1].split(": ")[1];
+                            String name = userDetails[2].split(": ")[1];
+
+                            currentUser = new User(username, password, name);
+                        } else if (line.startsWith("Description: ")) {
+                            if (currentUser != null) {
+                                currentUser.setDescription(line.split(": ", 2)[1]);
+                            }
+                        } else if (line.startsWith("Friends: ")) {
+                            if (currentUser != null) {
+                                String[] friends = line.split(": ")[1].trim().split(" ");
+                                for (String friend : friends) {
+                                    User friendUser = findUserByUsername(friend);
+                                    if (friendUser != null) {
+                                        currentUser.getFriends().add(friendUser);
+                                    }
+                                }
+                            }
+                        } else if (line.startsWith("Blocked Users: ")) {
+                            if (currentUser != null) {
+                                String[] blockedUsers = line.split(": ")[1].trim().split(" ");
+                                for (String blockedUser : blockedUsers) {
+                                    User blocked = findUserByUsername(blockedUser);
+                                    if (blocked != null) {
+                                        currentUser.getBlockedUsers().add(blocked);
+                                    }
+                                }
+                            }
+                        } else if (line.startsWith("Posts:")) {
+                            while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
+                                line = line.trim();
+                                if (line.startsWith("- Post ID: ")) {
+                                    String[] postDetails = line.split(", ");
+                                    String postId = postDetails[0].split(": ")[1];
+                                    String content = postDetails[1].split(": ")[1];
+                                    boolean hidden = Boolean.parseBoolean(postDetails[2].split(": ")[1]);
+
+                                    Post post = new Post(content, currentUser, postId);
+                                    post.setHidden(hidden);
+
+                                    line = reader.readLine().trim();
+                                    if (line.startsWith("Upvotes: ")) {
+                                        int upvotes = Integer.parseInt(line.split(": ")[1]);
+                                        post.setUpVotes(upvotes);
+                                    }
+                                    line = reader.readLine().trim();
+                                    if (line.startsWith("Downvotes: ")) {
+                                        int downvotes = Integer.parseInt(line.split(": ")[1]);
+                                        post.setDownVotes(downvotes);
+                                    }
+                                    line = reader.readLine().trim();
+                                    if (line.startsWith("Comments: ")) {
+                                        boolean commentsEnabled = line.split(": ")[1].equalsIgnoreCase("Enabled");
+                                        post.setCommentsEnabled(commentsEnabled);
+                                    }
+                                    while ((line = reader.readLine()) != null && line.startsWith(" - ID ")) {
+                                        int commentId = Integer.parseInt(line.split(":")[0].split(" ")[2]);
+                                        String commentContent = line.split(": ", 2)[1].trim();
+                                        post.addComment(commentContent);
+                                    }
+                                    posts.put(post.getId(), post);
+                                    currentUser.getPosts().add(post);
+                                }
+                            }
+                        }
+                    }
                     if (currentUser != null) {
                         users.add(currentUser);
                     }
-
-                    String[] userDetails = line.split(", ");
-                    String username = userDetails[0].split(": ")[1];
-                    String password = userDetails[1].split(": ")[1];
-                    String name = userDetails[2].split(": ")[1];
-
-                    currentUser = new User(username, password, name);
-                } else if (line.startsWith("Description: ")) {
-                    if (currentUser != null) {
-                        currentUser.setDescription(line.split(": ", 2)[1]);
-                    }
-                } else if (line.startsWith("Friends: ")) {
-                    if (currentUser != null) {
-                        String[] friends = line.split(": ")[1].trim().split(" ");
-                        for (String friend : friends) {
-                            User friendUser = findUserByUsername(friend);
-                            if (friendUser != null) {
-                                currentUser.getFriends().add(friendUser);
-                            }
-                        }
-                    }
-                } else if (line.startsWith("Blocked Users: ")) {
-                    if (currentUser != null) {
-                        String[] blockedUsers = line.split(": ")[1].trim().split(" ");
-                        for (String blockedUser : blockedUsers) {
-                            User blocked = findUserByUsername(blockedUser);
-                            if (blocked != null) {
-                                currentUser.getBlockedUsers().add(blocked);
-                            }
-                        }
-                    }
-                } else if (line.startsWith("Posts:")) {
-                    // Continue to next line for posts
-                    while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
-                        line = line.trim();
-                        if (line.startsWith("- Post ID: ")) {
-                            String[] postDetails = line.split(", ");
-                            String postId = postDetails[0].split(": ")[1];
-                            String content = postDetails[1].split(": ")[1];
-                            boolean hidden = Boolean.parseBoolean(postDetails[2].split(": ")[1]);
-
-                            Post post = new Post(content, currentUser, postId);
-                            post.setHidden(hidden);
-                            // Next line for upvotes, downvotes, and comments
-                            line = reader.readLine().trim();
-                            if (line.startsWith("Upvotes: ")) {
-                                int upvotes = Integer.parseInt(line.split(": ")[1]);
-                                post.setUpVotes(upvotes);
-                            }
-                            line = reader.readLine().trim();
-                            if (line.startsWith("Downvotes: ")) {
-                                int downvotes = Integer.parseInt(line.split(": ")[1]);
-                                post.setDownVotes(downvotes);
-                            }
-                            line = reader.readLine().trim();
-                            if (line.startsWith("Comments: ")) {
-                                boolean commentsEnabled = line.split(": ")[1].equalsIgnoreCase("Enabled");
-                                post.setCommentsEnabled(commentsEnabled);
-                            }
-                            // Now read comments
-                            while ((line = reader.readLine()) != null && line.startsWith(" - ID ")) {
-                                int commentId = Integer.parseInt(line.split(":")[0].split(" ")[2]);
-                                String commentContent = line.split(": ", 2)[1].trim();
-                                post.addComment(commentContent); // Assuming addComment handles comment IDs
-                            }
-                            // Add post to current user
-                            currentUser.getPosts().add(post);
-                        }
-                    }
+                    System.out.println("Database loaded from " + filename);
+                } catch (IOException e) {
+                    System.out.println("An error occurred while reading the database: " + e.getMessage());
                 }
             }
-            // Add the last user read to the list
-            if (currentUser != null) {
-                users.add(currentUser);
-            }
-            System.out.println("Database loaded from " + filename);
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading the database: " + e.getMessage());
         }
     }
+
 
 
 }
