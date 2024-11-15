@@ -27,11 +27,11 @@ public interface IDatabase {
     boolean blockUser(User user, User toBlock);
     void upvotePost(String postId);
     void downvotePost(String postId);
-    void addCommentToPost(String postId, String comment);
+    void addCommentToPost(String postId, String comment, User commentAuthor);
     void deleteCommentFromPost(String postId, String commentId);
     void hidePost(String postId);
     void enableCommentsForPost(String postId);
     void disableCommentsForPost(String postId);
-    void saveDatabaseToFile(String filename);
+    void writeDatabaseToFile(String filename);
     void readDatabaseFromFile(String filename);
 }

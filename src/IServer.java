@@ -1,5 +1,5 @@
 package src;
 
-public interface IServer extends Runnable {
+public interface    IServer extends Runnable {
     void startServer();
 }
