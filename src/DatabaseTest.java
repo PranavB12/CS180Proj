@@ -67,14 +67,14 @@ public class DatabaseTest {
 
     @Test
     public void testCommentOnPost() {
-        post1.addComment("This is a comment.");
+        post1.addComment(com.getID(), "This is a comment.");
         assertEquals(1, post1.getComments().size());
         assertTrue(post1.getComments().containsValue("This is a comment."));
     }
 
     @Test
     public void testDeleteComment() {
-        post1.addComment("Comment to be deleted");
+        post1.addComment(com.getID(), "Comment to be deleted");
         assertEquals(1, post1.getComments().size());
 
         post1.deleteComment(String.valueOf(1));
@@ -124,8 +124,8 @@ public class DatabaseTest {
     @Test
     public void testMultipleComments() {
         post1.enableComments();
-        post1.addComment("First Comment");
-        post1.addComment("Second Comment");
+        post1.addComment(com.getID(), "First Comment");
+        post1.addComment(com.getID(), "Second Comment");
 
         assertEquals(2, post1.getComments().size());
     }
@@ -189,7 +189,7 @@ public class DatabaseTest {
     @Test
     public void testAddCommentWhenDisabled() {
         post1.disableComments();
-        post1.addComment("Comment on disabled post"); // Attempt to add comment
+        post1.addComment(com.getID(), "Comment on disabled post"); // Attempt to add comment
         assertEquals(0, post1.getComments().size()); // Should not be able to add
     }
 }

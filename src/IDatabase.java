@@ -25,8 +25,8 @@ public interface IDatabase {
     boolean addFriend(User user, User friend);
     boolean removeFriend(User user, User friend);
     boolean blockUser(User user, User toBlock);
-    void upvotePost(String postId, String username);
-    void downvotePost(String postId, String username);
+    void upvotePost(String postId, User requestedUser);
+    void downvotePost(String postId, User requestedUser);
     void addCommentToPost(String postId, String comment, User commentAuthor);
     void deleteCommentFromPost(String postId, String commentId, User requestingUser);
     void hidePost(String postId, User requestingUser);
