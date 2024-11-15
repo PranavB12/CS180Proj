@@ -1,8 +1,7 @@
 package src;
-
 import java.util.UUID;
 
-public class Comment implements IComment {
+public class Comment {
     private String comment;
     private String ID;
     private User author;
@@ -22,6 +21,22 @@ public class Comment implements IComment {
 
     }
 
+    public Comment(String comment, User author, String postID, String commentId) {
+        this.comment = comment;
+        this.ID = commentId;
+        this.upVotes = 0;
+        this.downVotes = 0;
+        this.postID = postID;
+        this.author = author;
+
+
+    }
+
+
+    public String getPostID() {
+        return this.postID;
+    }
+
 
 
     public int getDownVotes() {
@@ -32,11 +47,11 @@ public class Comment implements IComment {
         return upVotes;
     }
 
-    public String getComment() {
+    public String getContent() {
         return comment;
     }
-    public String getAuthor() {
-        return this.author.toString();
+    public User getAuthor() {
+        return this.author;
     }
     public void upVote() {
         this.upVotes ++;
