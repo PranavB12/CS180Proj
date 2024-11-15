@@ -1,111 +1,119 @@
 package src;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-/**
- * Group Project - CS18000 Gold
- *
- * User class, where User's data is managed
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
- *
- * @version November 3, 2024
- *
- */
-
-public class User extends Post implements IUser {
-
-    private String username;
+public class User {
+    private final String username;
     private String password;
-    private String name;
+    private final String name;
+    private List<User> friends = new ArrayList<>();
+    private List<User> blockedUsers = new ArrayList<>();
+    private List<Post> posts = Collections.synchronizedList(new ArrayList<>());
     private String description;
 
-
-    private Picture profilePicture;
-    private List<User> friends;
-    private List<User> blockedUsers;
-    private List<Post> posts;
-
-    // Constructors
-    public User(String username, String password, Picture profilePicture, String description, String name) {
-        this();
+    public User(String username, String password, String name, String description) {
         this.username = username;
         this.password = password;
-        this.profilePicture = profilePicture;
-        this.description = description;
         this.name = name;
-        this.friends = new ArrayList<>();
-        this.blockedUsers = new ArrayList<>();
-        this.posts = new ArrayList<>();
+        this.description = description;
     }
-
     public User(String username, String password, String name) {
-        this(username, password, null, "", name);
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.description = "";
     }
 
-    public User() {
-        this.friends = new ArrayList<>();
-        this.blockedUsers = new ArrayList<>();
-        this.posts = new ArrayList<>();
-    }
+
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public List<User> getFriends() {
+        synchronized (friends) {
+            return new ArrayList<>(friends); // Return a copy to avoid exposing internal list
+        }
+    }
+
+    public List<User> getBlockedUsers() {
+        synchronized (blockedUsers) {
+            return new ArrayList<>(blockedUsers); // Return a copy to avoid exposing internal list
+        }
+    }
+
+    public List<Post> getPosts() {
+        synchronized (posts) {
+            return new ArrayList<>(posts); // Return a copy to avoid exposing internal list
+        }
+    }
+
+    public void addFriend(User friend) {
+        synchronized (friends) {
+            if (!friends.contains(friend)) {
+                friends.add(friend);
+            }
+        }
+    }
+
+    public void removeFriend(User friend) {
+        synchronized (friends) {
+            friends.remove(friend);
+        }
+    }
+
+    public void blockUser(User user) {
+        synchronized (blockedUsers) {
+            if (!blockedUsers.contains(user)) {
+                blockedUsers.add(user);
+            }
+        }
+        removeFriend(user); // Automatically removes from friends if blocking
+    }
+
+    public void unblockUser(User user) {
+        synchronized (blockedUsers) {
+            blockedUsers.remove(user);
+        }
+    }
+
+    public void addPost(Post post) {
+        synchronized (posts) {
+            if (!posts.contains(post)) {
+                posts.add(post);
+            }
+        }
+    }
+    public void setDescription(String des) {
+        this.description = des;
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-
-
-    public List<User> getFriends() {
-        return this.friends;
-    }
-    public List<User> getBlockedUsers() {
-        return this.blockedUsers;
-    }
-    public List<Post> getPosts() {
-        return this.posts;
-    }
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-
-    public void deletePost() {
-
+        return this.description;
     }
     public String toString() {
-        String a = "Username: " + username + "\n" + "Password: " + password + "\n" + "Name: "  + name;
-        return a;
+        return "User{" +
+                "username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", friends=" + friends.stream().map(User::getUsername).toList() +
+                ", blockedUsers=" + blockedUsers.stream().map(User::getUsername).toList() +
+                ", description='" + description + '\'' +
+                '}';
     }
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+    
+    
     public boolean equals(Object o) {
         if(this == o) {
             return true;
@@ -116,4 +124,6 @@ public class User extends Post implements IUser {
         User other = (User) o;
         return this.username != null && this.username.equals(other.username);
     }
+
+
 }
