@@ -1,4 +1,6 @@
+package src;
 import java.util.UUID;
+
 
 public class Comment {
     private String comment;
