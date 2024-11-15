@@ -58,27 +58,67 @@ public class Server implements IDatabase, Runnable {
         }
 
         private String handleRequest(String request) {
-            String[] parts = request.split(" ");
             try {
-                switch (parts[0].toUpperCase()) {
-                    case "ADD_USER":
-                        return server.addUser(new User(parts[1], parts[2], parts[3])) ? "User added" : "Failed to add user";
-                    case "REMOVE_USER":
-                        return server.removeUser(new User(parts[1], parts[2], parts[3])) ? "User removed" : "Failed to remove user";
-                    case "VALIDATE":
-                        return server.validateCredentials(parts[1], parts[2]) ? "Valid credentials" : "Invalid credentials";
-                    case "CREATE_POST":
-                        return server.createPost(parts[1], server.database.findUserByUsername(parts[2]));
-                    case "VIEW_USER":
-                        User user = server.viewUser(parts[1]);
+                // Extract the command
+                int firstSpaceIndex = request.indexOf(" ");
+                if (firstSpaceIndex == -1) {
+                    return "Invalid command format.";
+                }
+                String command = request.substring(0, firstSpaceIndex).toUpperCase();
+                String arguments = request.substring(firstSpaceIndex + 1);
+
+                switch (command) {
+                    case "ADD_USER": {
+                        String[] parts = arguments.split(" ", 3); // Limit split to 3 parts
+                        if (parts.length < 3) {
+                            return "Invalid ADD_USER format. Use: ADD_USER <username> <password> <name>";
+                        }
+                        return server.addUser(new User(parts[0], parts[1], parts[2])) ? "User added" : "Failed to add user";
+                    }
+                    case "REMOVE_USER": {
+                        String[] parts = arguments.split(" ", 3); // Limit split to 3 parts
+                        if (parts.length < 3) {
+                            return "Invalid REMOVE_USER format. Use: REMOVE_USER <username> <password> <name>";
+                        }
+                        return server.removeUser(new User(parts[0], parts[1], parts[2])) ? "User removed" : "Failed to remove user";
+                    }
+                    case "VALIDATE": {
+                        String[] parts = arguments.split(" ", 2); // Limit split to 2 parts
+                        if (parts.length < 2) {
+                            return "Invalid VALIDATE format. Use: VALIDATE <username> <password>";
+                        }
+                        return server.validateCredentials(parts[0], parts[1]) ? "Valid credentials" : "Invalid credentials";
+                    }
+                    case "CREATE_POST": {
+                        int contentStartIndex = arguments.indexOf(" ");
+                        if (contentStartIndex == -1) {
+                            return "Invalid CREATE_POST format. Use: CREATE_POST <author> <content>";
+                        }
+                        String authorUsername = arguments.substring(0, contentStartIndex).trim();
+                        String content = arguments.substring(contentStartIndex + 1).trim();
+
+                        User author = server.database.findUserByUsername(authorUsername);
+                        if (author == null) {
+                            return "Author not found: " + authorUsername;
+                        }
+                        String postId = server.createPost(content, author);
+                        System.out.println(content);
+                        System.out.println(authorUsername);
+                        return postId != null ? "Post created with ID: " + postId : "Failed to create post";
+                    }
+                    case "VIEW_USER": {
+                        User user = server.viewUser(arguments);
                         return user != null ? "User found: " + user.getUsername() : "User not found";
+                    }
                     default:
-                        return "Unknown command";
+                        return "Unknown command: " + command;
                 }
             } catch (Exception e) {
                 return "Error processing request: " + e.getMessage();
             }
         }
+
+
     }
 
     // Methods from IDatabase implemented below
