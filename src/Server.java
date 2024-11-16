@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server implements IDatabase, Runnable {
+public class Server implements IDatabase, IServer, Runnable {
 
     private static final int PORT = 12345;
     private final Database database = new Database();
@@ -31,7 +31,7 @@ public class Server implements IDatabase, Runnable {
         }
     }
 
-    private static class ClientHandler implements Runnable {
+    private static class ClientHandler implements Runnable, IClientHandler {
         private final Socket clientSocket;
         private final Server server;
 
@@ -57,7 +57,7 @@ public class Server implements IDatabase, Runnable {
             }
         }
 
-        private String handleRequest(String request) {
+        public String handleRequest(String request) {
             try {
                 // Extract the command
                 int firstSpaceIndex = request.indexOf(" ");
