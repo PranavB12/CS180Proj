@@ -3,7 +3,7 @@ package src;
 import java.io.*;
 import java.net.*;
 
-public class Client {
+public class Client implements IClient{
 
     private final String host;
     private final int port;
