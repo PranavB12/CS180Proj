@@ -245,7 +245,7 @@ public class Server implements IServer, Runnable {
 
                         // Delete the comment
                         server.deleteCommentFromPost(postId, commentId, user);
-                        return "Attempted to delete comment with ID " + commentId + ". Check server logs for more details.";
+                        return "Comment with ID " + commentId + " successfully deleted";
                     }
                     case "DISABLE_COMMENTS": {
                         String[] parts = arguments.split(" ", 2);
