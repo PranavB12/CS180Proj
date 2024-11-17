@@ -24,9 +24,7 @@ public class User {
         this.name = name;
         this.description = "";
     }
-
-
-
+    
     public String getUsername() {
         return username;
     }
@@ -34,7 +32,9 @@ public class User {
     public String getPassword() {
         return password;
     }
-
+    public void setPassword(String password) {
+        this.password = password;
+    }
     public String getName() {
         return name;
     }
@@ -112,8 +112,7 @@ public class User {
     public void setFriends(List<User> friends) {
         this.friends = friends;
     }
-    
-    
+
     public boolean equals(Object o) {
         if(this == o) {
             return true;
