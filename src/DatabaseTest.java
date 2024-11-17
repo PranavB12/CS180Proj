@@ -1,3 +1,4 @@
+
 package src;
 
 import org.junit.jupiter.api.Assertions;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 
 public class DatabaseTest {
+    private Database db;
     private User user1;
     private User user2;
     private Post post1;
@@ -33,14 +35,15 @@ public class DatabaseTest {
     @BeforeEach
     public void setUp() {
         // Initialize users and pictures
+        //Database db = new Database(List<User> users, Map<String, Post> posts, Map<String, Comment> comments);
         picture1 = new Picture("http://example.com/pic1.jpg");
         picture2 = new Picture("http://example.com/pic2.jpg");
         user1 = new User("user1", "pass1", "User One", "This is user1");
         user2 = new User("user2", "pass2",  "User Two", "This is user2");
+
         // Initialize posts
         //post1 = new Post("Hello World!", user1, 1);
         //post2 = new Post("Java is awesome!", user2, 2);
-
 
         // Initialize NewsFeed
         newsFeed = new NewsFeed();
@@ -50,15 +53,36 @@ public class DatabaseTest {
         user2.getFriends().add(user1);
     }
 
-    @Test
-    public void testUserCreation() {
-        assertNotNull(user1);
-        assertEquals("user1", user1.getUsername());
-        assertEquals("User One", user1.getName());
+    @org.junit.Test
+    public void testGetUsers() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        System.out.println(db.getUsers().size());
+        assertEquals(db.getUsers().size(), 1);
     }
 
     @org.junit.Test
-    public void testUserCreationFailure() {
+    public void testGetPosts() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        String postId = db.createPost("New post 9", user9);
+        assertEquals(db.getPosts().size(), 1);
+    }
+
+    @org.junit.Test
+    public void testAddUser() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        assertNotNull(user9);
+        assertEquals(db.getUsers().size(), 1);
+        assertEquals("user9", user9.getUsername());
+    }
+
+    @org.junit.Test
+    public void testAddUserFailure() {
         Database db = new Database();
         boolean result = db.addUser(user1);
         assertFalse(result, "Adding a duplicate user should return false.");
