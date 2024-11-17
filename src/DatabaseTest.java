@@ -111,13 +111,19 @@ public class DatabaseTest {
         post1.deleteComment(com.getID(), user10);
         assertEquals(0, post1.getComments().size());
     }
-    /**
-    @Test
+
+    @org.junit.Test
     public void testHidePost() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Comment com = new Comment("This is User10 comment", user10, postId);
+        Post post1 = db.getPosts().get(postId);
         post1.hidePost();
         assertTrue(post1.isHidden());
     }
-
+    /**
     @Test
     public void testDeletePost() {
         user1.getPosts().add(post1);
