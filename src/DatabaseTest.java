@@ -203,13 +203,26 @@ public class DatabaseTest {
         assertEquals(2, post1.getDownVotes());
     }
 
-    /**
-    @Test
+    // test case for Post class
+    // can additionally test for upvoters
+    @org.junit.Test
     public void testUpvotePost() {
-        post2.upvote();
-        assertEquals(1, post2.getUpVotes());
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        User user12 = new User("user12", "pass1", "User Twelve", "This is user12");
+        boolean result = db.addUser(user10);
+        boolean result2 = db.addUser(user12);
+        String postId = db.createPost("New post 10", user10);
+        Post post1 = db.getPosts().get(postId);
+        assertEquals(0, post1.getUpVotes());
+        post1.upvote("user10");
+        assertEquals(1, post1.getUpVotes());
+        // tests that another user aside from user10 can downvote the post
+        post1.upvote("user12");
+        assertEquals(2, post1.getUpVotes());
     }
 
+    /**
     @Test
     public void testBlockedUsers() {
         user1.getBlockedUsers().add(user2);
