@@ -231,26 +231,37 @@ public class DatabaseTest {
         assertTrue(user10.getBlockedUsers().contains(user12));
     }
 
-    /**
-    @Test
+    // revisit this test case
+    @org.junit.Test
     public void testUserEquals() {
-        User user3 = new User("user1", "pass3", "Another User");
+        Database db = new Database();
+        User user1 = new User("user", "pass", "User", "This is user");
+        User user3 = new User("user", "pass", "User", "This is user");
+        db.addUser(user1);
+        db.addUser(user3);
         assertTrue(user1.equals(user3));
     }
 
     // New test cases for comments, pictures, and news feed
-
-    @Test
+    @org.junit.Test
     public void testPostWithNoComments() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Post post1 = db.getPosts().get(postId);
         assertEquals(0, post1.getComments().size());
     }
 
-    @Test
+    @org.junit.Test
     public void testPictureUrl() {
+        Picture picture1 = new Picture("http://example.com/pic1.jpg");
+        Picture picture2 = new Picture("http://example.com/pic2.jpg");
         assertEquals("http://example.com/pic1.jpg", picture1.getUrl());
         assertEquals("http://example.com/pic2.jpg", picture2.getUrl());
     }
 
+    /**
     @Test
     public void testNewsFeedWithMultiplePosts() {
         user1.getPosts().add(post1);
