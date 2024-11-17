@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class User {
+public class User implements  IUser {
     private final String username;
     private String password;
     private final String name;
@@ -24,7 +24,9 @@ public class User {
         this.name = name;
         this.description = "";
     }
-    
+
+
+
     public String getUsername() {
         return username;
     }
@@ -32,9 +34,7 @@ public class User {
     public String getPassword() {
         return password;
     }
-    public void setPassword(String password) {
-        this.password = password;
-    }
+
     public String getName() {
         return name;
     }
@@ -93,6 +93,7 @@ public class User {
             }
         }
     }
+
     public void setDescription(String des) {
         this.description = des;
     }
@@ -112,6 +113,13 @@ public class User {
     public void setFriends(List<User> friends) {
         this.friends = friends;
     }
+
+    public boolean deletePost(Post post) {
+        synchronized (posts) {
+            return posts.remove(post); // Remove the post if it exists
+        }
+    }
+
 
     public boolean equals(Object o) {
         if(this == o) {
