@@ -340,7 +340,30 @@ public class Database implements IDatabase {
         }
     }
 
+    // Unhide a post
+    public void unhidePost(String postId, User requestedUser) {
+        Post post;
+        synchronized (postsLock) {
+            post = posts.get(postId);
+        }
 
+        if (post != null) {
+            if (!post.getAuthor().equals(requestedUser)) {
+                System.out.println("User " + requestedUser.getUsername() + " is not authorized to unhide this post.");
+                return;
+            }
+
+            post.unhidePost();
+
+            synchronized (postsLock) {
+                posts.put(post.getId(), post);
+            }
+
+            System.out.println("Post with ID " + postId + " has been unhidden by the author.");
+        } else {
+            System.out.println("Post with ID " + postId + " not found.");
+        }
+    }
 
 
     // Hide a post
