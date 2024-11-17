@@ -34,4 +34,6 @@ public interface IDatabase {
     void disableCommentsForPost(String postId, User requestingUser);
     void writeDatabaseToFile(String filename);
     void readDatabaseFromFile(String filename);
+
+    void addPost(String content, User postAuthor, String postId);
 }
