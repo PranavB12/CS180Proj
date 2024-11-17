@@ -83,7 +83,7 @@ public class DatabaseTest {
         String postId = db.createPost("New post 9", user9);
         Assertions.assertTrue(db.getPosts().containsKey(postId), "Post should be added to the database.");
     }
-    /**
+
     @org.junit.Test
     public void testCommentOnPost() {
         // String postId, String comment , User commentAuthor
@@ -92,9 +92,10 @@ public class DatabaseTest {
         boolean result = db.addUser(user10);
         String postId = db.createPost("New post 10", user10);
         Comment com = new Comment("This is User10 comment", user10, postId);
+        //System.out.println(com);
+        Post post1 = db.getPosts().get(postId);
         post1.addComment(com.getID(), com);
-        assertEquals(1, post1.getComments().size());
-        assertTrue(post1.getComments().containsValue("This is a comment."));
+        assertTrue(post1.getComments().containsKey(com.getID()));
     }
     /**
     @Test
