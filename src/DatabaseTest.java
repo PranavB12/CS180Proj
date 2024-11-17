@@ -217,18 +217,21 @@ public class DatabaseTest {
         assertEquals(0, post1.getUpVotes());
         post1.upvote("user10");
         assertEquals(1, post1.getUpVotes());
-        // tests that another user aside from user10 can downvote the post
+        // tests that another user aside from user10 can upvote the post
         post1.upvote("user12");
         assertEquals(2, post1.getUpVotes());
     }
 
-    /**
-    @Test
+    @org.junit.Test
     public void testBlockedUsers() {
-        user1.getBlockedUsers().add(user2);
-        assertTrue(user1.getBlockedUsers().contains(user2));
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        User user12 = new User("user12", "pass1", "User Twelve", "This is user12");
+        user10.blockUser(user12);
+        assertTrue(user10.getBlockedUsers().contains(user12));
     }
 
+    /**
     @Test
     public void testUserEquals() {
         User user3 = new User("user1", "pass3", "Another User");
