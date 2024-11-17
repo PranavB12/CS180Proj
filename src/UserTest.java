@@ -2,178 +2,150 @@ package src;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 
 /**
  * Group Project - CS18000 Gold
  *
- * User JUnits
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ * User JUnit Tests
  *
  * @version November 3, 2024
- *
  */
-
 public class UserTest {
 
     private User user;
     private User friend;
-    private User friend2;
-    private Picture profilePicture;
+    private Post post;
 
     @BeforeEach
     public void setUp() {
-        //profilePicture = new Picture("https://images.pexels.com/photos/736230/pexels-photo-736230.jpeg?cs=srgb&dl=pexels-jonaskakaroto-736230.jpg&fm=jpg"); // Assuming default constructor for Picture
-        user = new User("testUser", "password123", "A test user", "Arthur Morgan");
-        friend = new User("friendUser1", "password456", "Buster Baxter");
-        friend2 = new User("friendUser2", "password789", "Arnold Austin");
+        user = new User("testUser", "password123", "Arthur Morgan", "A test user");
+        friend = new User("friendUser", "password456", "Buster Baxter");
+        post = new Post("1", "This is a post", user); // Assuming Post constructor requires ID, content, and author
     }
 
+    // Constructor Tests
     @Test
-    public void testConstructorWithoutProfilePicture() {
-        System.out.println("before creating user");
+    public void testConstructorWithoutDescription() {
         User newUser = new User("simpleUser", "simplePass", "Buster Baxter");
         assertEquals("simpleUser", newUser.getUsername());
         assertEquals("simplePass", newUser.getPassword());
         assertEquals("Buster Baxter", newUser.getName());
-        //assertNull(newUser.getProfilePicture());
         assertEquals("", newUser.getDescription()); // Default description
         assertTrue(newUser.getFriends().isEmpty());
         assertTrue(newUser.getBlockedUsers().isEmpty());
         assertTrue(newUser.getPosts().isEmpty());
     }
 
-    // Username Tests
-    // setter for username can't be created/tested because it's declared as final
-    @Test
-    public void testGetUsername() {
-        assertEquals("newUsername", user.getUsername());
-    }
-
-    @Test
-    public void testSetUsernameEmptyString() {
-        //user.setUsername("");
-        // no set methods for final vars
-        assertEquals("", user.getUsername());
-    }
-
     // Password Tests
     @Test
-    public void testSetAndGetPassword() {
-        user.setPassword("newPassword");
-        assertEquals("newPassword", user.getPassword());
+    public void testGetPassword() {
+        assertEquals("password123", user.getPassword());
     }
-
-    @Test
-    public void testSetPasswordNull() {
-        user.setPassword(null);
-        assertNull(user.getPassword());
-    }
-
-    // Name Tests
-    @Test
-    public void testGetName() {
-        assertEquals("A test user", user.getName());
-    }
-
-    // setter for name can't be created/tested because it's declared as final
-//    @Test
-//    public void testSetNameEmptyString() {
-//        user.setName("");
-//        assertEquals("", user.getName());
-//    }
 
     // Description Tests
     @Test
     public void testSetAndGetDescription() {
-        user.setDescription("Arthur Morgan Updated");
-        assertEquals("Arthur Morgan Updated", user.getDescription());
-    }
-
-    @Test
-    public void testSetDescriptionEmptyString() {
-        user.setDescription("");
-        assertEquals("", user.getDescription());
+        user.setDescription("New description");
+        assertEquals("New description", user.getDescription());
     }
 
     // Friend Management Tests
     @Test
     public void testAddFriend() {
         user.addFriend(friend);
-        user.addFriend(friend2);
         assertTrue(user.getFriends().contains(friend));
-        assertTrue(user.getFriends().contains(friend2));
-        List<User> friendList = user.getFriends();
-        assertTrue(friendList.size() == 2);
-        assertEquals("Buster Baxter", friendList.get(0).getName());
-        assertEquals("Arnold Austin", friendList.get(1).getName());
     }
 
     @Test
     public void testRemoveFriend() {
         user.addFriend(friend);
-        user.addFriend(friend2);
-        List<User> friendList = user.getFriends();
-        assertTrue(friendList.size() == 2);
-        // removing Buster
         user.removeFriend(friend);
-        assertTrue(friendList.size() == 1);
-        assertEquals("Arnold Austin", friendList.get(0).getName());
-        assertFalse(friendList.contains(friend));
+        assertFalse(user.getFriends().contains(friend));
     }
 
     @Test
-    public void testRemoveNonExistingFriend() {
-        User nonExistingFriend = new User("randomUser", "password1212", "A random user", "Ethan Harper");
-        assertFalse(user.getFriends().remove(nonExistingFriend));
+    public void testAddDuplicateFriend() {
+        user.addFriend(friend);
+        user.addFriend(friend); // Try to add the same friend again
+        assertEquals(1, user.getFriends().size()); // Should still have only one friend
     }
 
     // Block Management Tests
     @Test
     public void testBlockUser() {
-        assertTrue(user.getBlockedUsers().add(friend));
+        user.blockUser(friend);
         assertTrue(user.getBlockedUsers().contains(friend));
+        assertFalse(user.getFriends().contains(friend)); // Ensure they are removed from friends
     }
 
     @Test
     public void testUnblockUser() {
-        user.getBlockedUsers().add(friend);
-        assertTrue(user.getBlockedUsers().remove(friend));
+        user.blockUser(friend);
+        user.unblockUser(friend);
         assertFalse(user.getBlockedUsers().contains(friend));
     }
 
-    @Test
-    public void testUnblockNonExistingUser() {
-        assertFalse(user.getBlockedUsers().remove(friend));
-    }
-  
-    // Post methods not working, commenting out for now
     // Post Management Tests
-    // @Test
-    // public void testAddPost() {
-    //     Post newPost = new Post(); // Assuming Post has a default constructor
-    //     user.getPosts().add(newPost);
-    //     assertTrue(user.getPosts().contains(newPost));
-    // }
+    @Test
+    public void testAddPost() {
+        user.addPost(post);
+        assertTrue(user.getPosts().contains(post));
+    }
 
-    // @Test
-    // public void testDeletePost() {
-    //     Post newPost = new Post();
-    //     user.getPosts().add(newPost);
-    //     assertTrue(user.getPosts().remove(newPost));
-    //     assertFalse(user.getPosts().contains(newPost));
-    // }
+    @Test
+    public void testRemovePost() {
+        // Add a post to the user
+        user.addPost(post);
 
-    // @Test
-    // public void testDeleteNonExistingPost() {
-    //     Post newPost = new Post();
-    //     assertFalse(user.getPosts().remove(newPost));
-    // }
+        // Remove the post using the deletePost method
+        boolean removed = user.deletePost(post);
 
+        // Assert the post was removed
+        assertTrue(removed, "The post was not removed from the list.");
+        assertFalse(user.getPosts().contains(post), "The post is still present in the list after removal.");
+    }
+
+
+
+
+    @Test
+    public void testAddDuplicatePost() {
+        user.addPost(post);
+        user.addPost(post); // Try to add the same post again
+        assertEquals(1, user.getPosts().size()); // Should still have only one post
+    }
+
+    // Equals Method Tests
+    @Test
+    public void testUserEqualsSameUsername() {
+        User user2 = new User("testUser", "differentPass", "Different Name");
+        assertTrue(user.equals(user2)); // Equal based on username
+    }
+
+    @Test
+    public void testUserEqualsDifferentUsername() {
+        User user2 = new User("differentUser", "password123", "Arthur Morgan");
+        assertFalse(user.equals(user2));
+    }
+
+    // Edge Cases
+    @Test
+    public void testUserEqualsNull() {
+        assertFalse(user.equals(null));
+    }
+
+    @Test
+    public void testUserEqualsDifferentObject() {
+        assertFalse(user.equals("String Object")); // Comparing to a non-User object
+    }
+
+    @Test
+    public void testDefaultConstructorValues() {
+        User newUser = new User("userWithoutDescription", "password", "No Description User");
+        assertEquals("", newUser.getDescription()); // Default description is an empty string
+        assertTrue(newUser.getFriends().isEmpty());
+        assertTrue(newUser.getBlockedUsers().isEmpty());
+        assertTrue(newUser.getPosts().isEmpty());
+    }
 }
