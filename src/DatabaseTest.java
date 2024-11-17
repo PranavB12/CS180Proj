@@ -38,7 +38,7 @@ public class DatabaseTest {
         user1 = new User("user1", "pass1", "User One", "This is user1");
         user2 = new User("user2", "pass2",  "User Two", "This is user2");
         // Initialize posts
-       // post1 = new Post("Hello World!", user1, 1);
+        //post1 = new Post("Hello World!", user1, 1);
         //post2 = new Post("Java is awesome!", user2, 2);
 
 
@@ -261,30 +261,43 @@ public class DatabaseTest {
         assertEquals("http://example.com/pic2.jpg", picture2.getUrl());
     }
 
-    /**
-    @Test
-    public void testNewsFeedWithMultiplePosts() {
-        user1.getPosts().add(post1);
-        user2.getPosts().add(post2);
-        newsFeed.displayPosts(user1); // User1 should see User2's post
+    // these tests should be in NewsFeedTest class
+//    @org.junit.Test
+//    public void testNewsFeedWithMultiplePosts() {
+//        user1.getPosts().add(post1);
+//        user2.getPosts().add(post2);
+//        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
+//
+//        // Ideally, you would check for output, but this is a basic check
+//        assertFalse(newsFeed.getPosts().isEmpty());
+//    }
+//
+//    @Test
+//    public void testDisplayPostsWithNoFriends() {
+//        User lonelyUser = new User("lonelyUser", "lonelyPass", "Lonely User");
+//        newsFeed.displayPosts(lonelyUser); // No friends, no posts
+//
+//        // Validate that the news feed is empty
+//        assertTrue(newsFeed.getPosts().isEmpty());
+//    }
 
-        // Validate that the newsFeed has the posts
-        assertTrue(newsFeed.getPosts().contains(post1) || newsFeed.getPosts().contains(post2));
-    }
-
-    @Test
-    public void testDisplayPostsWithNoFriends() {
-        User lonelyUser = new User("lonelyUser", "lonelyPass", "Lonely User");
-        newsFeed.displayPosts(lonelyUser); // No friends, no posts
-
-        // Validate that the news feed is empty
-        assertTrue(newsFeed.getPosts().isEmpty());
-    }
-
-    @Test
+    @org.junit.Test
     public void testAddCommentWhenDisabled() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Post post1 = db.getPosts().get(postId);
+        Comment com = new Comment("This is User10 comment", user10, postId);
+        post1.addComment(com.getID(), com);
         post1.disableComments();
-        post1.addComment(com.getID(), "Comment on disabled post"); // Attempt to add comment
-        assertEquals(0, post1.getComments().size()); // Should not be able to add
-    }*/
+        assertFalse(post1.areCommentsEnabled());
+        Comment newCom = new Comment("Comment after disabling comments on post.", user10, postId);
+        // handling exception when comment is added after comments are disabled
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            post1.addComment(newCom.getID(), newCom);
+        });
+        assertEquals("Comments are disabled for this post.", exception.getMessage());
+        assertEquals(1, post1.getComments().size());
+    }
 }
