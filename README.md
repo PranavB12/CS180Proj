@@ -52,5 +52,10 @@
 - Testing: The tests for this ensure that voting, commenting, and visibility control all work as expected. Verified in `PostTest.java`
 - Relationships: This class uses the User class as the author of the post and optionally includes a Picture for post images. It is managed by the Database and NewsFeed classes to enable post sharing and feed display.
 
+### Comment
+- Functionality: This class represents a comment on a post created by a user. It contains details about the comment, such as its content, author, unique identifier (ID), the ID of the associated post, and the number of upvotes and downvotes. It provides methods to interact with the comment, including upvoting, downvoting, undoing votes, and retrieving information such as the comment content, author, or associated post ID. This class ensures thread-safe operations for vote management and uniquely identifies each comment using a randomly generated or pre-specified ID.
+- Testing: The tests for this ensure that voting, commenting, deleting, and visibility all work as expected. Verefied in `CommentTest.java`
+- Relationships: This class uses the User class to represent the author of the comment, ensuring that each comment is linked to a valid user. It is associated with a post through the postID field, which identifies the specific post to which the comment belongs. The class interacts with systems managing posts and comments, such as a Database or NewsFeed class, to facilitate comment storage, retrieval, and display within a larger application framework.
+
 ### Test
 This class is a test class that adds some sample users and posts to the database to test the data persistence it will not be present in the final project.
