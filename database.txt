@@ -1,34 +1,12 @@
-Users:
-Username: alice123, Password: password1, Name: Alice
-Description: 
-Friends: bob456 charlie789 
-Blocked Users: 
-Posts:
- - Post ID: cc4b6bbb-e5fb-4dcc-834f-2f3fd8540347, Content: Hello this is Alice's first post!, Hidden: false
-   Upvotes: 1
-   Downvotes: 0
-   Comments: Enabled
-    - ID 1d88c4a5-b676-46dd-927b-e3fbdcc32a95: Nice post, Alice!
-
-Username: bob456, Password: password2, Name: Bob
-Description: Hello! My name is Bob.
-Friends: alice123 
-Blocked Users: 
-Posts:
- - Post ID: 9e094b85-6694-4515-b8b5-b81f04be4d69, Content: Bob here enjoying this new app!, Hidden: false
-   Upvotes: 0
-   Downvotes: 1
-   Comments: Disabled
-
-Username: charlie789, Password: password3, Name: Charlie
-Description: 
-Friends: alice123 
-Blocked Users: 
-Posts:
- - Post ID: 3dc55c96-9822-447b-9790-d517b6a04eb9, Content: Charlie posting a quick update!, Hidden: false
-   Upvotes: 0
-   Downvotes: 0
-   Comments: Enabled
-    - ID 1261a9a0-467d-43dd-9b82-2b4cd0556049: Welcome, Charlie!
-    - ID 1f2a2ec4-d269-4726-a9e2-f7c273da9f2a: This is my 2nd Post!
-
+USERS
+jane456,mypassword,Jane Smith,
+Friends for - jane456: 
+Blocked users for - jane456: 
+john123,password123,John Doe,
+Friends for - john123: 
+Blocked users for - john123: 
+POSTS
+b445f17d-6b35-4596-8592-c14e9c1907b3,This is Jane's second post,jane456,0,0
+COMMENTS
+75bdb3d2-086c-490e-84c7-84c4eb0e3085,This is a comment on Jane's post,john123,0,0,b445f17d-6b35-4596-8592-c14e9c1907b3
+d3c53591-03b4-4e90-8c75-d3f132fecaee,This is a comment on Jane's post,john123,0,0,b445f17d-6b35-4596-8592-c14e9c1907b3

@@ -283,29 +283,27 @@ public class Database implements IDatabase {
 
 
 
-    // Add a comment to a post
-    public String addCommentToPost(String postId, String comment , User commentAuthor) {
+    public String addCommentToPost(String postId, String comment, User commentAuthor) {
         Post post;
-        Comment com = new Comment(comment, commentAuthor, postId);
         synchronized (postsLock) {
             post = posts.get(postId);
         }
-        comments.put(com.getID(), com);
 
         if (post != null) {
-            post.addComment(com.getID(), com);
-
+            Comment com = new Comment(comment, commentAuthor, postId);
+            String commentId = com.getID();
+            comments.put(commentId, com);
+            post.addComment(commentId, com);
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
-                return com.getID();
             }
+            return commentId; // Return generated comment ID
         } else {
             System.out.println("Post with ID " + postId + " not found.");
+            return null;
         }
-
-
-        return postId;
     }
+
 
     // Delete a comment from a post
     public void deleteCommentFromPost(String postId, String commentId, User requestedUser) {
@@ -643,8 +641,4 @@ public class Database implements IDatabase {
             System.err.println("Error reading the database file: " + e.getMessage());
         }
     }
-
-
-
-
 }
