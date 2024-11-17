@@ -2,7 +2,7 @@ package src;
 
 import java.util.UUID;
 
-public class Comment {
+public class Comment implements IComment {
     private final String comment;
     private final String ID;
     private final User author;
