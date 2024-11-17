@@ -1,13 +1,10 @@
 USERS
-rishi,rao,dubai_123,
+rishi,rao,dubai_boy,
 Friends for - rishi: 
 Blocked users for - rishi: 
 mike,lee,mike_lee,
 Friends for - mike: 
 Blocked users for - mike: 
 POSTS
-d8bf6b1a-0aa5-431c-8760-d60067dd360c,This is rishi's first post,rishi,0,0
+db484ec9-20e0-4e07-b756-45268491e321,beach day,rishi,0,0
 COMMENTS
-080bc503-7f3e-490f-a667-e890f48be96b,This is a second comment on rishi's post,mike,0,0,d8bf6b1a-0aa5-431c-8760-d60067dd360c
-35f5af98-e5c5-414f-94bc-7df4426a69d6,This is a third attempted comment on rishi's post,mike,0,0,d8bf6b1a-0aa5-431c-8760-d60067dd360c
-37919085-3149-440a-9dbd-ef45facabe01,This is a fourth attempted comment on rishi's post,mike,0,0,d8bf6b1a-0aa5-431c-8760-d60067dd360c

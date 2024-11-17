@@ -185,6 +185,36 @@ public class Server implements IServer, Runnable {
                         server.hidePost(postId, requestingUser);
                         return "Post hidden.";
                     }
+                    case "UNHIDE_POST": {
+                        String[] parts = arguments.split(" ", 2);
+                        if (parts.length < 2) {
+                            return "Invalid UNHIDE_POST format. Use: UNHIDE_POST <postId> <username>";
+                        }
+
+                        String postId = parts[0];
+                        String username = parts[1];
+
+                        // Validate user
+                        User requestingUser = server.database.findUserByUsername(username);
+                        if (requestingUser == null) {
+                            return "User not found.";
+                        }
+
+                        // Fetch the post
+                        Post post = server.database.getPostById(postId);
+                        if (post == null) {
+                            return "Post not found.";
+                        }
+
+                        // Check if the requesting user is the author of the post
+                        if (!post.getAuthor().equals(requestingUser)) {
+                            return "Only the author of the post can unhide it.";
+                        }
+
+                        // Unhide the post
+                        server.unhidePost(postId, requestingUser);
+                        return "Post with ID " + postId + " has been unhidden.";
+                    }
                     case "ENABLE_COMMENTS": {
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
@@ -347,6 +377,8 @@ public class Server implements IServer, Runnable {
     public void hidePost(String postId, User requestingUser) {
         database.hidePost(postId, requestingUser);
     }
+
+    public void unhidePost(String postId, User requestingUser) {database.unhidePost(postId, requestingUser);}
 
     public void enableCommentsForPost(String postId, User user) {
         database.enableCommentsForPost(postId, user);
