@@ -135,48 +135,75 @@ public class DatabaseTest {
         assertFalse(user10.getPosts().contains(post1));
     }
 
-    /**
-    @Test
-    public void testNewsFeedDisplayPosts() {
-        user1.getPosts().add(post1);
-        user2.getPosts().add(post2);
-        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
+    // newsfeed not a part of database.java
+//    @org.junit.Test
+//    public void testNewsFeedDisplayPosts() {
+//        user1.getPosts().add(post1);
+//        user2.getPosts().add(post2);
+//        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
+//
+//        // Ideally, you would check for output, but this is a basic check
+//        assertFalse(newsFeed.getPosts().isEmpty());
+//    }
+//
+//    @org.junit.Test
+//    public void testNewsFeedDeletePost() {
+//        user1.getPosts().add(post1);
+//        newsFeed.deletePost(post1);
+//        assertFalse(newsFeed.getPosts().contains(post1));
+//    }
 
-        // Ideally, you would check for output, but this is a basic check
-        assertFalse(newsFeed.getPosts().isEmpty());
-    }
 
-    @Test
-    public void testNewsFeedDeletePost() {
-        user1.getPosts().add(post1);
-        newsFeed.deletePost(post1);
-        assertFalse(newsFeed.getPosts().contains(post1));
-    }
-
-    @Test
+    @org.junit.Test
     public void testEnableDisableComments() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Comment com = new Comment("This is User10 comment", user10, postId);
+        Post post1 = db.getPosts().get(postId);
+        post1.addComment(com.getID(), com);
+
         post1.disableComments();
-        assertFalse(post1.isCommentsEnabled());
+        assertFalse(post1.areCommentsEnabled());
 
         post1.enableComments();
-        assertTrue(post1.isCommentsEnabled());
+        assertTrue(post1.areCommentsEnabled());
     }
 
-    @Test
+    @org.junit.Test
     public void testMultipleComments() {
-        post1.enableComments();
-        post1.addComment(com.getID(), "First Comment");
-        post1.addComment(com.getID(), "Second Comment");
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Comment com1 = new Comment("This is User10 first comment", user10, postId);
+        Comment com2 = new Comment("This is User10 second comment", user10, postId);
+        Post post1 = db.getPosts().get(postId);
+        post1.addComment(com1.getID(), com1);
+        post1.addComment(com2.getID(), com2);
 
         assertEquals(2, post1.getComments().size());
     }
 
-    @Test
+    @org.junit.Test
     public void testDownvotePost() {
-        post1.downvote();
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        User user12 = new User("user12", "pass1", "User Twelve", "This is user12");
+        boolean result = db.addUser(user10);
+        boolean result2 = db.addUser(user12);
+        String postId = db.createPost("New post 10", user10);
+        Post post1 = db.getPosts().get(postId);
+        assertEquals(0, post1.getDownVotes());
+        post1.downvote("user10");
         assertEquals(1, post1.getDownVotes());
+        // tests that another user aside from user10 can downvote the post
+        post1.downvote("user12");
+        assertEquals(2, post1.getDownVotes());
     }
 
+    /**
     @Test
     public void testUpvotePost() {
         post2.upvote();
