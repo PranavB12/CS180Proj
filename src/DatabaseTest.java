@@ -118,20 +118,24 @@ public class DatabaseTest {
         User user10 = new User("user10", "pass1", "User Ten", "This is user10");
         boolean result = db.addUser(user10);
         String postId = db.createPost("New post 10", user10);
-        Comment com = new Comment("This is User10 comment", user10, postId);
         Post post1 = db.getPosts().get(postId);
         post1.hidePost();
         assertTrue(post1.isHidden());
     }
-    /**
-    @Test
+
+    @org.junit.Test
     public void testDeletePost() {
-        user1.getPosts().add(post1);
-        post1.deletePost(user1);
-        assertFalse(user1.getPosts().contains(post1));
-        assertTrue(post1.isHidden());
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Post post1 = db.getPosts().get(postId);
+        user10.getPosts().add(post1);
+        db.deletePost(post1.getId(), user10);
+        assertFalse(user10.getPosts().contains(post1));
     }
 
+    /**
     @Test
     public void testNewsFeedDisplayPosts() {
         user1.getPosts().add(post1);
