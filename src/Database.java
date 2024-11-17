@@ -284,7 +284,7 @@ public class Database implements IDatabase {
 
 
     // Add a comment to a post
-    public void addCommentToPost(String postId, String comment , User commentAuthor) {
+    public String addCommentToPost(String postId, String comment , User commentAuthor) {
         Post post;
         Comment com = new Comment(comment, commentAuthor, postId);
         synchronized (postsLock) {
@@ -294,14 +294,17 @@ public class Database implements IDatabase {
 
         if (post != null) {
             post.addComment(com.getID(), com);
+
             synchronized (postsLock) {
                 posts.put(post.getId(), post);
+                return com.getID();
             }
         } else {
             System.out.println("Post with ID " + postId + " not found.");
         }
 
 
+        return postId;
     }
 
     // Delete a comment from a post

@@ -27,7 +27,7 @@ public interface IDatabase {
     boolean blockUser(User user, User toBlock);
     void upvotePost(String postId, User requestedUser);
     void downvotePost(String postId, User requestedUser);
-    void addCommentToPost(String postId, String comment, User commentAuthor);
+    String addCommentToPost(String postId, String comment, User commentAuthor);
     void deleteCommentFromPost(String postId, String commentId, User requestingUser);
     void hidePost(String postId, User requestingUser);
     void enableCommentsForPost(String postId, User requestingUser);
