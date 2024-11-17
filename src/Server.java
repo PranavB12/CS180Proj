@@ -289,4 +289,9 @@ public class Server implements IDatabase, IServer, Runnable {
     public void readDatabaseFromFile(String filename) {
         database.readDatabaseFromFile(filename);
     }
+
+    @Override
+    public void addPost(String content, User postAuthor, String postId) {
+        database.addPost(content, postAuthor, postId);
+    }
 }

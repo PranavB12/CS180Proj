@@ -29,9 +29,8 @@
 //        // Initialize users and pictures
 //        picture1 = new Picture("http://example.com/pic1.jpg");
 //        picture2 = new Picture("http://example.com/pic2.jpg");
-//        user1 = new User("user1", "pass1", picture1, "This is user1", "User One");
-//        user2 = new User("user2", "pass2", picture2, "This is user2", "User Two");
-//
+//        user1 = new User("user1", "pass1", "This is user1", "User One");
+//        user2 = new User("user2", "pass2",  "This is user2", "User Two");
 //        // Initialize posts
 //       // post1 = new Post("Hello World!", user1, 1);
 //        //post2 = new Post("Java is awesome!", user2, 2);
