@@ -30,6 +30,7 @@ public interface IDatabase {
     String addCommentToPost(String postId, String comment, User commentAuthor);
     void deleteCommentFromPost(String postId, String commentId, User requestingUser);
     void hidePost(String postId, User requestingUser);
+    void unhidePost(String postId, User requestedUser);
     void enableCommentsForPost(String postId, User requestingUser);
     void disableCommentsForPost(String postId, User requestingUser);
     void writeDatabaseToFile(String filename);
