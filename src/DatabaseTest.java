@@ -1,7 +1,13 @@
 package src;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -9,29 +15,39 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * Database JUnits
  *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
  * @version November 3, 2024
+ *
  */
+
 public class DatabaseTest {
     private User user1;
     private User user2;
     private Post post1;
     private Post post2;
-    private Database database;
+    private Picture picture1;
+    private Picture picture2;
+    private NewsFeed newsFeed;
 
     @BeforeEach
     public void setUp() {
-        // Initialize users
-        user1 = new User("user1", "pass1", "User One");
-        user2 = new User("user2", "pass2", "User Two");
-
+        // Initialize users and pictures
+        picture1 = new Picture("http://example.com/pic1.jpg");
+        picture2 = new Picture("http://example.com/pic2.jpg");
+        user1 = new User("user1", "pass1", "User One", "This is user1");
+        user2 = new User("user2", "pass2",  "User Two", "This is user2");
         // Initialize posts
-        post1 = new Post("1", "Hello World!", user1);
-        post2 = new Post("2", "Java is awesome!", user2);
+       // post1 = new Post("Hello World!", user1, 1);
+        //post2 = new Post("Java is awesome!", user2, 2);
 
-        // Initialize database
-        database = new Database();
-        database.addUser(user1);
-        database.addUser(user2);
+
+        // Initialize NewsFeed
+        newsFeed = new NewsFeed();
+
+        // Set up friendships
+        user1.getFriends().add(user2);
+        user2.getFriends().add(user1);
     }
 
     @Test
@@ -41,40 +57,54 @@ public class DatabaseTest {
         assertEquals("User One", user1.getName());
     }
 
-    @Test
+    @org.junit.Test
+    public void testUserCreationFailure() {
+        Database db = new Database();
+        boolean result = db.addUser(user1);
+        assertFalse(result, "Adding a duplicate user should return false.");
+        boolean result2 = db.addUser(null);
+        assertFalse(result, "Adding a null user should return false.");
+    }
+
+    @org.junit.Test
+    public void testCreatePost() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        String postId = db.createPost("New post 9", user9);
+        Assertions.assertTrue(postId != null, "A valid post should include a valid id.");
+    }
+
+    @org.junit.Test
     public void testAddPostToUser() {
-        database.addPost(post1);
-        assertTrue(database.getPosts().containsValue(post1));
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        String postId = db.createPost("New post 9", user9);
+        Assertions.assertTrue(db.getPosts().containsKey(postId), "Post should be added to the database.");
     }
-
-    @Test
+    /**
+    @org.junit.Test
     public void testCommentOnPost() {
-        database.addPost(post1);
-        assertNotNull(database.getPostById(post1.getId()), "Post1 was not added to the database!");
-        database.addCommentToPost(post1.getId(), "this is a comment", user1);
-        assertEquals(1, database.getPosts().get(post1.getId()).getComments().size(),
-                "Comment was not added to the post correctly!");
+        // String postId, String comment , User commentAuthor
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Comment com = new Comment("This is User10 comment", user10, postId);
+        post1.addComment(com.getID(), com);
+        assertEquals(1, post1.getComments().size());
+        assertTrue(post1.getComments().containsValue("This is a comment."));
     }
-
-
+    /**
     @Test
     public void testDeleteComment() {
-        // Add post1 to the database
-        database.addPost(post1);
+        post1.addComment(com.getID(), "Comment to be deleted");
+        assertEquals(1, post1.getComments().size());
 
-        // Create a comment and add it to the
-        String commentID = database.addCommentToPost(post1.getId(), "hello", user1);
-
-        // Assert the comment was added successfully
-        assertEquals(1, database.getPostById(post1.getId()).getComments().size());
-
-        // Delete the comment
-        database.deleteCommentFromPost(post1.getId(), commentID, user1);
-
-        // Assert the comment was deleted successfully
-        assertEquals(0, database.getPostById(post1.getId()).getComments().size());
+        post1.deleteComment(String.valueOf(1));
+        assertEquals(0, post1.getComments().size());
     }
-
 
     @Test
     public void testHidePost() {
@@ -84,52 +114,62 @@ public class DatabaseTest {
 
     @Test
     public void testDeletePost() {
-        database.addPost(post1);
-        database.deletePost(post1.getId(), user1);
-        assertFalse(database.getPosts().containsKey(post1.getId()));
+        user1.getPosts().add(post1);
+        post1.deletePost(user1);
+        assertFalse(user1.getPosts().contains(post1));
+        assertTrue(post1.isHidden());
+    }
+
+    @Test
+    public void testNewsFeedDisplayPosts() {
+        user1.getPosts().add(post1);
+        user2.getPosts().add(post2);
+        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
+
+        // Ideally, you would check for output, but this is a basic check
+        assertFalse(newsFeed.getPosts().isEmpty());
+    }
+
+    @Test
+    public void testNewsFeedDeletePost() {
+        user1.getPosts().add(post1);
+        newsFeed.deletePost(post1);
+        assertFalse(newsFeed.getPosts().contains(post1));
     }
 
     @Test
     public void testEnableDisableComments() {
         post1.disableComments();
-        assertFalse(post1.areCommentsEnabled());
+        assertFalse(post1.isCommentsEnabled());
 
         post1.enableComments();
-        assertTrue(post1.areCommentsEnabled());
+        assertTrue(post1.isCommentsEnabled());
     }
 
     @Test
     public void testMultipleComments() {
-        // Add post1 to the database
-        database.addPost(post1);
-
-        // Enable comments for the post
         post1.enableComments();
+        post1.addComment(com.getID(), "First Comment");
+        post1.addComment(com.getID(), "Second Comment");
 
-        // Add comments
-        database.addCommentToPost(post1.getId(), "First Comment", user1);
-        database.addCommentToPost(post1.getId(), "Second Comment", user1);
-
-        // Verify the size of the comments
-        assertEquals(2, database.getPostById(post1.getId()).getComments().size());
+        assertEquals(2, post1.getComments().size());
     }
-
 
     @Test
     public void testDownvotePost() {
-        post1.downvote(user1.getUsername());
+        post1.downvote();
         assertEquals(1, post1.getDownVotes());
     }
 
     @Test
     public void testUpvotePost() {
-        post2.upvote(user2.getUsername());
+        post2.upvote();
         assertEquals(1, post2.getUpVotes());
     }
 
     @Test
     public void testBlockedUsers() {
-        user1.blockUser(user2);
+        user1.getBlockedUsers().add(user2);
         assertTrue(user1.getBlockedUsers().contains(user2));
     }
 
@@ -139,23 +179,42 @@ public class DatabaseTest {
         assertTrue(user1.equals(user3));
     }
 
+    // New test cases for comments, pictures, and news feed
+
     @Test
     public void testPostWithNoComments() {
         assertEquals(0, post1.getComments().size());
     }
 
     @Test
+    public void testPictureUrl() {
+        assertEquals("http://example.com/pic1.jpg", picture1.getUrl());
+        assertEquals("http://example.com/pic2.jpg", picture2.getUrl());
+    }
+
+    @Test
+    public void testNewsFeedWithMultiplePosts() {
+        user1.getPosts().add(post1);
+        user2.getPosts().add(post2);
+        newsFeed.displayPosts(user1); // User1 should see User2's post
+
+        // Validate that the newsFeed has the posts
+        assertTrue(newsFeed.getPosts().contains(post1) || newsFeed.getPosts().contains(post2));
+    }
+
+    @Test
     public void testDisplayPostsWithNoFriends() {
         User lonelyUser = new User("lonelyUser", "lonelyPass", "Lonely User");
-        database.addUser(lonelyUser);
+        newsFeed.displayPosts(lonelyUser); // No friends, no posts
 
-        // No friends, no posts
-        assertEquals(0, lonelyUser.getFriends().size());
+        // Validate that the news feed is empty
+        assertTrue(newsFeed.getPosts().isEmpty());
     }
 
     @Test
     public void testAddCommentWhenDisabled() {
         post1.disableComments();
-        assertThrows(IllegalStateException.class, () -> post1.addComment("123", new Comment("Comment", user1, post1.getId())));
-    }
+        post1.addComment(com.getID(), "Comment on disabled post"); // Attempt to add comment
+        assertEquals(0, post1.getComments().size()); // Should not be able to add
+    }*/
 }
