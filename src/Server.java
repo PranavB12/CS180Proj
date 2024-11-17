@@ -258,8 +258,9 @@ public class Server implements IDatabase, IServer, Runnable {
     }
 
     @Override
-    public void addCommentToPost(String postId, String comment, User commentAuthor) {
+    public String addCommentToPost(String postId, String comment, User commentAuthor) {
         database.addCommentToPost(postId, comment, commentAuthor);
+        return postId;
     }
 
     @Override

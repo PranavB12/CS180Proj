@@ -1,5 +1,6 @@
 package src;
-public class DatabaseTest2 {
+public class
+DatabaseTest2 {
     public static void main(String[] args) {
         // Create the database instance
         Database db = new Database();
