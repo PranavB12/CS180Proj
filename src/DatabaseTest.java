@@ -97,16 +97,21 @@ public class DatabaseTest {
         post1.addComment(com.getID(), com);
         assertTrue(post1.getComments().containsKey(com.getID()));
     }
-    /**
-    @Test
-    public void testDeleteComment() {
-        post1.addComment(com.getID(), "Comment to be deleted");
-        assertEquals(1, post1.getComments().size());
 
-        post1.deleteComment(String.valueOf(1));
+    @org.junit.Test
+    public void testDeleteComment() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        boolean result = db.addUser(user10);
+        String postId = db.createPost("New post 10", user10);
+        Comment com = new Comment("This is User10 comment", user10, postId);
+        Post post1 = db.getPosts().get(postId);
+        post1.addComment(com.getID(), com);
+        assertEquals(1, post1.getComments().size());
+        post1.deleteComment(com.getID(), user10);
         assertEquals(0, post1.getComments().size());
     }
-
+    /**
     @Test
     public void testHidePost() {
         post1.hidePost();
