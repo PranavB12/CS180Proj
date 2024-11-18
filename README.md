@@ -61,112 +61,112 @@
 ### Server
 - Functionality: The Server class represents the backend server for handling user accounts, posts, and comments within a multi-threaded system. It listens for client connections via a ServerSocket and processes requests concurrently using a cached thread pool managed by an ExecutorService. The server provides numerous functionalities, including user authentication, account management, post creation, and comment handling. It uses a command-based system where clients send textual commands (e.g., ADD_USER, CREATE_POST), and the server executes corresponding actions through its database. Requests are handled thread-safely and scalably, ensuring that multiple clients can interact with the server without interference. The server also supports advanced operations like hiding posts, upvoting or downvoting content, and enabling or disabling comments.
 - Testing: As mentioned in Ed Discussion, since our Server Client uses Network IO, test cases are not required. However, these are the following tests the user can input in the server class:
-### 1. ADD_USER
+#### 1. ADD_USER
 - **Input**: Provide arguments in the format: `<username> <password> <name>`
 - **Expected Output**:
   - On success: `User added`.
   - On failure (e.g., duplicate username): `Failed to add user`.
   - On incorrect format: `Invalid ADD_USER format. Use: ADD_USER <username> <password> <name>`.
 
-### 2. REMOVE_USER
+#### 2. REMOVE_USER
 - **Input**: Provide arguments in the format: `<username> <password> <name>`
 - **Expected Output**:
   - On success: `User removed`.
   - On failure (e.g., user does not exist): `Failed to remove user`.
   - On incorrect format: `Invalid REMOVE_USER format. Use: REMOVE_USER <username> <password> <name>`.
 
-### 3. VALIDATE
+#### 3. VALIDATE
 - **Input**: Provide arguments in the format: `<username> <password>`
 - **Expected Output**:
   - On success: `Valid credentials`.
   - On failure: `Invalid credentials`.
   - On incorrect format: `Invalid VALIDATE format. Use: VALIDATE <username> <password>`.
 
-### 4. ADD_FRIEND
+#### 4. ADD_FRIEND
 - **Input**: Provide arguments in the format: `<username> <friendUsername>`
 - **Expected Output**:
   - On success: `Friend added`.
   - On failure (e.g., user or friend not found): `Failed to add friend`.
   - On incorrect format: `Invalid ADD_FRIEND format. Use: ADD_FRIEND <username> <friendUsername>`.
 
-### 5. REMOVE_FRIEND
+#### 5. REMOVE_FRIEND
 - **Input**: Provide arguments in the format: `<username> <friendUsername>`
 - **Expected Output**:
   - On success: `Friend removed`.
   - On failure (e.g., user or friend not found): `Failed to remove friend`.
   - On incorrect format: `Invalid REMOVE_FRIEND format. Use: REMOVE_FRIEND <username> <friendUsername>`.
 
-### 6. BLOCK_USER
+#### 6. BLOCK_USER
 - **Input**: Provide arguments in the format: `<username> <blockedUsername>`
 - **Expected Output**:
   - On success: `User blocked`.
   - On failure (e.g., user or blocked user not found): `Failed to block user`.
   - On incorrect format: `Invalid BLOCK_USER format. Use: BLOCK_USER <username> <blockedUsername>`.
 
-### 7. CREATE_POST
+#### 7. CREATE_POST
 - **Input**: Provide arguments in the format: `<author> <content>`
 - **Expected Output**:
   - On success: `Post created with ID: <postId>`.
   - On failure (e.g., author not found): `Failed to create post`.
   - On incorrect format: `Invalid CREATE_POST format. Use: CREATE_POST <author> <content>`.
 
-### 8. DELETE_POST
+#### 8. DELETE_POST
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Post deleted`.
   - On failure (e.g., post or user not found): `Failed to delete post`.
   - On incorrect format: `Invalid DELETE_POST format. Use: DELETE_POST <postId> <username>`.
 
-### 9. HIDE_POST
+#### 9. HIDE_POST
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Post hidden`.
   - On failure (e.g., post not found or user is not the author): `Only the creator of the post can hide it`.
   - On incorrect format: `Invalid HIDE_POST format. Use: HIDE_POST <postId> <username>`.
 
-### 10. UNHIDE_POST
+#### 10. UNHIDE_POST
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Post with ID <postId> has been unhidden`.
   - On failure (e.g., post not found or user is not the author): `Only the author of the post can unhide it`.
   - On incorrect format: `Invalid UNHIDE_POST format. Use: UNHIDE_POST <postId> <username>`.
 
-### 11. ENABLE_COMMENTS
+#### 11. ENABLE_COMMENTS
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Comments enabled for post`.
   - On failure (e.g., user not found): `User not found`.
   - On incorrect format: `Invalid ENABLE_COMMENTS format. Use: ENABLE_COMMENTS <postId> <username>`.
 
-### 12. ADD_COMMENT
+#### 12. ADD_COMMENT
 - **Input**: Provide arguments in the format: `<postId> <username> <comment>`
 - **Expected Output**:
   - On success: `Comment added with ID: <commentId>`.
   - On failure (e.g., post not found or hidden, or user not found): `Cannot add comment. Post not found or is hidden`.
   - On incorrect format: `Invalid ADD_COMMENT format. Use: ADD_COMMENT <postId> <username> <comment>`.
 
-### 13. DELETE_COMMENT
+#### 13. DELETE_COMMENT
 - **Input**: Provide arguments in the format: `<postId> <commentId> <username>`
 - **Expected Output**:
   - On success: `Comment with ID <commentId> successfully deleted`.
   - On failure (e.g., post or comment not found, or user unauthorized): `Failed to delete comment`.
   - On incorrect format: `Invalid DELETE_COMMENT format. Use: DELETE_COMMENT <postId> <commentId> <username>`.
 
-### 14. DISABLE_COMMENTS
+#### 14. DISABLE_COMMENTS
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Comments disabled for post`.
   - On failure (e.g., user not found): `User not found`.
   - On incorrect format: `Invalid DISABLE_COMMENTS format. Use: DISABLE_COMMENTS <postId> <username>`.
 
-### 15. UPVOTE_POST
+#### 15. UPVOTE_POST
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Post upvoted`.
   - On failure (e.g., post not found, user not found, or post is hidden): `Cannot upvote. Post not found or is hidden`.
   - On incorrect format: `Invalid UPVOTE_POST format. Use: UPVOTE_POST <postId> <username>`.
 
-### 16. DOWNVOTE_POST
+#### 16. DOWNVOTE_POST
 - **Input**: Provide arguments in the format: `<postId> <username>`
 - **Expected Output**:
   - On success: `Post downvoted`.
