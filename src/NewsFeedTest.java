@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version November 3, 2024
  *
  */
+
 public class NewsFeedTest {
 
     private NewsFeed newsFeed;
