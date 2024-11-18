@@ -8,8 +8,8 @@ import java.util.concurrent.Executors;
 public class Server implements IServer, Runnable {
 
     private static final int PORT = 12345;
-    private static final String DATABASE_FILE = "database.txt";
-    private final Database database = new Database();
+    private static final String DATABASE_FILE = "/Users/dahlia/IdeaProjects/CS180Proj/src/database.txt";
+    Database database = new Database();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
@@ -20,10 +20,10 @@ public class Server implements IServer, Runnable {
             System.out.println("Server shutting down. Saving database...");
             server.writeDatabaseToFile(DATABASE_FILE);
         }));
-
-        // Load the database state from a file
         System.out.println("Loading database from file...");
         server.readDatabaseFromFile(DATABASE_FILE);
+
+
 
         Thread serverThread = new Thread(server);
         serverThread.start();
@@ -32,6 +32,9 @@ public class Server implements IServer, Runnable {
 
     @Override
     public void run() {
+        // Load the database state from a file
+
+
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -80,24 +83,14 @@ public class Server implements IServer, Runnable {
                 String arguments = request.substring(firstSpaceIndex + 1);
 
                 switch (command) {
-                    // Input: Provide arguments in the format: <username> <password> <name>
-                    // Expected Output:
-                    //   - On success: "User added".
-                    //   - On failure (e.g., duplicate username): "Failed to add user".
-                    //   - On incorrect format: "Invalid ADD_USER format. Use: ADD_USER <username> <password> <name>".
                     case "ADD_USER": {
-                        String[] parts = arguments.split(" ", 3);
-                        if (parts.length < 3) {
+                        String[] parts = arguments.split(" ", 4);
+                        if (parts.length < 4) {
                             return "Invalid ADD_USER format. Use: ADD_USER <username> <password> <name>";
                         }
-                        return server.addUser(new User(parts[0], parts[1], parts[2])) ? "User added" : "Failed to add user";
+                        return server.addUser(new User(parts[0], parts[1], parts[2], parts[3])) ? "User added" : "Failed to add user";
                     }
                     case "REMOVE_USER": {
-                        // Input: Provide arguments in the format: <username> <password> <name>
-                        // Expected Output:
-                        //   - On success: "User removed".
-                        //   - On failure (e.g., user does not exist): "Failed to remove user".
-                        //   - On incorrect format: "Invalid REMOVE_USER format. Use: REMOVE_USER <username> <password> <name>".
                         String[] parts = arguments.split(" ", 3);
                         if (parts.length < 3) {
                             return "Invalid REMOVE_USER format. Use: REMOVE_USER <username> <password> <name>";
@@ -105,11 +98,6 @@ public class Server implements IServer, Runnable {
                         return server.removeUser(new User(parts[0], parts[1], parts[2])) ? "User removed" : "Failed to remove user";
                     }
                     case "VALIDATE": {
-                        // Input: Provide arguments in the format: <username> <password>
-                        // Expected Output:
-                        //   - On success: "Valid credentials".
-                        //   - On failure: "Invalid credentials".
-                        //   - On incorrect format: "Invalid VALIDATE format. Use: VALIDATE <username> <password>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid VALIDATE format. Use: VALIDATE <username> <password>";
@@ -117,11 +105,6 @@ public class Server implements IServer, Runnable {
                         return server.validateCredentials(parts[0], parts[1]) ? "Valid credentials" : "Invalid credentials";
                     }
                     case "ADD_FRIEND": {
-                        // Input: Provide arguments in the format: <username> <friendUsername>
-                        // Expected Output:
-                        //   - On success: "Friend added".
-                        //   - On failure (e.g., user or friend not found): "Failed to add friend".
-                        //   - On incorrect format: "Invalid ADD_FRIEND format. Use: ADD_FRIEND <username> <friendUsername>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid ADD_FRIEND format. Use: ADD_FRIEND <username> <friendUsername>";
@@ -134,11 +117,6 @@ public class Server implements IServer, Runnable {
                         return server.addFriend(user, friend) ? "Friend added" : "Failed to add friend";
                     }
                     case "REMOVE_FRIEND": {
-                        // Input: Provide arguments in the format: <username> <friendUsername>
-                        // Expected Output:
-                        //   - On success: "Friend removed".
-                        //   - On failure (e.g., user or friend not found): "Failed to remove friend".
-                        //   - On incorrect format: "Invalid REMOVE_FRIEND format. Use: REMOVE_FRIEND <username> <friendUsername>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid REMOVE_FRIEND format. Use: REMOVE_FRIEND <username> <friendUsername>";
@@ -151,11 +129,6 @@ public class Server implements IServer, Runnable {
                         return server.removeFriend(user, friend) ? "Friend removed" : "Failed to remove friend";
                     }
                     case "BLOCK_USER": {
-                        // Input: Provide arguments in the format: <username> <blockedUsername>
-                        // Expected Output:
-                        //   - On success: "User blocked".
-                        //   - On failure (e.g., user or blocked user not found): "Failed to block user".
-                        //   - On incorrect format: "Invalid BLOCK_USER format. Use: BLOCK_USER <username> <blockedUsername>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid BLOCK_USER format. Use: BLOCK_USER <username> <blockedUsername>";
@@ -168,11 +141,6 @@ public class Server implements IServer, Runnable {
                         return server.blockUser(user, toBlock) ? "User blocked" : "Failed to block user";
                     }
                     case "CREATE_POST": {
-                        // Input: Provide arguments in the format: <author> <content>
-                        // Expected Output:
-                        //   - On success: "Post created with ID: <postId>".
-                        //   - On failure (e.g., author not found): "Failed to create post".
-                        //   - On incorrect format: "Invalid CREATE_POST format. Use: CREATE_POST <author> <content>".
                         int contentStartIndex = arguments.indexOf(" ");
                         if (contentStartIndex == -1) {
                             return "Invalid CREATE_POST format. Use: CREATE_POST <author> <content>";
@@ -188,11 +156,6 @@ public class Server implements IServer, Runnable {
                         return postId != null ? "Post created with ID: " + postId : "Failed to create post";
                     }
                     case "DELETE_POST": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Post deleted".
-                        //   - On failure (e.g., post or user not found): "Failed to delete post".
-                        //   - On incorrect format: "Invalid DELETE_POST format. Use: DELETE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid DELETE_POST format. Use: DELETE_POST <postId> <username>";
@@ -205,11 +168,6 @@ public class Server implements IServer, Runnable {
                         return server.deletePost(parts[0], requestingUser) ? "Post deleted" : "Failed to delete post";
                     }
                     case "HIDE_POST": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Post hidden."
-                        //   - On failure (e.g., post not found or user is not the author): "Only the creator of the post can hide it."
-                        //   - On incorrect format: "Invalid HIDE_POST format. Use: HIDE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid HIDE_POST format. Use: HIDE_POST <postId> <username>";
@@ -231,11 +189,6 @@ public class Server implements IServer, Runnable {
                         return "Post hidden.";
                     }
                     case "UNHIDE_POST": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Post with ID <postId> has been unhidden."
-                        //   - On failure (e.g., post not found or user is not the author): "Only the author of the post can unhide it."
-                        //   - On incorrect format: "Invalid UNHIDE_POST format. Use: UNHIDE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid UNHIDE_POST format. Use: UNHIDE_POST <postId> <username>";
@@ -262,15 +215,10 @@ public class Server implements IServer, Runnable {
                         }
 
                         // Unhide the post
-                        server.unhidePost(postId, requestingUser);
+                        //server.unhidePost(postId, requestingUser);
                         return "Post with ID " + postId + " has been unhidden.";
                     }
                     case "ENABLE_COMMENTS": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Comments enabled for post."
-                        //   - On failure (e.g., user not found): "User not found."
-                        //   - On incorrect format: "Invalid ENABLE_COMMENTS format. Use: ENABLE_COMMENTS <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid ENABLE_COMMENTS format. Use: ENABLE_COMMENTS <postId> <username>";
@@ -283,11 +231,6 @@ public class Server implements IServer, Runnable {
                         return "Comments enabled for post";
                     }
                     case "ADD_COMMENT": {
-                        // Input: Provide arguments in the format: <postId> <username> <comment>
-                        // Expected Output:
-                        //   - On success: "Comment added with ID: <commentId>".
-                        //   - On failure (e.g., post not found or hidden, or user not found): "Cannot add comment. Post not found or is hidden."
-                        //   - On incorrect format: "Invalid ADD_COMMENT format. Use: ADD_COMMENT <postId> <username> <comment>".
                         String[] parts = arguments.split(" ", 3);
                         if (parts.length < 3) {
                             return "Invalid ADD_COMMENT format. Use: ADD_COMMENT <postId> <username> <comment>";
@@ -314,11 +257,6 @@ public class Server implements IServer, Runnable {
                         return "Failed to add comment.";
                     }
                     case "DELETE_COMMENT": {
-                        // Input: Provide arguments in the format: <postId> <commentId> <username>
-                        // Expected Output:
-                        //   - On success: "Comment with ID <commentId> successfully deleted".
-                        //   - On failure (e.g., post or comment not found, or user unauthorized): "Failed to delete comment."
-                        //   - On incorrect format: "Invalid DELETE_COMMENT format. Use: DELETE_COMMENT <postId> <commentId> <username>".
                         String[] parts = arguments.split(" ", 3);
                         if (parts.length < 3) {
                             return "Invalid DELETE_COMMENT format. Use: DELETE_COMMENT <postId> <commentId> <username>";
@@ -343,11 +281,6 @@ public class Server implements IServer, Runnable {
                         return "Comment with ID " + commentId + " successfully deleted";
                     }
                     case "DISABLE_COMMENTS": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Comments disabled for post."
-                        //   - On failure (e.g., user not found): "User not found."
-                        //   - On incorrect format: "Invalid DISABLE_COMMENTS format. Use: DISABLE_COMMENTS <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid DISABLE_COMMENTS format. Use: DISABLE_COMMENTS <postId> <username>";
@@ -360,11 +293,6 @@ public class Server implements IServer, Runnable {
                         return "Comments disabled for post";
                     }
                     case "UPVOTE_POST": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Post upvoted."
-                        //   - On failure (e.g., post not found, user not found, or post is hidden): "Cannot upvote. Post not found or is hidden."
-                        //   - On incorrect format: "Invalid UPVOTE_POST format. Use: UPVOTE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid UPVOTE_POST format. Use: UPVOTE_POST <postId> <username>";
@@ -378,10 +306,6 @@ public class Server implements IServer, Runnable {
                         return "Post upvoted.";
                     }
                     case "DOWNVOTE_POST": {
-                        // Input: Provide arguments in the format: <postId> <username>
-                        // Expected Output:
-                        //   - On success: "Post downvoted."
-                        //   - On failure (e.g., post not found, user not found, or post
                         String[] parts = arguments.split(" ", 2);
                         if (parts.length < 2) {
                             return "Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>";
