@@ -60,7 +60,9 @@
 
 ### Server
 - Functionality: The Server class represents the backend server for handling user accounts, posts, and comments within a multi-threaded system. It listens for client connections via a ServerSocket and processes requests concurrently using a cached thread pool managed by an ExecutorService. The server provides numerous functionalities, including user authentication, account management, post creation, and comment handling. It uses a command-based system where clients send textual commands (e.g., ADD_USER, CREATE_POST), and the server executes corresponding actions through its database. Requests are handled thread-safely and scalably, ensuring that multiple clients can interact with the server without interference. The server also supports advanced operations like hiding posts, upvoting or downvoting content, and enabling or disabling comments.
-- Testing: As mentioned in Ed Discussion, since our Server Client uses Network IO, test cases are not required. However, these are the following tests the user can input in the server class:
+- Testing: As mentioned in Ed Discussion, since our Server Client uses Network IO, test cases are not required. However, the server class supports commands (shown below) that can be used for testing the functionalities of the social media network.
+- Relationship: The Server class relies on a Database object to store and manage all user, post, and comment data. It interacts with users through sockets and delegates client-specific logic to the ClientHandler inner class, which implements the IClientHandler interface. It also implements the IDatabase and IServer interfaces, allowing it to act as both a database provider and a server controller. The ExecutorService facilitates concurrency, and the server's functionality integrates with other components, such as user-facing client applications, to provide a complete system for managing posts and comments.
+  
 #### 1. ADD_USER
 - **Input**: Provide arguments in the format: `<username> <password> <name>`
 - **Expected Output**:
@@ -172,8 +174,6 @@
   - On success: `Post downvoted`.
   - On failure (e.g., post not found, user not found, or post is hidden): `Cannot downvote. Post not found or is hidden`.
   - On incorrect format: `Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>`.
-
-- Relationship: The Server class relies on a Database object to store and manage all user, post, and comment data. It interacts with users through sockets and delegates client-specific logic to the ClientHandler inner class, which implements the IClientHandler interface. It also implements the IDatabase and IServer interfaces, allowing it to act as both a database provider and a server controller. The ExecutorService facilitates concurrency, and the server's functionality integrates with other components, such as user-facing client applications, to provide a complete system for managing posts and comments.
 
 ### Client
 - Functionality: The Client class facilitates communication between a user and the server. It connects to the server using a specified hostname and port, enabling the user to send textual commands and receive responses interactively. The class provides a simple command-line interface where the user can input commands such as ADD_USER or CREATE_POST to interact with the server's functionality. The client handles input and output streams for back-and-forth communication with the server. It continuously listens for user input, sends commands to the server, and displays the server’s responses. The class ensures a clean shutdown of resources in case of errors or termination.
