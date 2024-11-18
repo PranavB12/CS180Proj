@@ -23,11 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 
 public class DatabaseTest {
-    private Database db;
     private User user1;
     private User user2;
-    private Post post1;
-    private Post post2;
+    //private Post post1;
+    //private Post post2;
     private Picture picture1;
     private Picture picture2;
     private NewsFeed newsFeed;
@@ -82,12 +81,62 @@ public class DatabaseTest {
     }
 
     @org.junit.Test
+    public void testRemoveUser() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        boolean result2 = db.removeUser(user9);
+        assertEquals(db.getUsers().size(), 0);
+    }
+
+    @org.junit.Test
     public void testAddUserFailure() {
         Database db = new Database();
         boolean result = db.addUser(user1);
         assertFalse(result, "Adding a duplicate user should return false.");
         boolean result2 = db.addUser(null);
         assertFalse(result, "Adding a null user should return false.");
+    }
+
+    @org.junit.Test
+    public void testCreateAccount() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result2 = db.createAccount("user9", "pass1", "User Nine");
+        assertTrue(result2, "The user should be created successfully.");
+        assertEquals(user9.getUsername(), "user9");
+        assertEquals(user9.getPassword(), "pass1");
+        assertEquals(user9.getName(), "User Nine");
+        assertEquals(user9.getDescription(), "This is user9");
+    }
+
+    @org.junit.Test
+    public void testValidateCredentials() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        boolean result2 = db.validateCredentials("user9", "pass1");
+        assertTrue(result2, "The user should be validated successfully.");
+    }
+
+    @org.junit.Test
+    public void userExists() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        boolean result2 = db.userExists("user9");
+        assertTrue(result2, "The user should exist in the database.");
+    }
+
+    @org.junit.Test
+    public void viewUser() {
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        String postId = db.createPost("New post 1", user9);
+        Post post1 = db.getPosts().get(postId);
+        User viewedUser = db.viewUser("user9");
+        assertNotNull(viewedUser);
     }
 
     @org.junit.Test
@@ -105,11 +154,24 @@ public class DatabaseTest {
         User user9 = new User("user9", "pass1", "User Nine", "This is user9");
         boolean result = db.addUser(user9);
         String postId = db.createPost("New post 9", user9);
-        Assertions.assertTrue(db.getPosts().containsKey(postId), "Post should be added to the database.");
+        assertTrue(db.getPosts().containsKey(postId), "Post should be added to the database.");
     }
 
     @org.junit.Test
-    public void testCommentOnPost() {
+    public void testGetPostById(){
+        Database db = new Database();
+        User user9 = new User("user9", "pass1", "User Nine", "This is user9");
+        boolean result = db.addUser(user9);
+        String postId = db.createPost("New post 9", user9);
+        Post postCreated = db.getPostById(postId);
+        assertNotNull(postCreated);
+        assertEquals(postId, postCreated.getId());
+        assertEquals(postCreated.getContent(), "New post 9");
+        assertEquals(postCreated.getAuthor().getUsername(), "user9");
+    }
+
+    @org.junit.Test
+    public void testAddCommentToPost() {
         // String postId, String comment , User commentAuthor
         Database db = new Database();
         User user10 = new User("user10", "pass1", "User Ten", "This is user10");
@@ -247,7 +309,32 @@ public class DatabaseTest {
     }
 
     @org.junit.Test
-    public void testBlockedUsers() {
+    public void testAddFriend() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        User user12 = new User("user12", "pass1", "User Twelve", "This is user12");
+        boolean result = db.addUser(user10);
+        boolean result2 = db.addUser(user12);
+        user10.addFriend(user12);
+        assertEquals(1, user10.getFriends().size());
+        assertEquals(0, user12.getFriends().size());
+    }
+
+    @org.junit.Test
+    public void testRemoveFriend() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        User user12 = new User("user12", "pass1", "User Twelve", "This is user12");
+        boolean result = db.addUser(user10);
+        boolean result2 = db.addUser(user12);
+        user10.addFriend(user12);
+        assertEquals(1, user10.getFriends().size());
+        user10.removeFriend(user12);
+        assertEquals(0, user10.getFriends().size());
+    }
+
+    @org.junit.Test
+    public void testBlockUsers() {
         Database db = new Database();
         User user10 = new User("user10", "pass1", "User Ten", "This is user10");
         User user12 = new User("user12", "pass1", "User Twelve", "This is user12");
@@ -255,7 +342,6 @@ public class DatabaseTest {
         assertTrue(user10.getBlockedUsers().contains(user12));
     }
 
-    // revisit this test case
     @org.junit.Test
     public void testUserEquals() {
         Database db = new Database();
@@ -264,6 +350,30 @@ public class DatabaseTest {
         db.addUser(user1);
         db.addUser(user3);
         assertTrue(user1.equals(user3));
+    }
+
+    @org.junit.Test
+    public void testFindUserByUsername() {
+        Database db = new Database();
+        User user10 = new User("user10", "pass1", "User Ten", "This is user10");
+        db.addUser(user10);
+        User userFound = db.findUserByUsername("user10");
+        assertEquals(user10.getUsername(), userFound.getUsername());
+    }
+
+    @org.junit.Test
+    public void testUpdateUserInDatabase() {
+        Database db = new Database();
+        User user10 = new User("user10", "password", "User Ten", "This is user10");
+        db.addUser(user10);
+        // creating updated user object with partially changed fields
+        User updatedUser10 = new User("user10", "changedPassword", "User Ten", "This is new user10");
+        db.updateUserInDatabase(user10);
+        User getUser10 = db.getUserByUsername("user10");
+        assertEquals(updatedUser10.getUsername(), getUser10.getUsername());
+        assertNotEquals(updatedUser10.getPassword(), getUser10.getPassword());
+        assertEquals(updatedUser10.getName(), getUser10.getName());
+        assertNotEquals(updatedUser10.getDescription(), getUser10.getDescription());
     }
 
     // New test cases for comments, pictures, and news feed
