@@ -22,7 +22,9 @@
 3. To run all tests, you can also navigate to the Run menu, select Run All Tests, or use the JUnit configuration to execute all test cases.
 
 ### Submission Details
-#### Rishi Rao -`rao308@purdue.edu`
+#### Phase 1: Rishi Rao -`rao308@purdue.edu`
+- Submitted to Vocareum workspace.
+#### Phase 2: Pranav Bansal -`bansa124@purdue.edu`
 - Submitted to Vocareum workspace.
 
 
