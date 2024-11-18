@@ -221,25 +221,6 @@ public class DatabaseTest {
         assertFalse(user10.getPosts().contains(post1));
     }
 
-    // newsfeed not a part of database.java
-//    @org.junit.Test
-//    public void testNewsFeedDisplayPosts() {
-//        user1.getPosts().add(post1);
-//        user2.getPosts().add(post2);
-//        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
-//
-//        // Ideally, you would check for output, but this is a basic check
-//        assertFalse(newsFeed.getPosts().isEmpty());
-//    }
-//
-//    @org.junit.Test
-//    public void testNewsFeedDeletePost() {
-//        user1.getPosts().add(post1);
-//        newsFeed.deletePost(post1);
-//        assertFalse(newsFeed.getPosts().contains(post1));
-//    }
-
-
     @org.junit.Test
     public void testEnableDisableComments() {
         Database db = new Database();
@@ -394,26 +375,6 @@ public class DatabaseTest {
         assertEquals("http://example.com/pic1.jpg", picture1.getUrl());
         assertEquals("http://example.com/pic2.jpg", picture2.getUrl());
     }
-
-    // these tests should be in NewsFeedTest class
-//    @org.junit.Test
-//    public void testNewsFeedWithMultiplePosts() {
-//        user1.getPosts().add(post1);
-//        user2.getPosts().add(post2);
-//        newsFeed.displayPosts(user1); // User1's feed should show posts from user2
-//
-//        // Ideally, you would check for output, but this is a basic check
-//        assertFalse(newsFeed.getPosts().isEmpty());
-//    }
-//
-//    @Test
-//    public void testDisplayPostsWithNoFriends() {
-//        User lonelyUser = new User("lonelyUser", "lonelyPass", "Lonely User");
-//        newsFeed.displayPosts(lonelyUser); // No friends, no posts
-//
-//        // Validate that the news feed is empty
-//        assertTrue(newsFeed.getPosts().isEmpty());
-//    }
 
     @org.junit.Test
     public void testAddCommentWhenDisabled() {
