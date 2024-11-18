@@ -22,6 +22,15 @@ public class Post implements IPost {
         this.content = content;
         this.author = author;
     }
+    public Post(String id, String content, User author, int upVotes, int downVotes) {
+        this.id = id;
+        this.content = content;
+        this.author = author;
+        this.upVotes = upVotes;
+        this.downVotes = downVotes;
+        this.commentsEnabled = commentsEnabled;
+        this.hidden = hidden;
+    }
 
     public String getId() {
         return id;

@@ -36,5 +36,5 @@ public interface IDatabase {
     void writeDatabaseToFile(String filename);
     void readDatabaseFromFile(String filename);
 
-    void addPost(String content, User postAuthor, String postId);
+    void addPost(Post post);
 }

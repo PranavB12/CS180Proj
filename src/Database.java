@@ -469,12 +469,12 @@ public class Database implements IDatabase {
             return null;
         }
     }
-    public void addPost( String content, User postAuthor, String postId) {
+    /*public void addPost( String content, User postAuthor, String postId) {
         Post post =  new Post(postId, content, postAuthor);
         Map<String, Post> postss = this.getPosts();
         postss.put(postId, post);
         this.setPosts(postss);
-    }
+    }*/
     public synchronized void addPost(Post post) {
         // Check if the post already exists in the database
         if (posts.containsKey(post.getId())) {
@@ -632,7 +632,7 @@ public class Database implements IDatabase {
 
                             User postAuthor = this.getUserByUsername(authorUsername);
                             if (postAuthor != null) {
-                                this.addPost(content, postAuthor, postId);
+                                this.addPost(new Post(postId, content, postAuthor, upVotes, downVotes));
                             }
                         }
                         break;

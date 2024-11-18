@@ -1,10 +1,3 @@
 USERS
-rishi,rao,dubai_boy,
-Friends for - rishi: 
-Blocked users for - rishi: 
-mike,lee,mike_lee,
-Friends for - mike: 
-Blocked users for - mike: 
 POSTS
-db484ec9-20e0-4e07-b756-45268491e321,beach day,rishi,0,0
 COMMENTS
