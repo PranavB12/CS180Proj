@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 public class Server implements IServer, Runnable {
 
     private static final int PORT = 12345;
-    private static final String DATABASE_FILE = "/Users/dahlia/IdeaProjects/CS180Proj/src/database.txt";
+    private static final String DATABASE_FILE = "database.txt";
     Database database = new Database();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
