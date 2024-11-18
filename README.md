@@ -62,7 +62,8 @@
 - Functionality: The Server class represents the backend server for handling user accounts, posts, and comments within a multi-threaded system. It listens for client connections via a ServerSocket and processes requests concurrently using a cached thread pool managed by an ExecutorService. The server provides numerous functionalities, including user authentication, account management, post creation, and comment handling. It uses a command-based system where clients send textual commands (e.g., ADD_USER, CREATE_POST), and the server executes corresponding actions through its database. Requests are handled thread-safely and scalably, ensuring that multiple clients can interact with the server without interference. The server also supports advanced operations like hiding posts, upvoting or downvoting content, and enabling or disabling comments.
 - Testing: As mentioned in Ed Discussion, since our Server Client uses Network IO, test cases are not required. However, the server class supports commands (shown below) that can be used for testing the functionalities of the social media network.
 - Relationship: The Server class relies on a Database object to store and manage all user, post, and comment data. It interacts with users through sockets and delegates client-specific logic to the ClientHandler inner class, which implements the IClientHandler interface. It also implements the IDatabase and IServer interfaces, allowing it to act as both a database provider and a server controller. The ExecutorService facilitates concurrency, and the server's functionality integrates with other components, such as user-facing client applications, to provide a complete system for managing posts and comments.
-  
+
+#### Supported Commands: 
 #### 1. ADD_USER
 - **Input**: Provide arguments in the format: `<username> <password> <name>`
 - **Expected Output**:
