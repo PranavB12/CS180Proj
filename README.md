@@ -65,11 +65,11 @@
 
 #### Supported Commands: 
 #### 1. ADD_USER
-- **Input**: Provide arguments in the format: `<username> <password> <name>`
+- **Input**: Provide arguments in the format: `<username> <password> <name> <description>`
 - **Expected Output**:
   - On success: `User added`.
   - On failure (e.g., duplicate username): `Failed to add user`.
-  - On incorrect format: `Invalid ADD_USER format. Use: ADD_USER <username> <password> <name>`.
+  - On incorrect format: `Invalid ADD_USER format. Use: ADD_USER <username> <password> <name> <description>`.
 
 #### 2. REMOVE_USER
 - **Input**: Provide arguments in the format: `<username> <password> <name>`
