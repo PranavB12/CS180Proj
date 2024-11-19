@@ -21,7 +21,8 @@ public class UserTest {
     public void setUp() {
         user = new User("testUser", "password123", "Arthur Morgan", "A test user");
         friend = new User("friendUser", "password456", "Buster Baxter");
-        post = new Post("1", "This is a post", user); // Assuming Post constructor requires ID, content, and author
+        post = new Post("1", "This is a post", user); // Assuming Post constructor requires ID, content,
+        // and author
     }
 
     // Constructor Tests

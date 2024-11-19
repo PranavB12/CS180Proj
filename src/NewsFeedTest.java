@@ -70,7 +70,8 @@ public class NewsFeedTest {
 
         newsFeed.displayPosts(user);
         // Expectation: Posts from both friends should be displayed
-        assertEquals(2, newsFeed.getPosts().size(), "News feed should contain posts from both friends.");
+        assertEquals(2, newsFeed.getPosts().size(), "News feed should contain " +
+                "posts from both friends.");
     }
 
     @Test

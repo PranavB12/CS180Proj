@@ -197,8 +197,10 @@ public class DatabaseTest {
         // class level "com" is being created as null within method - to be fixed
         Comment com1 = new Comment("This is User2 comment", user2, postObject.getId());
         String commentID = db.addCommentToPost(postObject.getId(), com1.getContent(), com1.getAuthor());
-        // Expected: after a comment is added to a post, the commentID should be associated with the correct post in the database
-        assertTrue(db.getPostById(post1.getId()).getComments().containsKey(commentID), "Comment should exist in the database");
+        // Expected: after a comment is added to a post, the commentID should be associated with the correct post in
+        // the database
+        assertTrue(db.getPostById(post1.getId()).getComments().containsKey(commentID), "Comment should " +
+                "exist in the database");
     }
 
     @Test
@@ -336,20 +338,6 @@ public class DatabaseTest {
         // Expected: the username found from the database should match "user1"
         assertEquals(db.getUserByUsername("user1").getUsername(), userFound.getUsername());
     }
-
-    // this method doesn't seem to work
-    /**@Test
-    public void testUpdateUserInDatabase() {
-        db.addUser(user2);
-        // an object to compare the updated user to
-        User updatedUser2 = new User("user2", "changedPassword", "User Two", "This is new user2");
-        db.updateUserInDatabase(updatedUser2);
-        //System.out.println(user2.toString());
-        assertEquals(updatedUser2.getUsername(), user2.getUsername());
-        assertNotEquals(updatedUser2.getPassword(), user2.getPassword());
-        assertEquals(updatedUser2.getName(), user2.getName());
-        assertNotEquals(updatedUser2.getDescription(), user2.getDescription());
-    }*/
 
     // New test cases for comments, pictures, and news feed
     @Test
