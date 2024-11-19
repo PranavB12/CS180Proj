@@ -125,7 +125,8 @@ public class Post implements IPost {
             throw new IllegalStateException("Comment with ID " + commentId + " does not exist.");
         }
         if (!comment.getAuthor().equals(requestedUser)) {
-            throw new IllegalStateException("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
+            throw new IllegalStateException("User " + requestedUser.getUsername() + " is not authorized to " +
+                    "delete this comment.");
         }
         comments.remove(commentId);
     }

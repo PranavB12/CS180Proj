@@ -322,7 +322,8 @@ public class Database implements IDatabase {
 
             // Verify that the requested user is the author of the comment
             if (!comment.getAuthor().equals(requestedUser)) {
-                System.out.println("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
+                System.out.println("User " + requestedUser.getUsername() + " is not authorized to delete this " +
+                        "comment.");
                 return;
             }
 
@@ -401,7 +402,8 @@ public class Database implements IDatabase {
         if (post != null) {
             // Verify that the requested user is the author of the post
             if (!post.getAuthor().equals(requestedUser)) {
-                System.out.println("User " + requestedUser.getUsername() + " is not authorized to enable comments for this post.");
+                System.out.println("User " + requestedUser.getUsername() + " is not authorized to enable comments " +
+                        "for this post.");
                 return;
             }
 
@@ -426,7 +428,8 @@ public class Database implements IDatabase {
         if (post != null) {
             // Verify that the requested user is the author of the post
             if (!post.getAuthor().equals(requestedUser)) {
-                System.out.println("User " + requestedUser.getUsername() + " is not authorized to disable comments for this post.");
+                System.out.println("User " + requestedUser.getUsername() + " is not authorized to disable comments " +
+                        "for this post.");
                 return;
             }
 
@@ -491,7 +494,8 @@ public class Database implements IDatabase {
             writer.write("USERS\n");
 
             for (User user : users) {
-                writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getName() + "," + user.getDescription() + "\n");
+                writer.write(user.getUsername() + "," + user.getPassword() + "," + user.getName() + "," +
+                        user.getDescription() + "\n");
 
                 // Write Friends (if any)
                 List<User> friends = user.getFriends();
@@ -504,7 +508,8 @@ public class Database implements IDatabase {
                 List<User> blockedUsers = user.getBlockedUsers();
                 if (blockedUsers != null) {
                     writer.write("Blocked users for - " + user.getUsername() + ": ");
-                    writer.write(String.join(",", blockedUsers.stream().map(User::getUsername).toList()) + "\n");
+                    writer.write(String.join(",", blockedUsers.stream().map(User::getUsername).toList()) +
+                            "\n");
                 }
 
 
@@ -516,14 +521,16 @@ public class Database implements IDatabase {
                 // Write post ID, content, author, upvotes, and downvotes
                 writer.write(post.getId() + "," + post.getContent() + "," + post.getAuthor().getUsername() + ","
                         + post.getUpVotes() + "," + post.getDownVotes() + "\n");
-                System.out.println("Post created with ID: " + post.getId() + " Upvotes: " + post.getUpVotes() + " Downvotes: " + post.getDownVotes()); // Debugging line
+                System.out.println("Post created with ID: " + post.getId() + " Upvotes: " + post.getUpVotes() +
+                        " Downvotes: " + post.getDownVotes()); // Debugging line
             }
             // Write Comments
             writer.write("COMMENTS\n");
             for (Comment comment : comments.values()) {
                 // Include the postId along with other comment data
-                writer.write(comment.getID() + "," + comment.getContent() + "," + comment.getAuthor().getUsername() + ","
-                        + comment.getUpVotes() + "," + comment.getDownVotes() + "," + comment.getPostID() + "\n");
+                writer.write(comment.getID() + "," + comment.getContent() + "," +
+                        comment.getAuthor().getUsername() + "," + comment.getUpVotes() + "," + comment.getDownVotes()
+                        + "," + comment.getPostID() + "\n");
             }
 
         } catch (IOException e) {
