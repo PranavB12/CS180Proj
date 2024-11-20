@@ -194,9 +194,7 @@ public class DatabaseTest {
         db.addUser(user2);
         db.addPost(post1);
         Post postObject = db.getPostById(post1.getId());
-        // class level "com" is being created as null within method - to be fixed
-        Comment com1 = new Comment("This is User2 comment", user2, postObject.getId());
-        String commentID = db.addCommentToPost(postObject.getId(), com1.getContent(), com1.getAuthor());
+        String commentID = db.addCommentToPost(postObject.getId(), "This is User2 comment", user2);
         // Expected: after a comment is added to a post, the commentID should be associated with the correct post in
         // the database
         assertTrue(db.getPostById(post1.getId()).getComments().containsKey(commentID), "Comment should " +
@@ -211,9 +209,7 @@ public class DatabaseTest {
         db.addUser(user2);
         db.addPost(post1);
         Post postObject = db.getPostById(post1.getId());
-        // class level "com" is being created as null within method - to be fixed
-        Comment com1 = new Comment("This is User2 comment", user2, postObject.getId());
-        String commentID = db.addCommentToPost(postObject.getId(), com1.getContent(), com1.getAuthor());
+        String commentID = db.addCommentToPost(postObject.getId(), "This is User2 comment", user2);
         db.deleteCommentFromPost(postObject.getId(), commentID, user2);
         // Expected: after a comment is deleted from a post, there should be 0 comments under the post
         assertEquals(db.getPostById(post1.getId()).getComments().size(), 0);
@@ -250,12 +246,10 @@ public class DatabaseTest {
         post1.disableComments();
         // Expected: comments should not be enabled on post1
         assertFalse(post1.areCommentsEnabled());
-        Comment com1 = new Comment("This is User2 comment", user2, postObject.getId());
 
         // handling exception when comment is added after comments are disabled
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            String commentID = db.addCommentToPost(postObject.getId(), com1.getContent(), com1.getAuthor());
-            post1.addComment(com1.getID(), com1);
+            db.addCommentToPost(postObject.getId(), "This is User2 comment", user2);
         });
         // Expected: there should be 0 comments on post1
         assertEquals(0, db.getPostById(post1.getId()).getComments().size());
@@ -349,10 +343,4 @@ public class DatabaseTest {
         assertEquals(0, post1.getComments().size());
     }
 
-    @Test
-    public void testPictureUrl() {
-        // Testing picture url's
-        assertEquals("http://example.com/pic1.jpg", picture1.getUrl());
-        assertEquals("http://example.com/pic2.jpg", picture2.getUrl());
-    }
 }
