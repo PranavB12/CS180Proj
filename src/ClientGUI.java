@@ -288,7 +288,8 @@ public class ClientGUI extends JFrame {
                         hasComments = true;
                         index++; // Skip over "Comments: " line
 
-                        while (index < lines.size() && !lines.get(index).equals("---------------------------------------------------------------------------------------------------------") && !lines.get(index).startsWith("Posted by:")) {
+
+                        while (index < lines.size() && !lines.get(index).equals("---") ) {
                             String commentContent = lines.get(index).trim();
                             index++;
                             int upVotes = Integer.parseInt(lines.get(index).trim());
