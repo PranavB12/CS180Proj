@@ -11,9 +11,9 @@ public class Post implements IPost {
     private final User author;
     private int upVotes = 0;
     private int downVotes = 0;
-    private final Set<String> upvoters = new HashSet<>();
-    private final Set<String> downvoters = new HashSet<>();
-    private final Map<String, Comment> comments = new HashMap<>();
+    private Set<String> upvoters = new HashSet<>();
+    private Set<String> downvoters = new HashSet<>();
+    private Map<String, Comment> comments = new HashMap<>();
     private boolean commentsEnabled = true;
     private boolean hidden = false;
 
@@ -125,8 +125,7 @@ public class Post implements IPost {
             throw new IllegalStateException("Comment with ID " + commentId + " does not exist.");
         }
         if (!comment.getAuthor().equals(requestedUser)) {
-            throw new IllegalStateException("User " + requestedUser.getUsername() + " is not authorized to " +
-                    "delete this comment.");
+            throw new IllegalStateException("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
         }
         comments.remove(commentId);
     }
@@ -143,5 +142,8 @@ public class Post implements IPost {
                 ", commentsEnabled=" + commentsEnabled +
                 ", hidden=" + hidden +
                 '}';
+    }
+    public void setComments(Map<String, Comment> comments) {
+        this.comments = comments;
     }
 }
