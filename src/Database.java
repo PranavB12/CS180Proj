@@ -275,11 +275,12 @@ public class Database implements IDatabase {
                 for (Map.Entry<String, Comment> entry : comments.entrySet()) {
 
                     Comment comment = entry.getValue(); // Retrieve the Comment object
-                    lines.add( comment.getContent());
+                    lines.add(comment.getContent());
                     lines.add(String.valueOf(comment.getUpVotes()));
                     lines.add(String.valueOf(comment.getDownVotes()));
                     lines.add(comment.getAuthor().getUsername());
                 }
+                lines.add("---");
             }
 
             lines.add("---------------------------------------------------------------------------------------------------------");
