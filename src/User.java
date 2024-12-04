@@ -1,3 +1,4 @@
+
 package src;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +94,6 @@ public class User implements  IUser {
             }
         }
     }
-
     public void setDescription(String des) {
         this.description = des;
     }
@@ -113,11 +113,8 @@ public class User implements  IUser {
     public void setFriends(List<User> friends) {
         this.friends = friends;
     }
-
-    public boolean deletePost(Post post) {
-        synchronized (posts) {
-            return posts.remove(post); // Remove the post if it exists
-        }
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 
 
