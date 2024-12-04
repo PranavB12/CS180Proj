@@ -1,4 +1,5 @@
 
+
 package src;
 import java.util.*;
 import java.io.*;
@@ -239,7 +240,7 @@ public class Database implements IDatabase {
         return null;
     }
     public ArrayList<String> displayPosts(String username) {
-        User user = getUserByUsername(username);
+        User user = this.getUserByUsername(username);
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<Post> posts = new ArrayList<Post>();
         List<User> friends = this.getUsers();  // Changed to Set<User>
@@ -270,9 +271,9 @@ public class Database implements IDatabase {
 
             Map<String, Comment> comments = post.getComments();
             if (comments != null && !comments.isEmpty()) {
-
+                lines.add("     Comments: ");
                 for (Map.Entry<String, Comment> entry : comments.entrySet()) {
-                    lines.add("     Comments: ");
+
                     Comment comment = entry.getValue(); // Retrieve the Comment object
                     lines.add( comment.getContent());
                     lines.add(String.valueOf(comment.getUpVotes()));
@@ -718,7 +719,7 @@ public class Database implements IDatabase {
                             parentPost.setComments(comments);
                             this.comments.put(commentId, new Comment(commentContent, commentAuthor, postIdForComment, commentId, commentUpVotes, commentDownVotes));
                             synchronized (postsLock) {
-                                posts.put(postIdForComment, getPostById(postIdForComment));
+                                posts.put(postIdForComment, parentPost);
                             }
 
 
