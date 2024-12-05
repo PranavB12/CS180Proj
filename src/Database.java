@@ -416,7 +416,7 @@ public class Database implements IDatabase {
             }
 
             // Verify that the requested user is the author of the comment
-            if (!comment.getAuthor().equals(requestedUser)) {
+            if (!comment.getAuthor().equals(requestedUser) || !post.getAuthor().equals(requestedUser)) {
                 return ("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
             }
 
