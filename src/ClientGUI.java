@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ClientGUI extends JFrame {
     private static final int WIDTH = 800;
@@ -205,40 +206,30 @@ public class ClientGUI extends JFrame {
         JPanel feedContentPanel = (JPanel) ((JScrollPane) feedPanel.getComponent(0)).getViewport().getView();
         feedContentPanel.removeAll();
 
-        // Fetch the posts for the current user from the server
         String response = handleRequest("GET_FEED " + currentUser);
 
-
         if (response != null && !response.isEmpty()) {
-            // Split the response into individual posts
             String[] lin = response.split("12345");
-            ArrayList<String> lines = new ArrayList<String>();
-            for (int u = 0; u < lin.length; u++ ) {
-                lines.add(lin[u]);
-            }
+            ArrayList<String> lines = new ArrayList<>();
+            Collections.addAll(lines, lin);
 
             int index = 0;
             while (index < lines.size()) {
                 String line = lines.get(index);
 
-                // Skip separator lines
                 if (line.equals("---------------------------------------------------------------------------------------------------------")) {
                     index++;
                     continue;
-
                 }
 
-                // Handle the "Posted by" part
                 if (line.startsWith("Posted by:")) {
-                    feedContentPanel.add(new JLabel(line));  // Add post info to the feed
+                    feedContentPanel.add(new JLabel(line));
                     index++;
 
-                    // Handle the content of the post
                     String content = lines.get(index);
                     feedContentPanel.add(new JLabel(content));
                     index++;
 
-                    // Handle upvotes and downvotes
                     String upvotes = lines.get(index);
                     feedContentPanel.add(new JLabel(upvotes));
                     index++;
@@ -247,49 +238,40 @@ public class ClientGUI extends JFrame {
                     feedContentPanel.add(new JLabel(downvotes));
                     index++;
 
-                    // Handle postId (used for voting and comments)
                     String postId = lines.get(index);
                     index++;
 
-                    // Add upvote button
-                    // Add upvote button
                     JButton upvoteButton = new JButton("Upvote");
                     upvoteButton.addActionListener(e -> {
-                        // Send properly formatted request with space between command and arguments
-                        String upvoteResponse = handleRequest("UPVOTE_POST " + postId + " " + currentUser);
-                        if ("Post upvoted.".equals(upvoteResponse)) {
-                            JOptionPane.showMessageDialog(ClientGUI.this, "Post upvoted.");
-                            showNewsFeed(); // Refresh feed
-                        } else {
-                            JOptionPane.showMessageDialog(ClientGUI.this, "Failed to upvote post.");
+                        try {
+                            out.println("UPVOTE_POST " + postId + " " + currentUser);
+                            String voteResponse = in.readLine();
+                            JOptionPane.showMessageDialog(ClientGUI.this, voteResponse);
+                            showNewsFeed();
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                         }
                     });
                     feedContentPanel.add(upvoteButton);
 
-// Add downvote button
                     JButton downvoteButton = new JButton("Downvote");
                     downvoteButton.addActionListener(e -> {
-                        // Send properly formatted request with space between command and arguments
-                        String downvoteResponse = handleRequest("DOWNVOTE_POST " + postId + " " + currentUser);
-                        if ("Post downvoted.".equals(downvoteResponse)) {
-                            JOptionPane.showMessageDialog(ClientGUI.this, "Post downvoted.");
-                            showNewsFeed(); // Refresh feed
-                        } else {
-                            JOptionPane.showMessageDialog(ClientGUI.this, "Failed to downvote post.");
+                        try {
+                            out.println("DOWNVOTE_POST " + postId + " " + currentUser);
+                            String voteResponse = in.readLine();
+                            JOptionPane.showMessageDialog(ClientGUI.this, voteResponse);
+                            showNewsFeed();
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                         }
                     });
                     feedContentPanel.add(downvoteButton);
 
-
-                    // Render comments (if any)
-                    // Handle the comment display
                     boolean hasComments = false;
                     while (index < lines.size() && lines.get(index).equals("     Comments: ")) {
                         hasComments = true;
-                        index++; // Skip over "Comments: " line
-
-
-                        while (index < lines.size() && !lines.get(index).equals("---") ) {
+                        index++;
+                        while (index < lines.size() && !lines.get(index).equals("---")) {
                             String commentContent = lines.get(index).trim();
                             index++;
                             int upVotes = Integer.parseInt(lines.get(index).trim());
@@ -298,20 +280,60 @@ public class ClientGUI extends JFrame {
                             index++;
                             String commenter = lines.get(index);
                             index++;
+
                             feedContentPanel.add(new JLabel("   Commented by: " + commenter));
                             feedContentPanel.add(new JLabel("     " + commentContent));
                             feedContentPanel.add(new JLabel("     Upvotes: " + upVotes));
                             feedContentPanel.add(new JLabel("     DownVotes: " + downVotes));
+
+                            String commentId = lines.get(index);
+                            index++;
+
+                            JButton commentUpvoteButton = new JButton("Upvote Comment");
+                            commentUpvoteButton.addActionListener(e -> {
+                                try {
+                                    out.println("UPVOTE_COMMENT " + commentId + " " + currentUser);
+                                    String voteResponse = in.readLine();
+                                    JOptionPane.showMessageDialog(ClientGUI.this, voteResponse);
+                                    showNewsFeed();
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                            feedContentPanel.add(commentUpvoteButton);
+
+                            JButton commentDownvoteButton = new JButton("Downvote Comment");
+                            commentDownvoteButton.addActionListener(e -> {
+                                try {
+                                    out.println("DOWNVOTE_COMMENT " + commentId + " " + currentUser);
+                                    String voteResponse = in.readLine();
+                                    JOptionPane.showMessageDialog(ClientGUI.this, voteResponse);
+                                    showNewsFeed();
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                            feedContentPanel.add(commentDownvoteButton);
+
+                            JButton deleteCommentButton = new JButton("Delete Comment");
+                            deleteCommentButton.addActionListener(e -> {
+                                try {
+                                    out.println("DELETE_COMMENT " + postId + " " + commentId + " " + currentUser);
+                                    String deleteResponse = in.readLine();
+                                    JOptionPane.showMessageDialog(ClientGUI.this, deleteResponse);
+                                    showNewsFeed();
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            });
+                            feedContentPanel.add(deleteCommentButton);
                         }
                     }
 
-
-                    // If comments exist, render them under the buttons
                     if (hasComments) {
                         feedContentPanel.add(new JLabel("     Comments:"));
                     }
 
-                    // Add input for new comment
                     JTextField commentField = new JTextField();
                     commentField.setColumns(30);
                     feedContentPanel.add(commentField);
@@ -320,25 +342,18 @@ public class ClientGUI extends JFrame {
                     postCommentButton.addActionListener(e -> {
                         String commentContent = commentField.getText().trim();
                         if (!commentContent.isEmpty()) {
-                            // Format the request correctly: ADD_COMMENT <postId> <username> <commentContent>
-                            String commentResponse = handleRequest("ADD_COMMENT " + postId + " " + currentUser + " " + commentContent);
-
-                            // Print the response for debugging
-                            System.out.println("Server response: " + commentResponse);
-
-                            if (commentResponse != null && commentResponse.startsWith("Comment added with ID:")) {
-                                JOptionPane.showMessageDialog(ClientGUI.this, commentResponse); // Show success message
-                                showNewsFeed(); // Refresh the feed immediately after adding the comment
-                            } else {
-                                JOptionPane.showMessageDialog(ClientGUI.this, "Failed to add comment.");
+                            try {
+                                out.println("ADD_COMMENT " + postId + " " + currentUser + " " + commentContent);
+                                String commentResponse = in.readLine();
+                                JOptionPane.showMessageDialog(ClientGUI.this, commentResponse);
+                                showNewsFeed();
+                            } catch (IOException ex) {
+                                JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                             }
                         } else {
                             JOptionPane.showMessageDialog(ClientGUI.this, "Comment cannot be empty!");
                         }
                     });
-
-
-
                     feedContentPanel.add(postCommentButton);
                 }
                 index++;
@@ -350,6 +365,19 @@ public class ClientGUI extends JFrame {
 
         feedPanel.setVisible(true);
     }
+
+
+    private void handleVote(String action, String id) {
+        String response = handleRequest(action + " " + id + " " + currentUser);
+        if (response != null && (response.equals("Post upvoted.") || response.equals("Comment upvoted.") ||
+                response.equals("Post downvoted.") || response.equals("Comment downvoted."))) {
+            JOptionPane.showMessageDialog(ClientGUI.this, response);
+            showNewsFeed();
+        } else {
+            JOptionPane.showMessageDialog(ClientGUI.this, "Failed to vote.");
+        }
+    }
+
 
 
 
@@ -371,5 +399,6 @@ public class ClientGUI extends JFrame {
         });
     }
 }
+
 
 
