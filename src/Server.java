@@ -359,7 +359,7 @@ public class Server implements IServer, Runnable {
 
                         // Delete the comment
                         server.deleteCommentFromPost(postId, commentId, user);
-                        return "Comment with ID " + commentId + " successfully deleted";
+                        return server.deleteCommentFromPost(postId, commentId, user);
                     }
                     case "DISABLE_COMMENTS": {
                         // Input: Provide arguments in the format: <postId> <username>
@@ -423,6 +423,37 @@ public class Server implements IServer, Runnable {
 
                         return content;
                     }
+                    case "UPVOTE_COMMENT": {
+                        String[] parts = arguments.split(" ", 2);
+                        if (parts.length < 2) {
+                            return "Invalid UPVOTE_COMMENT format. Use: UPVOTE_COMMENT <commentId> <username>";
+                        }
+                        String commentId = parts[0];
+                        String username = parts[1];
+
+                        User user = server.database.findUserByUsername(username);
+                        if (user == null) {
+                            return "User not found.";
+                        }
+                        server.database.upvoteComment(commentId, user);
+                        return "Comment upvoted.";
+                    }
+                    case "DOWNVOTE_COMMENT": {
+                        String[] parts = arguments.split(" ", 2);
+                        if (parts.length < 2) {
+                            return "Invalid DOWNVOTE_COMMENT format. Use: DOWNVOTE_COMMENT <commentId> <username>";
+                        }
+                        String commentId = parts[0];
+                        String username = parts[1];
+
+                        User user = server.database.findUserByUsername(username);
+                        if (user == null) {
+                            return "User not found.";
+                        }
+                        server.database.downvoteComment(commentId, user);
+                        return "Comment downvoted.";
+                    }
+
 
                     default:
                         return "Unknown command: " + command;
@@ -503,11 +534,11 @@ public class Server implements IServer, Runnable {
         return database.addCommentToPost(postId, comment, commentAuthor);
     }
 
-    public void deleteCommentFromPost(String postId, String commentId, User user) {
+    public String deleteCommentFromPost(String postId, String commentId, User user) {
         try {
-            database.deleteCommentFromPost(postId, commentId, user);
+            return database.deleteCommentFromPost(postId, commentId, user);
         } catch (Exception e) {
-            System.err.println("Error deleting comment: " + e.getMessage());
+            return "Error deleting comment: " + e.getMessage();
         }
     }
 
