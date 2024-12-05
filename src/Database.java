@@ -279,6 +279,7 @@ public class Database implements IDatabase {
                     lines.add(String.valueOf(comment.getUpVotes()));
                     lines.add(String.valueOf(comment.getDownVotes()));
                     lines.add(comment.getAuthor().getUsername());
+                    lines.add(comment.getID());
                 }
                 lines.add("---");
             }
@@ -311,6 +312,46 @@ public class Database implements IDatabase {
             }
         } else {
             System.out.println("Post with ID " + postId + " not found.");
+        }
+    }
+    public void upvoteComment(String commentID, User requestedUser) {
+        Comment comment;
+        synchronized (postsLock) {
+            comment = getCommentById(commentID);
+        }
+
+        if (comment != null) {
+            try {
+                comment.upvote(requestedUser.getUsername());
+                synchronized (postsLock) {
+                    comments.put(comment.getID(), comment);
+                }
+                System.out.println("Post with ID " + commentID + " upvoted by " + requestedUser.getUsername() + ".");
+            } catch (IllegalStateException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            System.out.println("Post with ID " + commentID + " not found.");
+        }
+    }
+    public void downvoteComment(String commentID, User requestedUser) {
+        Comment comment;
+        synchronized (postsLock) {
+            comment = getCommentById(commentID);
+        }
+
+        if (comment != null) {
+            try {
+                comment.downvote(requestedUser.getUsername());
+                synchronized (postsLock) {
+                    comments.put(comment.getID(), comment);
+                }
+                System.out.println("Post with ID " + commentID + " downvoted by " + requestedUser.getUsername() + ".");
+            } catch (IllegalStateException e) {
+                System.out.println(e.getMessage());
+            }
+        } else {
+            System.out.println("Post with ID " + commentID + " not found.");
         }
     }
 
@@ -361,7 +402,7 @@ public class Database implements IDatabase {
 
 
     // Delete a comment from a post
-    public void deleteCommentFromPost(String postId, String commentId, User requestedUser) {
+    public String deleteCommentFromPost(String postId, String commentId, User requestedUser) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -371,14 +412,12 @@ public class Database implements IDatabase {
             Comment comment = comments.get(commentId);
 
             if (comment == null) {
-                System.out.println("Comment with ID " + commentId + " not found.");
-                return;
+                return ("Comment with ID " + commentId + " not found.");
             }
 
             // Verify that the requested user is the author of the comment
             if (!comment.getAuthor().equals(requestedUser)) {
-                System.out.println("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
-                return;
+                return ("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
             }
 
             synchronized (postsLock) {
@@ -387,9 +426,9 @@ public class Database implements IDatabase {
                 posts.put(post.getId(), post);
             }
 
-            System.out.println("Comment with ID " + commentId + " deleted from post with ID " + postId + ".");
+            return ("Comment with ID " + commentId + " deleted from post with ID " + postId + ".");
         } else {
-            System.out.println("Post with ID " + postId + " not found.");
+            return ("Post with ID " + postId + " not found.");
         }
     }
 
@@ -521,6 +560,16 @@ public class Database implements IDatabase {
         } else {
             // If postId is not found, return null or handle as needed
             System.err.println("Post with ID " + postId + " not found.");
+            return null;
+        }
+    }
+    public Comment getCommentById(String commentId) {
+        // Check if the posts map contains the postId
+        if (comments.containsKey(commentId)) {
+            return comments.get(commentId); // Return the post with the specified postId
+        } else {
+            // If postId is not found, return null or handle as needed
+            System.err.println("Post with ID " + commentId + " not found.");
             return null;
         }
     }
