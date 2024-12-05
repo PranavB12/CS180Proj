@@ -255,7 +255,7 @@ public class Database implements IDatabase {
         }
 
         // Shuffle the posts for random order display
-        Collections.shuffle(posts);
+
         lines.add("---------------------------------------------------------------------------------------------------------");
 
         // Display each post
@@ -409,14 +409,14 @@ public class Database implements IDatabase {
         }
 
         if (post != null) {
-            Comment comment = comments.get(commentId);
+            Comment comment = this.getCommentById(commentId);
 
             if (comment == null) {
                 return ("Comment with ID " + commentId + " not found.");
             }
 
             // Verify that the requested user is the author of the comment
-            if (!comment.getAuthor().equals(requestedUser) || !post.getAuthor().equals(requestedUser)) {
+            if (!(comment.getAuthor().equals(requestedUser) || post.getAuthor().equals(requestedUser))) {
                 return ("User " + requestedUser.getUsername() + " is not authorized to delete this comment.");
             }
 
@@ -426,7 +426,7 @@ public class Database implements IDatabase {
                 posts.put(post.getId(), post);
             }
 
-            return ("Comment with ID " + commentId + " deleted from post with ID " + postId + ".");
+            return ("Comment deleted from the post.");
         } else {
             return ("Post with ID " + postId + " not found.");
         }
