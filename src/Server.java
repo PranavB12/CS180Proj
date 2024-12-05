@@ -358,7 +358,7 @@ public class Server implements IServer, Runnable {
                         }
 
                         // Delete the comment
-                        server.deleteCommentFromPost(postId, commentId, user);
+
                         return server.deleteCommentFromPost(postId, commentId, user);
                     }
                     case "DISABLE_COMMENTS": {
