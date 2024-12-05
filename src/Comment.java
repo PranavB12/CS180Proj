@@ -1,4 +1,6 @@
 package src;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 /**
  * Group Project - CS18000 Gold
@@ -17,6 +19,8 @@ public class Comment {
     private int upVotes;
     private int downVotes;
     private String postID;
+    private Set<String> upvoters = new HashSet<>();
+    private Set<String> downvoters = new HashSet<>();
 
     public Comment(String comment, User author, String postID) {
         this.comment = comment;
@@ -44,6 +48,29 @@ public class Comment {
 
     public String getPostID() {
         return this.postID;
+    }
+    public synchronized void upvote(String username) {
+        if (upvoters.contains(username)) {
+            throw new IllegalStateException("User " + username + " has already upvoted this post.");
+        }
+        if (downvoters.contains(username)) {
+            downvoters.remove(username);
+            downVotes--;
+        }
+        upvoters.add(username);
+        upVotes++;
+    }
+
+    public synchronized void downvote(String username) {
+        if (downvoters.contains(username)) {
+            throw new IllegalStateException("User " + username + " has already downvoted this post.");
+        }
+        if (upvoters.contains(username)) {
+            upvoters.remove(username);
+            upVotes--;
+        }
+        downvoters.add(username);
+        downVotes++;
     }
 
 
