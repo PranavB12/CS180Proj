@@ -2,6 +2,17 @@ package src;
 
 import java.util.List;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * User class interface
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
+
 public interface IUser {
     String getUsername();
     String getPassword();
