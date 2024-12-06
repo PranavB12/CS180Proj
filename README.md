@@ -13,7 +13,7 @@
 
 3. Run the classes by running
 ```java -cp src ClassName```
-- For Server Client interaction, run the Server via ```java -cp src Server``` and then client via ```java -cp src Client```
+- For Server Client interaction, run the Server via ```java -cp src Server``` and then client via ```java -cp src ClientGUI```
 - There are sample tests that can be run within server, explained in the Server section below.
 
 ##### Alternatively
@@ -178,7 +178,7 @@
   - On failure (e.g., post not found, user not found, or post is hidden): `Cannot downvote. Post not found or is hidden`.
   - On incorrect format: `Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>`.
 
-### Client
+### ClientGUI
 - Functionality: The Client class facilitates communication between a user and the server. It connects to the server using a specified hostname and port, enabling the user to send textual commands and receive responses interactively. The class provides a simple command-line interface where the user can input commands such as ADD_USER or CREATE_POST to interact with the server's functionality. The client handles input and output streams for back-and-forth communication with the server. It continuously listens for user input, sends commands to the server, and displays the server’s responses. The class ensures a clean shutdown of resources in case of errors or termination.
 - Testing: As mentioned in Ed Discussion, since our Server Client uses Network IO, test cases are not required. 
 - Relationship: The Client class connects to the Server class over a network using Socket. It acts as an interface for users to interact with the server's functionality, bridging the gap between the user and the server-side Database. It implements the IClient interface, which defines the client’s responsibilities. The class relies on system input and output for user interaction and collaborates with the server to execute operations such as user account management and content creation within a larger application framework.
