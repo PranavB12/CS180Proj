@@ -18,7 +18,7 @@ import java.util.*;
 */
 
 
-public class NewsFeed {
+public class NewsFeed implements INewsFeed {
     private List<Post> posts;
 
     // Constructor to initialize the posts list

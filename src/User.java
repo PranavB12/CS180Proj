@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class User  {
+public class User implements IUser {
     private final String username;
     private String password;
     private final String name;

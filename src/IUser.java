@@ -1,18 +1,5 @@
 package src;
-
-import java.util.List;
-
-/**
- * Group Project - CS18000 Gold
- *
- * User class interface
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, lab sec 37
- *
- * @version November 19, 2024
- *
- */
-
+import java.util.*;
 public interface IUser {
     String getUsername();
     String getPassword();
@@ -25,9 +12,10 @@ public interface IUser {
     void blockUser(User user);
     void unblockUser(User user);
     void addPost(Post post);
-    boolean deletePost(Post post);
+    void setBlockedUsers(List<User> blocked);
     void setDescription(String description);
     String getDescription();
     void setFriends(List<User> friends);
+    void setPosts(List<Post> posts);
     boolean equals(Object o);
 }

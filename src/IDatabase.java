@@ -1,40 +1,37 @@
 package src;
-
-/**
- * Group Project - CS18000 Gold
- *
- * additional interfaces
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
- *
- * @version November 3, 2024
- *
- */
-
+import java.util.*;
 public interface IDatabase {
-
-
+    Map<String, Comment> getComments();
+    List<User> getUsers();
+    Map<String, Post> getPosts();
     boolean addUser(User user);
     boolean removeUser(User user);
     boolean createAccount(String username, String password, String name);
     boolean validateCredentials(String username, String password);
     boolean userExists(String username);
     String createPost(String content, User author);
-    boolean deletePost(String postId, User requestingUser);
+    boolean deletePost(String postId, User requestedUser);
     User viewUser(String username);
     boolean addFriend(User user, User friend);
     boolean removeFriend(User user, User friend);
     boolean blockUser(User user, User toBlock);
+    User findUserByUsername(String username);
+    ArrayList<String> displayPosts(String username);
     void upvotePost(String postId, User requestedUser);
     void downvotePost(String postId, User requestedUser);
+    void upvoteComment(String commentID, User requestedUser);
+    void downvoteComment(String commentID, User requestedUser);
     String addCommentToPost(String postId, String comment, User commentAuthor);
-    void deleteCommentFromPost(String postId, String commentId, User requestingUser);
-    void hidePost(String postId, User requestingUser);
+    String deleteCommentFromPost(String postId, String commentId, User requestedUser);
     void unhidePost(String postId, User requestedUser);
-    void enableCommentsForPost(String postId, User requestingUser);
-    void disableCommentsForPost(String postId, User requestingUser);
-    void writeDatabaseToFile(String filename);
-    void readDatabaseFromFile(String filename);
-
+    void hidePost(String postId, User requestedUser);
+    String enableCommentsForPost(String postId, User requestedUser);
+    String disableCommentsForPost(String postId, User requestedUser);
+    User getUserByUsername(String username);
+    void updateUserInDatabase(User user);
+    Post getPostById(String postId);
+    Comment getCommentById(String commentId);
     void addPost(Post post);
+    void writeDatabaseToFile(String filePath);
+    void readDatabaseFromFile(String filePath);
 }
