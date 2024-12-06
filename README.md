@@ -182,3 +182,5 @@
   - On success: `Post downvoted`.
   - On failure (e.g., post not found, user not found, or post is hidden): `Cannot downvote. Post not found or is hidden`.
   - On incorrect format: `Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>`.
+
+  < br / >
