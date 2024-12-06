@@ -30,7 +30,8 @@ public class ClientGUI extends JFrame {
     private JButton loginButton;
     private JButton registerButton;
     private JButton createPostButton;
-    private JButton logoutButton; // New logout button
+    private JButton logoutButton;
+    private JButton searchUserButton; // New button for searching users
 
     public ClientGUI() {
         try {
@@ -85,6 +86,10 @@ public class ClientGUI extends JFrame {
         logoutButton = new JButton("Logout");
         createPostPanel.add(logoutButton, BorderLayout.EAST);
 
+        // Add Search User button
+        searchUserButton = new JButton("Search User");
+        createPostPanel.add(searchUserButton, BorderLayout.WEST);
+
         feedPanel.add(createPostPanel, BorderLayout.SOUTH);
 
         // Add panels to frame
@@ -96,9 +101,11 @@ public class ClientGUI extends JFrame {
         registerButton.addActionListener(new RegisterButtonListener());
         createPostButton.addActionListener(new CreatePostButtonListener());
         logoutButton.addActionListener(new LogoutButtonListener());
+        searchUserButton.addActionListener(new SearchUserButtonListener()); // New ActionListener
 
         // Initially, show only the login panel, hide the feed panel
         feedPanel.setVisible(false);
+
 
         // Add a WindowListener to close the socket and resources before exiting
         addWindowListener(new WindowAdapter() {
@@ -113,67 +120,6 @@ public class ClientGUI extends JFrame {
             }
         });
     }
-
-    // Sends a request to the server and returns the response
-    private synchronized String handleRequest(String request) {
-        try {
-            out.println(request);
-            return in.readLine();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
-            return null;
-        }
-    }
-
-    // ActionListener for login
-    private class LoginButtonListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Get the username and password input from the user
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-
-            // Send request to server for validation
-            String response = handleRequest("VALIDATE " + username + " " + password);
-
-            // Check if the server responds with "Valid credentials"
-            if ("Valid credentials".equals(response)) {
-                // Set the current user and display the feed panel
-                currentUser = username;
-
-                // Call showNewsFeed() to display the feed after a successful login
-                showNewsFeed();
-
-                // Make the feed panel visible
-                feedPanel.setVisible(true);
-
-                // Hide the login UI components after successful login
-                toggleLoginUI(false);
-            } else {
-                // Show an error message if credentials are invalid
-                JOptionPane.showMessageDialog(ClientGUI.this, "Invalid credentials.");
-            }
-        }
-    }
-
-
-    // ActionListener for registration
-    private class RegisterButtonListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-            String response = handleRequest("ADD_USER " + username + " " + password + " Some Name");
-
-            if ("User added".equals(response)) {
-                JOptionPane.showMessageDialog(ClientGUI.this, "User registered successfully.");
-            } else {
-                JOptionPane.showMessageDialog(ClientGUI.this, "Failed to register user.");
-            }
-        }
-    }
-
-    // ActionListener for creating a post
     private class CreatePostButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -191,9 +137,6 @@ public class ClientGUI extends JFrame {
             }
         }
     }
-
-
-    // ActionListener for logout
     private class LogoutButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -202,6 +145,110 @@ public class ClientGUI extends JFrame {
             feedPanel.setVisible(false);
         }
     }
+
+    // ActionListener for login
+    private class LoginButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            try {
+                out.println("VALIDATE " + username + " " + password);
+                String response = in.readLine();
+
+                if ("Valid credentials".equals(response)) {
+                    currentUser = username;
+                    showNewsFeed();
+                    feedPanel.setVisible(true);
+                    toggleLoginUI(false);
+                } else {
+                    JOptionPane.showMessageDialog(ClientGUI.this, "Invalid credentials.");
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // ActionListener for registration
+    // ActionListener for registration
+    private class RegisterButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            // Check if username and password fields are not empty
+            if (username.trim().isEmpty() || password.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(ClientGUI.this, "Username and password cannot be empty.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                return; // Exit early if fields are empty
+            }
+
+            try {
+                out.println("ADD_USER " + username + " " + password + " Some Name");
+                String response = in.readLine();
+
+                if ("User added".equals(response)) {
+                    JOptionPane.showMessageDialog(ClientGUI.this, "User registered successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(ClientGUI.this, "Failed to register user.");
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+
+    // ActionListener for searching a user
+    private class SearchUserButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String usernameToSearch = JOptionPane.showInputDialog(ClientGUI.this, "Enter username to search:");
+            if (usernameToSearch != null && !usernameToSearch.trim().isEmpty()) {
+                try {
+                    out.println("GET_USER " + usernameToSearch);
+                    String response = in.readLine();
+
+                    if (response != null && !response.isEmpty()) {
+                        // Split the response string at "--"
+                        String[] details = response.split("--");
+                        if (details.length == 3) {
+                            String username = details[0].replace("Username: ", "").trim();
+                            String actualName = details[1].replace("Actual Name: ", "").trim();
+                            String description = details[2].replace("Description: ", "").trim();
+
+                            // Display user details in a dialog
+                            JOptionPane.showMessageDialog(ClientGUI.this,
+                                    "Username: " + username + "\n" +
+                                            "Actual Name: " + actualName + "\n" +
+                                            "Description: " + description,
+                                    "User Details", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            // Handle unexpected response format
+                            JOptionPane.showMessageDialog(ClientGUI.this,
+                                    "Unexpected response format: " + response,
+                                    "Error", JOptionPane.WARNING_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(ClientGUI.this,
+                                "User not found.",
+                                "Search Result", JOptionPane.WARNING_MESSAGE);
+                    }
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(ClientGUI.this,
+                            "Error communicating with the server.",
+                            "Communication Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(ClientGUI.this,
+                        "Username cannot be empty!",
+                        "Input Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
     private void showNewsFeed() {
         JPanel feedContentPanel = (JPanel) ((JScrollPane) feedPanel.getComponent(0)).getViewport().getView();
         feedContentPanel.removeAll();
@@ -223,24 +270,30 @@ public class ClientGUI extends JFrame {
                 }
 
                 if (line.startsWith("Posted by:")) {
-                    feedContentPanel.add(new JLabel(line));
+                    // Create a panel for the post content and set its layout to BoxLayout
+                    JPanel postPanel = new JPanel();
+                    postPanel.setLayout(new BoxLayout(postPanel, BoxLayout.Y_AXIS)); // Vertical layout for the post content
+
+                    // Add post details (Posted by, content, upvotes, downvotes, etc.)
+                    postPanel.add(new JLabel(line));
                     index++;
 
                     String content = lines.get(index);
-                    feedContentPanel.add(new JLabel(content));
+                    postPanel.add(new JLabel(content));
                     index++;
 
                     String upvotes = lines.get(index);
-                    feedContentPanel.add(new JLabel(upvotes));
+                    postPanel.add(new JLabel(upvotes));
                     index++;
 
                     String downvotes = lines.get(index);
-                    feedContentPanel.add(new JLabel(downvotes));
+                    postPanel.add(new JLabel(downvotes));
                     index++;
 
                     String postId = lines.get(index);
                     index++;
 
+                    // Create and add upvote button
                     JButton upvoteButton = new JButton("Upvote");
                     upvoteButton.addActionListener(e -> {
                         try {
@@ -252,8 +305,9 @@ public class ClientGUI extends JFrame {
                             JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                         }
                     });
-                    feedContentPanel.add(upvoteButton);
+                    postPanel.add(upvoteButton);
 
+                    // Create and add downvote button
                     JButton downvoteButton = new JButton("Downvote");
                     downvoteButton.addActionListener(e -> {
                         try {
@@ -265,8 +319,55 @@ public class ClientGUI extends JFrame {
                             JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                         }
                     });
-                    feedContentPanel.add(downvoteButton);
+                    postPanel.add(downvoteButton);
 
+                    // Panel for Enable/Disable Comments buttons (side by side)
+                    // Enable Comments Button
+                    JButton enableCommentsButton = new JButton("Enable Comments");
+                    enableCommentsButton.addActionListener(e -> {
+                        try {
+                            out.println("ENABLE_COMMENTS " + postId + " " + currentUser);
+                            String responseEnable = in.readLine();
+                            JOptionPane.showMessageDialog(ClientGUI.this, responseEnable);
+                            showNewsFeed();  // Refresh the feed to reflect changes
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                    postPanel.add(enableCommentsButton);
+
+                    // Disable Comments Button
+                    JButton disableCommentsButton = new JButton("Disable Comments");
+                    disableCommentsButton.addActionListener(e -> {
+                        try {
+                            out.println("DISABLE_COMMENTS " + postId + " " + currentUser);
+                            String responseDisable = in.readLine();
+                            JOptionPane.showMessageDialog(ClientGUI.this, responseDisable);
+                            showNewsFeed();  // Refresh the feed to reflect changes
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                    postPanel.add(disableCommentsButton);
+
+                    // Hide Post Button
+                    JButton hidePostButton = new JButton("Hide Post");
+                    hidePostButton.addActionListener(e -> {
+                        try {
+                            out.println("HIDE_POST " + postId + " " + currentUser);
+                            String hideResponse = in.readLine();
+                            JOptionPane.showMessageDialog(ClientGUI.this, hideResponse);
+                            showNewsFeed();  // Refresh the feed to reflect changes
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
+                    postPanel.add(hidePostButton);
+
+                    // Add the post panel to the feed content panel
+                    feedContentPanel.add(postPanel);
+
+                    // Display comments (if any)
                     boolean hasComments = false;
                     while (index < lines.size() && lines.get(index).equals("     Comments: ")) {
                         hasComments = true;
@@ -281,10 +382,10 @@ public class ClientGUI extends JFrame {
                             String commenter = lines.get(index);
                             index++;
 
-                            feedContentPanel.add(new JLabel("   Commented by: " + commenter));
-                            feedContentPanel.add(new JLabel("     " + commentContent));
-                            feedContentPanel.add(new JLabel("     Upvotes: " + upVotes));
-                            feedContentPanel.add(new JLabel("     DownVotes: " + downVotes));
+                            postPanel.add(new JLabel("   Commented by: " + commenter));
+                            postPanel.add(new JLabel("     " + commentContent));
+                            postPanel.add(new JLabel("     Upvotes: " + upVotes));
+                            postPanel.add(new JLabel("     DownVotes: " + downVotes));
 
                             String commentId = lines.get(index);
                             index++;
@@ -300,7 +401,7 @@ public class ClientGUI extends JFrame {
                                     JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                                 }
                             });
-                            feedContentPanel.add(commentUpvoteButton);
+                            postPanel.add(commentUpvoteButton);
 
                             JButton commentDownvoteButton = new JButton("Downvote Comment");
                             commentDownvoteButton.addActionListener(e -> {
@@ -313,7 +414,7 @@ public class ClientGUI extends JFrame {
                                     JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                                 }
                             });
-                            feedContentPanel.add(commentDownvoteButton);
+                            postPanel.add(commentDownvoteButton);
 
                             JButton deleteCommentButton = new JButton("Delete Comment");
                             deleteCommentButton.addActionListener(e -> {
@@ -326,17 +427,17 @@ public class ClientGUI extends JFrame {
                                     JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                                 }
                             });
-                            feedContentPanel.add(deleteCommentButton);
+                            postPanel.add(deleteCommentButton);
                         }
                     }
 
                     if (hasComments) {
-                        feedContentPanel.add(new JLabel("     Comments:"));
+                        postPanel.add(new JLabel("     Comments:"));
                     }
 
                     JTextField commentField = new JTextField();
                     commentField.setColumns(30);
-                    feedContentPanel.add(commentField);
+                    postPanel.add(commentField);
 
                     JButton postCommentButton = new JButton("Post Comment");
                     postCommentButton.addActionListener(e -> {
@@ -354,7 +455,7 @@ public class ClientGUI extends JFrame {
                             JOptionPane.showMessageDialog(ClientGUI.this, "Comment cannot be empty!");
                         }
                     });
-                    feedContentPanel.add(postCommentButton);
+                    postPanel.add(postCommentButton);
                 }
                 index++;
             }
@@ -362,9 +463,10 @@ public class ClientGUI extends JFrame {
 
         feedContentPanel.revalidate();
         feedContentPanel.repaint();
-
         feedPanel.setVisible(true);
     }
+
+
 
 
     private void handleVote(String action, String id) {
@@ -377,28 +479,31 @@ public class ClientGUI extends JFrame {
             JOptionPane.showMessageDialog(ClientGUI.this, "Failed to vote.");
         }
     }
+    private synchronized String handleRequest(String request) {
+        try {
+            out.println(request);
+            return in.readLine();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
 
 
 
+    // Other methods (e.g., createPostButton, showNewsFeed, logoutButton) remain unchanged.
 
-
-
-
-    // Toggle the visibility of login UI components
     private void toggleLoginUI(boolean show) {
         usernameField.setVisible(show);
         passwordField.setVisible(show);
         loginButton.setVisible(show);
         registerButton.setVisible(show);
     }
+
     public static void main(String[] args) {
-        // Initialize and show the GUI
         SwingUtilities.invokeLater(() -> {
             ClientGUI gui = new ClientGUI();
             gui.setVisible(true);
         });
     }
 }
-
-
-
