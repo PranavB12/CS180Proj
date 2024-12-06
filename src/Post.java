@@ -5,6 +5,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Post class
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
+
 public class Post implements IPost {
     private final String id;
     private final String content;
