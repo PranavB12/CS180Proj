@@ -13,7 +13,7 @@ import java.io.*;
  * @version November 3, 2024
  *
  */
-public class Database {
+public class Database implements IDatabase {
 
 
     private List<User> users = new ArrayList<>();
@@ -47,6 +47,7 @@ public class Database {
     public Map<String, Post> getPosts() {
         return posts;
     }
+    @Override
     public boolean addUser(User user) {
         if (user == null || userExists(user.getUsername())) {
             return false;
@@ -62,6 +63,7 @@ public class Database {
     }
 
     // Remove an existing user from the database
+    @Override
     public boolean removeUser(User user) {
         // This needs to be fixed -> if (user == null || !userExists(user.getUsername()))
         if (user == null || !userExists(user.getUsername())) {
@@ -96,6 +98,7 @@ public class Database {
     }
 
     // Validate user credentials
+    @Override
     public boolean validateCredentials(String username, String password) {
         User user = findUserByUsername(username);
         if (user != null && user.getPassword().equals(password)) {
@@ -107,6 +110,7 @@ public class Database {
     }
 
     // Check if a user exists by username
+    @Override
     public boolean userExists(String username) {
         return findUserByUsername(username) != null;
     }
@@ -190,6 +194,15 @@ public class Database {
 
     // Add a friend to a user's friend list
     public synchronized boolean addFriend(User user, User friend) {
+        user = getUserByUsername(user.getUsername());
+        
+        List<User> a = user.getBlockedUsers();
+        a.remove(friend);
+        user.setBlockedUsers(a);
+        updateUserInDatabase(user);
+
+
+
         if (!user.getFriends().contains(friend)) {
             user.addFriend(friend); // Add friend to the user's list
             friend.addFriend(user);
@@ -240,7 +253,7 @@ public class Database {
         User user = this.getUserByUsername(username);
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<Post> posts = new ArrayList<Post>();
-        List<User> friends = this.getUsers();  // Changed to Set<User>
+        List<User> friends = user.getFriends();  // Changed to Set<User>
 
 
 
@@ -326,12 +339,12 @@ public class Database {
                 synchronized (postsLock) {
                     comments.put(comment.getID(), comment);
                 }
-                System.out.println("Post with ID " + commentID + " upvoted by " + requestedUser.getUsername() + ".");
+                System.out.println("Comment with ID " + commentID + " upvoted by " + requestedUser.getUsername() + ".");
             } catch (IllegalStateException e) {
                 System.out.println(e.getMessage());
             }
         } else {
-            System.out.println("Post with ID " + commentID + " not found.");
+            System.out.println("Comment with ID " + commentID + " not found.");
         }
     }
     public void downvoteComment(String commentID, User requestedUser) {
