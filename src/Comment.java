@@ -38,8 +38,8 @@ public class Comment {
     public Comment(String comment, User author, String postID, String commentId, int upVotes, int downVotes) {
         this.comment = comment;
         this.ID = commentId;
-        this.upVotes = 0;
-        this.downVotes = 0;
+        this.upVotes = upVotes;
+        this.downVotes = downVotes;
         this.postID = postID;
         this.author = author;
 
