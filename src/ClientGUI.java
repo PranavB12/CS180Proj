@@ -103,9 +103,6 @@ public class ClientGUI extends JFrame {
 
         feedPanel.add(createPostPanel, BorderLayout.SOUTH);
 
-        /*
-        add remove block friends
-         */
         // Inside the ClientGUI constructor (where feedPanel is set up)
 
         // Inside the ClientGUI constructor (where feedPanel is set up)
