@@ -23,16 +23,17 @@ public class Comment {
     private Set<String> downvoters = new HashSet<>();
 
     public Comment(String comment, User author, String postID) {
+        if (comment == null || author == null || postID == null) {
+            throw new IllegalArgumentException("Arguments cannot be null.");
+        }
         this.comment = comment;
-        String Id = UUID.randomUUID().toString();
-        this.ID = Id;
+        this.ID = UUID.randomUUID().toString();
+        this.author = author;
+        this.postID = postID;
         this.upVotes = 0;
         this.downVotes = 0;
-        this.postID = postID;
-        this.author = author;
-
-
     }
+
 
     public Comment(String comment, User author, String postID, String commentId, int upVotes, int downVotes) {
         this.comment = comment;

@@ -13,7 +13,7 @@ import java.io.*;
  * @version November 3, 2024
  *
  */
-public class Database implements IDatabase {
+public class Database {
 
 
     private List<User> users = new ArrayList<>();
@@ -47,7 +47,6 @@ public class Database implements IDatabase {
     public Map<String, Post> getPosts() {
         return posts;
     }
-    @Override
     public boolean addUser(User user) {
         if (user == null || userExists(user.getUsername())) {
             return false;
@@ -63,7 +62,6 @@ public class Database implements IDatabase {
     }
 
     // Remove an existing user from the database
-    @Override
     public boolean removeUser(User user) {
         // This needs to be fixed -> if (user == null || !userExists(user.getUsername()))
         if (user == null || !userExists(user.getUsername())) {
@@ -98,7 +96,6 @@ public class Database implements IDatabase {
     }
 
     // Validate user credentials
-    @Override
     public boolean validateCredentials(String username, String password) {
         User user = findUserByUsername(username);
         if (user != null && user.getPassword().equals(password)) {
@@ -110,7 +107,6 @@ public class Database implements IDatabase {
     }
 
     // Check if a user exists by username
-    @Override
     public boolean userExists(String username) {
         return findUserByUsername(username) != null;
     }
