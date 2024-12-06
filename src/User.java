@@ -4,17 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Group Project - CS18000 Gold
- *
- * User class
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
- *
- * @version November 19, 2024
- *
- */
-
 public class User  {
     private final String username;
     private String password;
@@ -29,6 +18,7 @@ public class User  {
         this.password = password;
         this.name = name;
         this.description = description;
+
     }
     public User(String username, String password, String name) {
         this.username = username;
@@ -104,6 +94,9 @@ public class User  {
                 posts.add(post);
             }
         }
+    }
+    public void setBlockedUsers(List<User> blocked) {
+        this.blockedUsers = blocked;
     }
     public void setDescription(String des) {
         this.description = des;
