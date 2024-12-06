@@ -135,6 +135,7 @@ public class ClientGUI extends JFrame {
             if (friendUsername != null && !friendUsername.trim().isEmpty()) {
                 String response = handleRequest("ADD_FRIEND " + currentUser + " " + friendUsername.trim());
                 JOptionPane.showMessageDialog(this, response);
+                showNewsFeed();
             }
         });
 
@@ -143,6 +144,7 @@ public class ClientGUI extends JFrame {
             if (friendUsername != null && !friendUsername.trim().isEmpty()) {
                 String response = handleRequest("REMOVE_FRIEND " + currentUser + " " + friendUsername.trim());
                 JOptionPane.showMessageDialog(this, response);
+                showNewsFeed();
             }
         });
 
@@ -151,6 +153,7 @@ public class ClientGUI extends JFrame {
             if (blockUsername != null && !blockUsername.trim().isEmpty()) {
                 String response = handleRequest("BLOCK_USER " + currentUser + " " + blockUsername.trim());
                 JOptionPane.showMessageDialog(this, response);
+                showNewsFeed();
             }
         });
 
@@ -459,12 +462,14 @@ public class ClientGUI extends JFrame {
                                 try {
                                     out.println("UPVOTE_COMMENT " + commentId + " " + currentUser);
                                     String voteResponse = in.readLine();
+                                    System.out.println("Vote response: " + voteResponse); // Debugging
                                     JOptionPane.showMessageDialog(ClientGUI.this, voteResponse);
-                                    showNewsFeed();
+                                    showNewsFeed(); // Refresh feed
                                 } catch (IOException ex) {
                                     JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
                                 }
                             });
+
                             postPanel.add(commentUpvoteButton);
 
                             JButton commentDownvoteButton = new JButton("Downvote Comment");
