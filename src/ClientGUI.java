@@ -11,6 +11,17 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * ClientGUI class
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
+
 public class ClientGUI extends JFrame {
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
