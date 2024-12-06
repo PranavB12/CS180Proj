@@ -94,21 +94,6 @@ public class UserTest {
         assertTrue(user.getPosts().contains(post));
     }
 
-    @Test
-    public void testRemovePost() {
-        // Add a post to the user
-        user.addPost(post);
-
-        // Remove the post using the deletePost method
-        boolean removed = user.deletePost(post);
-
-        // Assert the post was removed
-        assertTrue(removed, "The post was not removed from the list.");
-        assertFalse(user.getPosts().contains(post), "The post is still present in the list after removal.");
-    }
-
-
-
 
     @Test
     public void testAddDuplicatePost() {

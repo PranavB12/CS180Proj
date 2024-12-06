@@ -2,17 +2,17 @@ package src;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Group Project - CS18000 Gold
  *
- * JUNIT tests for Comment class
+ * Updated JUnit tests for Comment class
  *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee lab sec 37
+ * @author Team
  *
- * @version November 16, 2024
- *
+ * @version December 6, 2024
  */
 
 class CommentTest {
@@ -39,62 +39,48 @@ class CommentTest {
 
     @Test
     void testConstructorWithNullArguments() {
-        assertThrows(IllegalArgumentException.class, () -> new Comment(null, author, postID));
-        assertThrows(IllegalArgumentException.class, () -> new Comment("Comment", null, postID));
-        assertThrows(IllegalArgumentException.class, () -> new Comment("Comment", author, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Comment(null, author, postID),
+                "Constructor should throw exception if comment is null");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Comment("Comment", null, postID),
+                "Constructor should throw exception if author is null");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Comment("Comment", author, null),
+                "Constructor should throw exception if postID is null");
     }
 
     @Test
-    void testConstructorWithCustomCommentID() {
-        String customID = "custom-id-123";
-        Comment customComment = new Comment("Custom comment", author, postID, customID);
-        assertEquals(customID, customComment.getID());
-    }
-
-    @Test
-    void testUpVote() {
-        comment.upVote();
+    void testUpvoteAndDownvoteWithUsernames() {
+        comment.upvote("user1");
         assertEquals(1, comment.getUpVotes());
-        comment.upVote();
+        comment.upvote("user2");
         assertEquals(2, comment.getUpVotes());
-    }
 
-    @Test
-    void testDownVote() {
-        comment.downVote();
+        assertThrows(IllegalStateException.class, () -> comment.upvote("user1"),
+                "Should throw exception if user tries to upvote again");
+
+        comment.downvote("user1");
+        assertEquals(1, comment.getUpVotes(), "Upvotes should decrease when user changes to downvote");
         assertEquals(1, comment.getDownVotes());
-        comment.downVote();
-        assertEquals(2, comment.getDownVotes());
-    }
 
-    @Test
-    void testUndoUpVote() {
-        comment.upVote();
-        comment.upVote();
-        comment.undoUpVote();
-        assertEquals(1, comment.getUpVotes());
-        comment.undoUpVote();
-        assertEquals(0, comment.getUpVotes());
-        comment.undoUpVote(); // Should not go below zero
-        assertEquals(0, comment.getUpVotes());
-    }
-
-    @Test
-    void testUndoDownVote() {
-        comment.downVote();
-        comment.downVote();
-        comment.undoDownVote();
-        assertEquals(1, comment.getDownVotes());
-        comment.undoDownVote();
-        assertEquals(0, comment.getDownVotes());
-        comment.undoDownVote(); // Should not go below zero
-        assertEquals(0, comment.getDownVotes());
+        assertThrows(IllegalStateException.class, () -> comment.downvote("user1"),
+                "Should throw exception if user tries to downvote again");
     }
 
     @Test
     void testToString() {
         String expectedString = "COMMENT|" + comment.getID() + "|" + author.getUsername() + "|This is a test comment.";
-        assertEquals(expectedString, comment.toString());
+        assertEquals(expectedString, comment.toString(), "toString output should match expected format");
+    }
+
+    @Test
+    void testSetUpvotesAndSetDownvotes() {
+        comment.setUpvotes(5);
+        comment.setDownvotes(3);
+        assertEquals(5, comment.getUpVotes());
+        assertEquals(3, comment.getDownVotes());
     }
 }
-
