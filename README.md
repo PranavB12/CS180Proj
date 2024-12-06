@@ -26,8 +26,7 @@
 - Submitted to Vocareum workspace.
 #### Phase 2: Pranav Bansal -`bansa124@purdue.edu`
 - Submitted to Vocareum workspace.
-
-
+--------------------------------------------------------------------------------------------------------------------------------------------
 ### Class Descriptions
 
 #### Database
@@ -182,7 +181,6 @@
   - On success: `Post downvoted`.
   - On failure (e.g., post not found, user not found, or post is hidden): `Cannot downvote. Post not found or is hidden`.
   - On incorrect format: `Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>`.
-
 --------------------------------------------------------------------------------------------------------------------------------------------
 # News Feed App GUI Analysis
 
@@ -232,6 +230,6 @@ This GUI is used to create client application for a News Feed App, allowing user
 
 ### Button-Driven Actions:
 - Almost all actions are performed through buttons, making it straightforward for users.
-- 
+  
 ### Focus on Functionality:
 - The design prioritizes functionality over aesthetics. It’s clean and avoids distractions.
