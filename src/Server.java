@@ -92,9 +92,7 @@ public class Server implements IServer, Runnable {
                         //   - On failure (e.g., duplicate username): "Failed to add user".
                         //   - On incorrect format: "Invalid ADD_USER format. Use: ADD_USER <username> <password>
                         String[] parts = arguments.split(" ", 4);
-                        if (parts.length < 4) {
-                            return "Invalid ADD_USER format. Use: ADD_USER <username> <password> <name>";
-                        }
+                        
                         return server.addUser(new User(parts[0], parts[1], parts[2], parts[3])) ? "User added" :
                                 "Failed to add user";
                     }
@@ -106,9 +104,7 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid REMOVE_USER format. Use: REMOVE_USER <username>
                         //   <password> <name>".
                         String[] parts = arguments.split(" ", 3);
-                        if (parts.length < 3) {
-                            return "Invalid REMOVE_USER format. Use: REMOVE_USER <username> <password> <name>";
-                        }
+                        
                         return server.removeUser(new User(parts[0], parts[1], parts[2])) ? "User removed" :
                                 "Failed to remove user";
                     }
@@ -119,9 +115,7 @@ public class Server implements IServer, Runnable {
                         //   - On failure: "Invalid credentials".
                         //   - On incorrect format: "Invalid VALIDATE format. Use: VALIDATE <username> <password>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid VALIDATE format. Use: VALIDATE <username> <password>";
-                        }
+                        
                         return server.validateCredentials(parts[0], parts[1]) ? "Valid credentials" :
                                 "Invalid credentials";
                     }
@@ -133,9 +127,7 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid ADD_FRIEND format. Use: ADD_FRIEND <username>
                         //   <friendUsername>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid ADD_FRIEND format. Use: ADD_FRIEND <username> <friendUsername>";
-                        }
+                        
                         User user = server.database.findUserByUsername(parts[0]);
                         User friend = server.database.findUserByUsername(parts[1]);
                         if (user == null || friend == null) {
@@ -151,9 +143,7 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid REMOVE_FRIEND format. Use: REMOVE_FRIEND <username>
                         //   <friendUsername>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid REMOVE_FRIEND format. Use: REMOVE_FRIEND <username> <friendUsername>";
-                        }
+                        
                         User user = server.database.findUserByUsername(parts[0]);
                         User friend = server.database.findUserByUsername(parts[1]);
                         if (user == null || friend == null) {
@@ -169,9 +159,7 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid BLOCK_USER format. Use: BLOCK_USER <username>
                         //   <blockedUsername>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid BLOCK_USER format. Use: BLOCK_USER <username> <blockedUsername>";
-                        }
+                        
                         User user = server.database.findUserByUsername(parts[0]);
                         User toBlock = server.database.findUserByUsername(parts[1]);
                         if (user == null || toBlock == null) {
@@ -206,9 +194,7 @@ public class Server implements IServer, Runnable {
                         //   - On failure (e.g., post or user not found): "Failed to delete post".
                         //   - On incorrect format: "Invalid DELETE_POST format. Use: DELETE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid DELETE_POST format. Use: DELETE_POST <postId> <username>";
-                        }
+                        
                         Post post = server.database.getPostById(parts[0]);
                         User requestingUser = server.database.findUserByUsername(parts[1]);
                         if (post == null || requestingUser == null) {
@@ -224,9 +210,7 @@ public class Server implements IServer, Runnable {
                         //   post can hide it."
                         //   - On incorrect format: "Invalid HIDE_POST format. Use: HIDE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid HIDE_POST format. Use: HIDE_POST <postId> <username>";
-                        }
+                        
                         String postId = parts[0];
                         String username = parts[1];
                         User requestingUser = server.database.findUserByUsername(username);
@@ -251,9 +235,7 @@ public class Server implements IServer, Runnable {
                         //   post can unhide it."
                         //   - On incorrect format: "Invalid UNHIDE_POST format. Use: UNHIDE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid UNHIDE_POST format. Use: UNHIDE_POST <postId> <username>";
-                        }
+                        
 
                         String postId = parts[0];
                         String username = parts[1];
@@ -287,15 +269,13 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid ENABLE_COMMENTS format. Use: ENABLE_COMMENTS <postId>
                         //   <username>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid ENABLE_COMMENTS format. Use: ENABLE_COMMENTS <postId> <username>";
-                        }
+                        
                         User user = server.database.findUserByUsername(parts[1]);
                         if (user == null) {
                             return "User not found.";
                         }
-                        server.enableCommentsForPost(parts[0], user);
-                        return "Comments enabled for post";
+                        return server.enableCommentsForPost(parts[0], user);
+
                     }
                     case "ADD_COMMENT": {
                         // Input: Provide arguments in the format: <postId> <username> <comment>
@@ -306,9 +286,7 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid ADD_COMMENT format. Use: ADD_COMMENT <postId> <username>
                         //   <comment>".
                         String[] parts = arguments.split(" ", 3);
-                        if (parts.length < 3) {
-                            return "Invalid ADD_COMMENT format. Use: ADD_COMMENT <postId> <username> <comment>";
-                        }
+                        
                         String postId = parts[0];
                         String username = parts[1];
                         String comment = parts[2];
@@ -339,9 +317,7 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid DELETE_COMMENT format. Use: DELETE_COMMENT <postId>
                         //   <commentId> <username>".
                         String[] parts = arguments.split(" ", 3);
-                        if (parts.length < 3) {
-                            return "Invalid DELETE_COMMENT format. Use: DELETE_COMMENT <postId> <commentId> <username>";
-                        }
+                        
                         String postId = parts[0];
                         String commentId = parts[1];
                         String username = parts[2];
@@ -369,15 +345,13 @@ public class Server implements IServer, Runnable {
                         //   - On incorrect format: "Invalid DISABLE_COMMENTS format. Use: DISABLE_COMMENTS <postId>
                         //   <username>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid DISABLE_COMMENTS format. Use: DISABLE_COMMENTS <postId> <username>";
-                        }
+
                         User user = server.database.findUserByUsername(parts[1]);
                         if (user == null) {
                             return "User not found.";
                         }
-                        server.disableCommentsForPost(parts[0], user);
-                        return "Comments disabled for post";
+
+                        return server.disableCommentsForPost(parts[0], user);
                     }
                     case "UPVOTE_POST": {
                         // Input: Provide arguments in the format: <postId> <username>
@@ -387,9 +361,7 @@ public class Server implements IServer, Runnable {
                         //   Post not found or is hidden."
                         //   - On incorrect format: "Invalid UPVOTE_POST format. Use: UPVOTE_POST <postId> <username>".
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid UPVOTE_POST format. Use: UPVOTE_POST <postId> <username>";
-                        }
+                        
                         Post post = server.database.getPostById(parts[0]);
                         User requestingUser = server.database.findUserByUsername(parts[1]);
                         if (post == null || requestingUser == null || post.isHidden()) {
@@ -404,9 +376,7 @@ public class Server implements IServer, Runnable {
                         //   - On success: "Post downvoted."
                         //   - On failure (e.g., post not found, user not found, or post
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>";
-                        }
+                        
                         Post post = server.database.getPostById(parts[0]);
                         User requestingUser = server.database.findUserByUsername(parts[1]);
                         if (post == null || requestingUser == null || post.isHidden()) {
@@ -425,9 +395,7 @@ public class Server implements IServer, Runnable {
                     }
                     case "UPVOTE_COMMENT": {
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid UPVOTE_COMMENT format. Use: UPVOTE_COMMENT <commentId> <username>";
-                        }
+                        
                         String commentId = parts[0];
                         String username = parts[1];
 
@@ -440,9 +408,7 @@ public class Server implements IServer, Runnable {
                     }
                     case "DOWNVOTE_COMMENT": {
                         String[] parts = arguments.split(" ", 2);
-                        if (parts.length < 2) {
-                            return "Invalid DOWNVOTE_COMMENT format. Use: DOWNVOTE_COMMENT <commentId> <username>";
-                        }
+                        
                         String commentId = parts[0];
                         String username = parts[1];
 
@@ -452,6 +418,12 @@ public class Server implements IServer, Runnable {
                         }
                         server.database.downvoteComment(commentId, user);
                         return "Comment downvoted.";
+                    } case "GET_USER": {
+                        String[] parts = arguments.split(" ", 1);
+                        String username = parts[0];
+                        User user = server.database.findUserByUsername(username);
+                        return "Username: " + username + "--Actual Name: " + user.getName() + "--Description: " + user.getDescription();
+
                     }
 
 
@@ -522,12 +494,12 @@ public class Server implements IServer, Runnable {
         database.unhidePost(postId, requestingUser);
     }
 
-    public void enableCommentsForPost(String postId, User user) {
-        database.enableCommentsForPost(postId, user);
+    public String enableCommentsForPost(String postId, User user) {
+        return database.enableCommentsForPost(postId, user);
     }
 
-    public void disableCommentsForPost(String postId, User user) {
-        database.disableCommentsForPost(postId, user);
+    public String disableCommentsForPost(String postId, User user) {
+        return database.disableCommentsForPost(postId, user);
     }
 
     public String addCommentToPost(String postId, String comment, User commentAuthor) {
