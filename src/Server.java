@@ -6,6 +6,17 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Server class
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
+
 public class Server implements IServer, Runnable {
 
     private static final int PORT = 12345;

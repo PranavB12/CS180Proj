@@ -1,5 +1,16 @@
 package src;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * interface for post class
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
+
 import java.util.Map;
 import java.util.Set;
 
