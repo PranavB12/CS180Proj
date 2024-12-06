@@ -183,4 +183,88 @@
   - On failure (e.g., post not found, user not found, or post is hidden): `Cannot downvote. Post not found or is hidden`.
   - On incorrect format: `Invalid DOWNVOTE_POST format. Use: DOWNVOTE_POST <postId> <username>`.
 
-  < br / >
+--------------------------------------------------------------------------------------------------------------------------------------------
+# News Feed App GUI Analysis
+
+This GUI appears to be a client interface for a News Feed App, allowing users to interact with posts and comments, as well as manage relationships with other users. Below is an analysis of its design and functionality:
+
+## Key Features and Functionalities
+
+### User Login:
+- **Username and Password Fields**: Positioned at the top for user authentication.
+- Minimalistic, which might lack more advanced options like "Forgot Password" or "Sign Up."
+
+### User Interaction:
+- **Add Friend / Remove Friend / Block User Buttons**:
+  - Provide social network-like functionality, enabling relationship management.
+  - Positioned prominently at the top for easy access.
+
+### Post Management:
+- Each post is displayed with:
+  - **Post Author Name**: e.g., "mikelee."
+  - **Content**: A small snippet or full post body.
+  - **Votes**: Upvotes and Downvotes, reflecting community interaction.
+  - **Action Buttons**:
+    - **Upvote/Downvote**: Allows the user to interact with the post's ranking.
+    - **Enable/Disable Comments**: Suggests users or moderators can control engagement with a post.
+    - **Hide Post**: Potentially useful for personal feed customization.
+
+### Comment System:
+- A **Post Comment** button and text input allow users to add their responses.
+- Comments are nested under the respective post, showing:
+  - **Author Information**.
+  - **Voting Options** (similar to posts).
+
+### Post Creation:
+- A **Create Post** section at the bottom for users to share new posts.
+- It's unclear if there’s rich text or multimedia support.
+
+### Search User:
+- A dedicated button for user search, enabling exploration of friends or posts by specific users.
+
+### Logout Button:
+- Positioned at the bottom right, likely for quick session termination.
+
+## Design Choices
+
+### Simple Layout:
+- The layout is linear, with sections stacked vertically. This makes it easy to understand but may feel cluttered when there are many posts or comments.
+- A scrollable area seems to be included to handle content overflow, which is a good choice for scalability.
+
+### Button-Driven Actions:
+- Almost all actions are performed through buttons, making it straightforward for users. However, the lack of icons or tooltips might make it less intuitive for some.
+
+### Focus on Functionality:
+- The design prioritizes functionality over aesthetics. It’s clean and avoids distractions, but it might benefit from better spacing, alignment, or styling to improve readability and user experience.
+
+### Lack of Visual Hierarchy:
+- There is minimal visual distinction between different sections (e.g., posts, comments, and user actions). Adding borders, different colors, or spacing could make it more organized.
+
+### Limited Customization:
+- It seems rigid in terms of user customization (e.g., no themes, font scaling, or layout adjustments). Adding such features could make it more user-friendly.
+
+## Potential Improvements
+
+### UI Enhancements:
+- Use of panels or boxes to clearly delineate different areas (e.g., posts vs. comments).
+- Adding icons for common actions like upvote, downvote, comment, etc., to make them more visually appealing.
+- Employing some color to highlight buttons or important information (e.g., green for "Upvote," red for "Downvote").
+
+### Search and Navigation:
+- Allow filtering or categorization for posts and users.
+- Add a navigation bar for quick access to sections like "Home," "Friends," or "Notifications."
+
+### Responsive Design:
+- Ensure that the interface adapts well to different window sizes, making it usable on smaller screens.
+
+### Feedback and Validation:
+- Add feedback messages for actions (e.g., "Post successfully created!" or "User blocked.").
+- Validate inputs for fields like comments or new posts to improve reliability.
+
+### Accessibility:
+- Add tooltips or placeholders for buttons and fields.
+- Ensure compatibility with screen readers or keyboard navigation for better accessibility.
+
+## Overall
+This GUI has a strong focus on functionality and simplicity, making it approachable for basic use. However, there’s room for improvement in terms of visual design, user experience, and modern UI standards to make it more polished and user-friendly.
+
