@@ -22,6 +22,7 @@ public class Database implements IDatabase {
     private static final Object postIdLock = new Object();
     private static final Object usersLock = new Object();
     private static final Object postsLock = new Object();
+    private static final Object commentsLock = new Object();
     private Map<String, Comment> comments;
 
     // temp
@@ -261,6 +262,9 @@ public class Database implements IDatabase {
         // Display each post
         for (Post post : posts) {
             post = getPostById(post.getId());
+            if (post.isHidden()) {
+                continue;
+            }
 
 
             lines.add("Posted by: " + post.getAuthor().getUsername());
@@ -486,7 +490,7 @@ public class Database implements IDatabase {
 
     // Enable comments for a post
     // Enable comments for a post
-    public void enableCommentsForPost(String postId, User requestedUser) {
+    public String enableCommentsForPost(String postId, User requestedUser) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -495,8 +499,10 @@ public class Database implements IDatabase {
         if (post != null) {
             // Verify that the requested user is the author of the post
             if (!post.getAuthor().equals(requestedUser)) {
-                System.out.println("User " + requestedUser.getUsername() + " is not authorized to enable comments for this post.");
-                return;
+                return ("User " + requestedUser.getUsername() + " is not authorized to enable comments for this post.");
+            }
+            if (post.areCommentsEnabled()) {
+                return "Comments already enabled.";
             }
 
             post.enableComments();
@@ -504,14 +510,14 @@ public class Database implements IDatabase {
                 posts.put(postId, post);
             }
 
-            System.out.println("Comments enabled for post with ID " + postId + " by the author.");
+            return ("Comments enabled for post.");
         } else {
-            System.out.println("Post with ID " + postId + " not found.");
+            return ("Post with ID " + postId + " not found.");
         }
     }
 
     // Disable comments for a post
-    public void disableCommentsForPost(String postId, User requestedUser) {
+    public String disableCommentsForPost(String postId, User requestedUser) {
         Post post;
         synchronized (postsLock) {
             post = posts.get(postId);
@@ -520,18 +526,27 @@ public class Database implements IDatabase {
         if (post != null) {
             // Verify that the requested user is the author of the post
             if (!post.getAuthor().equals(requestedUser)) {
-                System.out.println("User " + requestedUser.getUsername() + " is not authorized to disable comments for this post.");
-                return;
+                return ("User " + requestedUser.getUsername() + " is not authorized to disable comments for this post.");
             }
+
+            Set<String> commentsIDs = post.getComments().keySet();
+            synchronized (commentsLock) {
+                for (String commentId : commentsIDs) {
+                    comments.remove(commentId);  // Remove each comment from the map
+                }
+            }
+
+
+
 
             post.disableComments();
             synchronized (postsLock) {
                 posts.put(postId, post);
             }
 
-            System.out.println("Comments disabled for post with ID " + postId + " by the author.");
+            return ("Comments disabled for post.");
         } else {
-            System.out.println("Post with ID " + postId + " not found.");
+            return ("Post with ID " + postId + " not found.");
         }
     }
 
@@ -614,7 +629,7 @@ public class Database implements IDatabase {
             for (Post post : posts.values()) {
                 // Write post ID, content, author, upvotes, and downvotes
                 writer.write(post.getId() + "," + post.getContent() + "," + post.getAuthor().getUsername() + ","
-                        + post.getUpVotes() + "," + post.getDownVotes() + "\n");
+                        + post.getUpVotes() + "," + post.getDownVotes() + "," + post.areCommentsEnabled() + "," + post.isHidden() + "\n");
                 System.out.println("Post created with ID: " + post.getId() + " Upvotes: " + post.getUpVotes() + " Downvotes: " + post.getDownVotes()); // Debugging line
             }
             // Write Comments
@@ -722,12 +737,14 @@ public class Database implements IDatabase {
                     case "POSTS":
                         // Parse posts
                         String[] postDetails = line.split(",");
-                        if (postDetails.length == 5) {  // Make sure there are enough elements for a post
+                        if (postDetails.length == 7) {  // Make sure there are enough elements for a post
                             String postId = postDetails[0].trim();
                             String content = postDetails[1].trim();
                             String authorUsername = postDetails[2].trim();
                             int upVotes = Integer.parseInt(postDetails[3].trim());
                             int downVotes = Integer.parseInt(postDetails[4].trim());
+                            boolean commentsEnabled = Boolean.valueOf(postDetails[5].trim());
+                            boolean isHidden = Boolean.valueOf(postDetails[6].trim());
 
                             User postAuthor = this.getUserByUsername(authorUsername);
                             List<Post> a = postAuthor.getPosts();
@@ -741,10 +758,10 @@ public class Database implements IDatabase {
                             if (exists) {
                                 continue;
                             }
-                            a.add(new Post(postId, content, postAuthor, upVotes, downVotes));
+                            a.add(new Post(postId, content, postAuthor, upVotes, downVotes, commentsEnabled, isHidden));
                             postAuthor.setPosts(a);
                             if (postAuthor != null) {
-                                this.addPost(new Post(postId, content, postAuthor, upVotes, downVotes));
+                                this.addPost(new Post(postId, content, postAuthor, upVotes, downVotes, commentsEnabled, isHidden));
                             }
                         }
                         break;
