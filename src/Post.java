@@ -22,7 +22,7 @@ public class Post implements IPost {
         this.content = content;
         this.author = author;
     }
-    public Post(String id, String content, User author, int upVotes, int downVotes) {
+    public Post(String id, String content, User author, int upVotes, int downVotes, boolean commentsEnabled, boolean hidden) {
         this.id = id;
         this.content = content;
         this.author = author;
@@ -66,14 +66,17 @@ public class Post implements IPost {
 
     public boolean areCommentsEnabled() {
         return commentsEnabled;
+
     }
 
     public void enableComments() {
+        comments = new HashMap<>();
         commentsEnabled = true;
     }
 
     public void disableComments() {
         commentsEnabled = false;
+        comments.clear();
     }
 
     public boolean isHidden() {
