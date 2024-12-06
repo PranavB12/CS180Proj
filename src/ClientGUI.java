@@ -103,6 +103,62 @@ public class ClientGUI extends JFrame {
 
         feedPanel.add(createPostPanel, BorderLayout.SOUTH);
 
+        /*
+        add remove block friends
+         */
+        // Inside the ClientGUI constructor (where feedPanel is set up)
+
+        // Inside the ClientGUI constructor (where feedPanel is set up)
+
+        // Create a separate panel for friend management buttons
+        JPanel friendManagementPanel = new JPanel();
+        friendManagementPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        // Add Friend Management Buttons
+        JButton addFriendButton = new JButton("Add Friend");
+        JButton removeFriendButton = new JButton("Remove Friend");
+        JButton blockUserButton = new JButton("Block User");
+
+        // Set smaller sizes for the buttons
+        addFriendButton.setPreferredSize(new Dimension(100, 25));
+        removeFriendButton.setPreferredSize(new Dimension(100, 25));
+        blockUserButton.setPreferredSize(new Dimension(100, 25));
+
+        // Add buttons to the friendManagementPanel
+        friendManagementPanel.add(addFriendButton);
+        friendManagementPanel.add(removeFriendButton);
+        friendManagementPanel.add(blockUserButton);
+
+        // Add the friendManagementPanel to the top of feedPanel
+        feedPanel.add(friendManagementPanel, BorderLayout.NORTH);
+
+        // Add Event Listeners for Friend Management Buttons
+        addFriendButton.addActionListener(e -> {
+            String friendUsername = JOptionPane.showInputDialog(this, "Enter the username of the friend to add:");
+            if (friendUsername != null && !friendUsername.trim().isEmpty()) {
+                String response = handleRequest("ADD_FRIEND " + currentUser + " " + friendUsername.trim());
+                JOptionPane.showMessageDialog(this, response);
+            }
+        });
+
+        removeFriendButton.addActionListener(e -> {
+            String friendUsername = JOptionPane.showInputDialog(this, "Enter the username of the friend to remove:");
+            if (friendUsername != null && !friendUsername.trim().isEmpty()) {
+                String response = handleRequest("REMOVE_FRIEND " + currentUser + " " + friendUsername.trim());
+                JOptionPane.showMessageDialog(this, response);
+            }
+        });
+
+        blockUserButton.addActionListener(e -> {
+            String blockUsername = JOptionPane.showInputDialog(this, "Enter the username of the user to block:");
+            if (blockUsername != null && !blockUsername.trim().isEmpty()) {
+                String response = handleRequest("BLOCK_USER " + currentUser + " " + blockUsername.trim());
+                JOptionPane.showMessageDialog(this, response);
+            }
+        });
+
+
+
         // Add panels to frame
         getContentPane().add(loginPanel, BorderLayout.NORTH);
         getContentPane().add(feedPanel, BorderLayout.CENTER);
