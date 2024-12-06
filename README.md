@@ -26,6 +26,8 @@
 - Submitted to Vocareum workspace.
 #### Phase 2: Pranav Bansal -`bansa124@purdue.edu`
 - Submitted to Vocareum workspace.
+#### Phase 3: Pranav Bansal -`bansa124@purdue.edu`
+- Submitted to Vocareum workspace.
 --------------------------------------------------------------------------------------------------------------------------------------------
 ### Class Descriptions
 
