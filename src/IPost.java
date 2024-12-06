@@ -1,18 +1,8 @@
 package src;
 
-/**
- * Group Project - CS18000 Gold
- *
- * interface for post class
- *
- * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee, Vaishnavi Sharma, lab sec 37
- *
- * @version November 19, 2024
- *
- */
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 
 public interface IPost {
     String getId();
@@ -33,4 +23,5 @@ public interface IPost {
     void downvote(String username);
     void addComment(String id, Comment comment);
     void deleteComment(String commentId, User requestedUser);
+    void setComments(Map<String, Comment> comments);
 }
