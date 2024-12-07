@@ -431,6 +431,9 @@ public class Server implements IServer, Runnable {
                         String[] parts = arguments.split(" ", 1);
                         String username = parts[0];
                         User user = server.database.findUserByUsername(username);
+                        if (user == null) {
+                            return null;
+                        }
                         return "Username: " + username + "--Actual Name: " + user.getName() + "--Description: " + user.getDescription();
 
                     }
