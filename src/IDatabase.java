@@ -1,5 +1,17 @@
 package src;
 import java.util.*;
+
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Database class interface
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
+
 public interface IDatabase {
     Map<String, Comment> getComments();
     List<User> getUsers();
