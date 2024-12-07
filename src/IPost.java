@@ -3,6 +3,16 @@ package src;
 
 import java.util.*;
 
+/**
+ * Group Project - CS18000 Gold
+ *
+ * Post class interface
+ *
+ * @author Pranav Bansal, Vivaan Malhotra, Rishi Rao, Mike Lee lab sec 37
+ *
+ * @version November 19, 2024
+ *
+ */
 
 public interface IPost {
     String getId();
