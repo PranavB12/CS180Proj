@@ -15,7 +15,6 @@ import java.io.*;
  */
 public class Database implements IDatabase {
 
-
     private List<User> users = new ArrayList<>();
     private Map<String, Post> posts = new HashMap<>();
     private static int postIdCounter = 0;
