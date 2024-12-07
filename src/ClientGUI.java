@@ -235,7 +235,9 @@ public class ClientGUI extends JFrame {
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(ClientGUI.this, "Error communicating with the server.", "Communication Error", JOptionPane.ERROR_MESSAGE);
             }
+            showNewsFeed();
         }
+
     }
 
     // ActionListener for registration

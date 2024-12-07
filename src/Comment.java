@@ -12,7 +12,7 @@ import java.util.UUID;
  * @version November 19, 2024
  *
  */
-public class Comment {
+public class Comment implements IComment {
     private String comment;
     private String ID;
     private User author;
