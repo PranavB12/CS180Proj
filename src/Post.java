@@ -15,7 +15,6 @@ import java.util.Set;
  * @version November 19, 2024
  *
  */
-
 public class Post implements IPost {
     private final String id;
     private final String content;
@@ -72,7 +71,7 @@ public class Post implements IPost {
     }
 
     public Map<String, Comment> getComments() {
-        return new HashMap<>(comments); // Return a copy to avoid exposing internal state
+        return comments;
     }
 
     public boolean areCommentsEnabled() {
