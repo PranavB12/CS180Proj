@@ -126,15 +126,14 @@ public class Database implements IDatabase {
         // Generate a unique post ID using UUID
         String postId = UUID.randomUUID().toString();
         Post post = new Post(postId, content, author);
-
+        List<Post> p = author.getPosts();
+        p.add(post);
+        author.setPosts(p);
+        updateUserInDatabase(author);
 
 
         // Update the user in the users list
-        for (int i = 0; i < users.size(); i++) {
-            if (author.equals(users.get(i))) {
-                users.set(i, author);
-            }
-        }
+
 
         // Add the post to the posts map
         synchronized (postsLock) {
@@ -195,7 +194,7 @@ public class Database implements IDatabase {
     // Add a friend to a user's friend list
     public synchronized boolean addFriend(User user, User friend) {
         user = getUserByUsername(user.getUsername());
-        
+
         List<User> a = user.getBlockedUsers();
         a.remove(friend);
         user.setBlockedUsers(a);
@@ -337,6 +336,17 @@ public class Database implements IDatabase {
             try {
                 comment.upvote(requestedUser.getUsername());
                 synchronized (postsLock) {
+                    Post post = getPostById(comment.getPostID());
+
+                    Map<String, Comment> commentss = post.getComments();
+                    if (commentss.containsKey(commentID)) {
+                        commentss.put(commentID, comment); // Replace the comment with the new one
+                    }
+                    post.setComments(commentss);
+                    if (posts.containsKey(post.getId())) {
+                        posts.put(post.getId(), post); // Replace the comment with the new one
+                    }
+
                     comments.put(comment.getID(), comment);
                 }
                 System.out.println("Comment with ID " + commentID + " upvoted by " + requestedUser.getUsername() + ".");
@@ -357,6 +367,16 @@ public class Database implements IDatabase {
             try {
                 comment.downvote(requestedUser.getUsername());
                 synchronized (postsLock) {
+                    Post post = getPostById(comment.getPostID());
+
+                    Map<String, Comment> commentss = post.getComments();
+                    if (commentss.containsKey(commentID)) {
+                        commentss.put(commentID, comment); // Replace the comment with the new one
+                    }
+                    post.setComments(commentss);
+                    if (posts.containsKey(post.getId())) {
+                        posts.put(post.getId(), post); // Replace the comment with the new one
+                    }
                     comments.put(comment.getID(), comment);
                 }
                 System.out.println("Post with ID " + commentID + " downvoted by " + requestedUser.getUsername() + ".");
