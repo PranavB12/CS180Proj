@@ -23,27 +23,46 @@ public class Comment implements IComment {
     private Set<String> downvoters = new HashSet<>();
 
     public Comment(String comment, User author, String postID) {
+        if (comment == null || comment.isEmpty()) {
+            throw new IllegalArgumentException("Comment cannot be null or empty.");
+        }
+        if (author == null) {
+            throw new IllegalArgumentException("Author cannot be null.");
+        }
+        if (postID == null || postID.isEmpty()) {
+            throw new IllegalArgumentException("Post ID cannot be null or empty.");
+        }
+
         this.comment = comment;
-        String Id = UUID.randomUUID().toString();
-        this.ID = Id;
+        this.ID = UUID.randomUUID().toString();
         this.upVotes = 0;
         this.downVotes = 0;
         this.postID = postID;
         this.author = author;
-
-
     }
 
     public Comment(String comment, User author, String postID, String commentId, int upVotes, int downVotes) {
+        if (comment == null || comment.isEmpty()) {
+            throw new IllegalArgumentException("Comment cannot be null or empty.");
+        }
+        if (author == null) {
+            throw new IllegalArgumentException("Author cannot be null.");
+        }
+        if (postID == null || postID.isEmpty()) {
+            throw new IllegalArgumentException("Post ID cannot be null or empty.");
+        }
+        if (commentId == null || commentId.isEmpty()) {
+            throw new IllegalArgumentException("Comment ID cannot be null or empty.");
+        }
+
         this.comment = comment;
         this.ID = commentId;
         this.upVotes = upVotes;
         this.downVotes = downVotes;
         this.postID = postID;
         this.author = author;
-
-
     }
+
 
 
     public String getPostID() {
