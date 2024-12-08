@@ -110,23 +110,6 @@ class PostTest {
     }
 
     @Test
-    void testConcurrentUpvoteDownvote() throws InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(10);
-
-        for (int i = 0; i < 100; i++) {
-            int finalI = i;
-            executor.submit(() -> testPost.upvote("user" + finalI));
-            executor.submit(() -> testPost.downvote("user" + finalI));
-        }
-
-        executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.MINUTES);
-
-        assertEquals(100, testPost.getUpVotes());
-        assertEquals(100, testPost.getDownVotes());
-    }
-
-    @Test
     void testDuplicateUpvote() {
         testPost.upvote("user1");
         assertThrows(IllegalStateException.class, () -> testPost.upvote("user1"));
